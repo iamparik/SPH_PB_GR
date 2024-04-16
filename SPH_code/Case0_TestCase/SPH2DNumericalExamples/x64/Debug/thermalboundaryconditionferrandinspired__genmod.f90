@@ -1,0 +1,9 @@
+        !COMPILER-GENERATED INTERFACE MODULE: Tue Apr  9 18:25:31 2024
+        ! This source file is for reference only and may not completely
+        ! represent the generated interface used by the compiler.
+        MODULE THERMALBOUNDARYCONDITIONFERRANDINSPIRED__genmod
+          INTERFACE 
+            SUBROUTINE THERMALBOUNDARYCONDITIONFERRANDINSPIRED
+            END SUBROUTINE THERMALBOUNDARYCONDITIONFERRANDINSPIRED
+          END INTERFACE 
+        END MODULE THERMALBOUNDARYCONDITIONFERRANDINSPIRED__genmod
