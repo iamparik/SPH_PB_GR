@@ -1,0 +1,123 @@
+program SPH3D
+ 
+!-------------------------------------------------------
+! Program for running Boundary Integral SPH
+! Author- Parikshit B            
+!
+!   CREATED:        04/13/2022       by  PARIKSHIT BOREGOWDA
+!   Last Modified:  04/17/2022       by  PARIKSHIT BOREGOWDA 
+!-------------------------------------------------------
+
+use particle_data ,   only: rho,p,mu, x,vx,mass, temp, &
+        & hsml,itype,surf_norm,edge,nedge_rel_edge,itimestep, etype, &
+        & dgrho_prev, drho , rho_prev, xStart, ntotal
+use config_geometry
+use config_parameter, only: SPH_dim
+
+implicit none
+
+!--------------------------------------
+!inputTimeStep : An integer Paramter that decides the number of time step iterations 
+!                to be run for the simulation
+!maztimestep : An integer Paramter that logs the maximum time step iterations
+!yesorno :   An integer paramter,that implies no for 0
+!            and yes for 1
+!ic1,ic2 :   Counters to note clock time 
+!crate1, cmax1  :   Itneger kind 8 coutns time in Microseconds
+!                    and is used for calling function SYSTEM_CLOCK
+!--------------------------------------
+
+
+integer(4) inputTimeStep,maxtimestep, yesorno
+integer(8) :: ic1, crate1, cmax1, ic2
+logical ::  runSPH = .true.
+
+
+    call read_config_file
+
+   
+!start system clock to evealuate time taken to run
+! System_clock returns number of seconds from 00:00 CUT on 1 Jan 1970
+call system_clock(count=ic1, count_rate=crate1, count_max=cmax1)
+
+call minTimeStep
+
+!A series of subroutines are now run to initialize the particles, and obtain input file
+write(*,*)'  ***************************************************'
+write(*,*) 'Are you going to input external input file or back up file?'
+write(*,*) '(0=No Input file, 1=new external input file, 2=continue from backup file)'
+write(*,*)'  ***************************************************'
+read (*,*) yesorno
+
+
+! Maximum number of timesteps, and ith time step variables are initiatilized as 0 
+maxtimestep=0
+itimestep=0
+
+!The below requires the user to input on the terminal the maximum time step to run the simulation
+  write(*,*)'  ***************************************************'
+  write(*,*)'          Please input the maximal time steps to run simulations'
+  write(*,*)'  ***************************************************'
+  read(*,*) inputTimeStep
+
+
+
+! All particles are created, labeled, and retrieved to start calculations
+if(yesorno.eq.0) then    
+    !call input
+elseif(yesorno.eq.1) then
+    ! run packing algorithm according to user input
+    if(packagingIterations >0) call inputParticlePacking
+    call inputExt
+elseif(yesorno.eq.2) then
+    call backupInput(itimestep)
+endif
+
+Allocate(xStart(SPH_dim,ntotal))
+xStart=x
+    
+ maxtimestep=maxtimestep + inputTimeStep
+write(*,*)' Starting time step for simulation = ',itimestep, ' Ending time step for simulation = ', maxtimestep
+  
+do while (runSPH)
+    call SPH_operator(maxtimestep)
+
+    !call analytical_operator(maxtimestep)
+
+    !Now net time is calculated
+    call system_clock(count=ic2)
+    write (*,*)'        Elapsed time = ', (ic2-ic1)/real(crate1), 'sec'
+ 
+    !computations completed for the maximum timesteps input, the user hits 0 on terminal to end simulation
+    ! or 1 on terminal to continue simulation.
+    write(*,*)'  ***************************************************'
+    write(*,*) 'Are you going to run more time steps ? (0=No, 1=yes)'
+    write(*,*)'  ***************************************************'
+    read (*,*) yesorno
+    
+    if(yesorno .eq. 0) then
+        runSPH =.false.
+    else
+        write(*,*)'  ***************************************************'
+        write(*,*)'   Please input the additional time steps to continue running the simulation '
+        write(*,*)' Current int for timestep is int 4 hence max value permissible is 2,147,483,647'
+        write(*,*)'           Current timesteps run is ', maxtimestep
+        write(*,*)'  ***************************************************'
+        read(*,*) inputTimeStep
+        maxtimestep=maxtimestep + inputTimeStep
+        write(*,*)' This simulation will run for is ', maxtimestep , 'time steps'
+    endif    
+    
+end do
+!All allocated variables need to be deallocated so that the memory is freed
+
+DEALLOCATE(x,vx,mass, rho, p, hsml, itype, mu, temp, xStart) 
+Deallocate(surf_norm, edge,nedge_rel_edge, etype )
+
+if(Allocated(dgrho_prev)) DEALLOCATE(dgrho_prev)
+if(Allocated(drho)) DEALLOCATE(drho)
+if(Allocated(rho_prev)) DEALLOCATE(rho_prev)
+
+!Pause is used so that the terminal is closed only after hitting enter/return on keyboard
+pause 
+end program

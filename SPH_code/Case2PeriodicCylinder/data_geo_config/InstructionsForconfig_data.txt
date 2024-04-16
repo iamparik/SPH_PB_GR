@@ -1,0 +1,66 @@
+time_step 4.D-5
+
+print_step 10
+
+save_step 10
+
+backup_step 1000000
+
+dx_r 4.D-2
+
+ExtInputMeshType 1
+Following value possible:
+1 => Cartesian grid with particle_area=tot_area/nreal
+2 => Cartesian grid with particle_area=dx_r**(dimension)
+3 => Polynomial mesh with particle_area=tot_area/nreal
+4 => Polynomial mesh with particle_area=element_area
+
+packagingIterations 500
+
+hsml_const 8.D-2
+
+rho_init 1000.D0
+
+mu_const 1.D1
+
+hydroStaticHeight 1.D0
+
+g_const 9.81D0
+
+ref_vel_max	7.D0
+
+c_sound	70.D0
+
+F_ext_x	0.D0
+
+F_ext_y	0.D0
+
+NumericalSimCase 4 
+
+timeIntegrationScheme 1
+
+BILtype 10
+
+PrsrGradtype 14
+
+ConDivtype 8
+
+SumDenstype 3
+
+summationDensity 0
+
+artViscType 0
+
+MLS_density_bound 0
+
+MLS_step 1
+
+densDiffType 6
+
+delta_SPH 0.1D0
+
+prsrBdryType 4
+
+HG_density_correction 1
+
+PSTGradtype 1
