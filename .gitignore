@@ -363,5 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # Folders with data_output and data_packing should not be synced
-/data_packing*/
+/data_packing/*
 /data_output*/
