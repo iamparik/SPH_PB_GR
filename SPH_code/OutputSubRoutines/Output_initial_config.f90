@@ -32,6 +32,7 @@ subroutine  output_initial_config
         temp=0.D0
     endif
     
+    call createOutputFolder(dataOutputPath)
     
     if( dynamicProblem) then 
          call ConcGradient

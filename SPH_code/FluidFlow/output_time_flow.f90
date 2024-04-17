@@ -30,7 +30,7 @@ subroutine  output_time_flow(itimestep,dt)
 
     
     if (itimestep .eq. 1) then
-        if (iterStep .eq. 1) call createOutputFolder(dataOutputPath)
+        if (itimestep .eq. 1) call createOutputFolder(dataOutputPath)
         !!     output result in tecplot format
         !write(x2name, '(A,A)') dataOutputPath,'/energy.dat'
         !open (1, file = x2name)
