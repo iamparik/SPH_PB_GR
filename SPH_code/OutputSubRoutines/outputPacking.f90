@@ -20,11 +20,12 @@ subroutine  outputPacking(iterStep, saveStep, TPD)
 !                   d:      A variable used to iterate dimensions
 !                   xname:  Path of the file which needs to be created
 !------------------------------------------------------------------------
-    integer(4):: i,d,s, iterStep,f_dim,saveStep
+    integer(4):: a,d,s, iterStep,f_dim,saveStep
     character (40) :: xname, x2name
     real(8) :: TPD
     logical :: text_print
 
+    if (iterStep .eq. 1) call createOutputFolder(dataPackingPath)
     
 !     output result as a continous plot against time   
     if (iterStep .eq. 1) then
@@ -74,7 +75,7 @@ subroutine  outputPacking(iterStep, saveStep, TPD)
     
         ! First export data of all real particles ( not on boundary)
         do a = 1,ntotal
-            if((itype(i) .le. itype_real_max) .and. (itype(i) .gt. itype_real_min))  then
+            if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min))  then
                 if(text_print) write(1,'(A)')'ZONE T="Real Particles",F=Point,C=Blue'
                write(1,*) (x(d, a), d=1,SPH_dim)
                 text_print=.false. 
@@ -89,7 +90,7 @@ subroutine  outputPacking(iterStep, saveStep, TPD)
         do s=1,etotal 
             if((etype(s) .le. etype_real_max) .and. (etype(s) .ge. etype_real_min)) then
                 if(text_print) write(1,'(A)')'ZONE T="Edge Particles",F=Point,C=Red'
-	            i=nedge_rel_edge(s)  ! this needs to be changed for edges with mroe than one poitn representation. This will then be itereated 
+	            a=nedge_rel_edge(s)  ! this needs to be changed for edges with mroe than one poitn representation. This will then be itereated 
                 write(1,*) (x(d, a), d=1,SPH_dim)
                 text_print=.false.
             endif                                       
@@ -98,8 +99,8 @@ subroutine  outputPacking(iterStep, saveStep, TPD)
         text_print=.true.       
     
     ! Export all Ghost particles/ponts.    
-        do i=1, ntotal
-            if(itype(i) .eq. 0) then
+        do a=1, ntotal
+            if(itype(a) .eq. 0) then
                 if(text_print)  write(1,'(A)')'ZONE T="Edge vertices",F=Point,C=Black'
                 write(1,*) (x(d, a), d=1,SPH_dim)
                 text_print=.false.
