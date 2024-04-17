@@ -26,6 +26,7 @@ subroutine  output_flow_simplified(itimestep,dt)
     character (40) :: xname, x2name 
     logical :: text_print
 
+    if (iterStep .eq. 1) call createOutputFolder(dataOutputPath)
     
     !call gamma_density_continuous_leroy
     

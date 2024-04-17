@@ -9,13 +9,10 @@
 !   CREATED:        09/13/2017       by  PARIKSHIT BOREGOWDA
 !   Last Modified:  10/17/2023        by  PARIKSHIT BOREGOWDA 
 !****************************************************************************      
-subroutine  outputPacking(iterStep, saveStep)
+subroutine  outputPacking(iterStep, saveStep, TPD)
     use config_parameter, only:dataPackingPath, SPH_dim, itype_real_max, itype_real_min, &
-        & etype_real_max, etype_real_min, etype_virtual, itype_virtual, itype_periodic
-    use particle_data ,   only: x, mass, rho, p, vx, nedge_rel_edge, &
-        & ntotal,etotal, itype, etype, gamma_cont, gamma_discrt, KE, PE,TE,max_vel, &
-        & del_gamma,delC, delcAvg, delCMax, delCL2, &
-        & ga_Max,ga_Avg,ga_L2, g_a_min, g_a_max
+            & etype_real_max, etype_real_min, etype_virtual, itype_virtual, itype_periodic
+    use particle_data ,   only: x, itype, etype, nedge_rel_edge, ntotal, etotal
     
     implicit none
 !----------------------------------------------------------------------           
@@ -23,26 +20,27 @@ subroutine  outputPacking(iterStep, saveStep)
 !                   d:      A variable used to iterate dimensions
 !                   xname:  Path of the file which needs to be created
 !------------------------------------------------------------------------
-    integer(4):: i,d,s, iterStep,f_dim,saveStep
+    integer(4):: a,d,s, iterStep,f_dim,saveStep
     character (40) :: xname, x2name
+    real(8) :: TPD
     logical :: text_print
 
-!     output result in tecplot format  
+    if (iterStep .eq. 1) call createOutputFolder(dataPackingPath)
+    
+!     output result as a continous plot against time   
     if (iterStep .eq. 1) then
         write(x2name, '(A,A)') dataPackingPath,'/energy.dat'
         open (1, file = x2name)
-        write(1,'(A)') 'variables = Iterations, KE, PE, TE, u_max , delcAvg, delCMax, delCL2, ga_Max, ga_Avg, ga_L2, g_a_min, g_a_max '
+        write(1,'(A)') 'variables = Iterations, TPD '
         close(1)
-    elseif (mod(iterStep,saveStep).eq.0) then
+    elseif (mod(iterStep,100).eq. 0) then
         write(x2name, '(A,A)') dataPackingPath,'/energy.dat'
         open (1, file = x2name,  position='append')
-        do i=1,saveStep
-            write(1,1002) iterStep-saveStep+i, KE(i), PE(i), TE(i), max_vel(i), delcAvg(i), delCMax(i), delCL2(i), &
-                &  ga_Max(i) ,ga_Avg(i) ,ga_L2(i), g_a_min(i), g_a_max(i)
-        enddo
+        write(1,*) iterStep, TPD
         close(1)
     endif
     
+! output resultsof each time step as particle position
     if ((iterStep .eq. 1) .or. (mod(iterStep,saveStep).eq.0)) then
         !     output result in tecplot format
         if(iterStep.eq.0) then
@@ -71,41 +69,29 @@ subroutine  outputPacking(iterStep, saveStep)
         write (1, '(A)') 'title="Starting Config"'
 
     !   Specify variables that need to be read by tecplot to correspond to the data fed
-    ! for 3D output 
-        if(SPH_dim.eq.3)    write(1,*) 'variables = x, y, z, mass, rho, vx, vy, vz, gamma_cont, gamma_discrt, dgammax, dgammay, dgammaz, delCx, delCy, delCz '
-    ! for 2D output
-        if(SPH_dim.eq.2)    write(1,*) 'variables = x, y, mass, rho, vx, vy,gamma_cont, gamma_discrt, dgammax, dgammay, delCx, delCy'
-    ! for 1D output
-        if(SPH_dim.eq.1)    write(1,*) 'variables = x, mass, rho, temp, vx, gamma_cont, gamma_discrt, dgammax, delCx '
-  
-    text_print=.true.
-    ! First export data of all real particles ( not on boundary)
-    
-        do i=1,ntotal
-            if((itype(i) .le. itype_real_max) .and. (itype(i) .gt. itype_real_min))  then
-                if(text_print) write(1,'(A)')'ZONE T="Real Particles",F=Point,C=Blue'
-                write(1,1001) (x(d, i), d=1,SPH_dim), mass(i),rho(i), (vx(d, i), d = 1, SPH_dim), gamma_cont(i), gamma_discrt(i), (del_gamma(d, i), d = 1, SPH_dim), (delC(d, i), d = 1, SPH_dim)
-                text_print=.false. 
-            endif
+        write(1,*) 'variables = x, y'
         
-            if(itype(i) .eq. itype_real_min) then
-                rho(i) =0.D0
-                vx(:,i)=0.D0
-                p(i)=0.D0
-            endif
-        
-        enddo
-        
-    
         text_print=.true.
-    ! Export data of all particles representative of boundary, which are used in interpolation,
+    
+        ! First export data of all real particles ( not on boundary)
+        do a = 1,ntotal
+            if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min))  then
+                if(text_print) write(1,'(A)')'ZONE T="Real Particles",F=Point,C=Blue'
+               write(1,*) (x(d, a), d=1,SPH_dim)
+                text_print=.false. 
+            endif            
+        enddo  
+        
+        text_print=.true.
+        
+         ! Export data of all particles representative of boundary, which are used in interpolation,
     ! called edge particles
     
         do s=1,etotal 
             if((etype(s) .le. etype_real_max) .and. (etype(s) .ge. etype_real_min)) then
                 if(text_print) write(1,'(A)')'ZONE T="Edge Particles",F=Point,C=Red'
-	            i=nedge_rel_edge(s)  ! this needs to be changed for edges with mroe than one poitn representation. This will then be itereated 
-                write(1,1001) (x(d, i), d=1,SPH_dim), mass(i),rho(i), (0.D0, d = 1, SPH_dim),  gamma_cont(i), gamma_discrt(i), (del_gamma(d, i), d = 1, SPH_dim), (delC(d, i), d = 1, SPH_dim)
+	            a=nedge_rel_edge(s)  ! this needs to be changed for edges with mroe than one poitn representation. This will then be itereated 
+                write(1,*) (x(d, a), d=1,SPH_dim)
                 text_print=.false.
             endif                                       
         enddo
@@ -113,22 +99,14 @@ subroutine  outputPacking(iterStep, saveStep)
         text_print=.true.       
     
     ! Export all Ghost particles/ponts.    
-        do i=1, ntotal
-            if(itype(i) .eq. 0) then
+        do a=1, ntotal
+            if(itype(a) .eq. 0) then
                 if(text_print)  write(1,'(A)')'ZONE T="Edge vertices",F=Point,C=Black'
-                write(1,1001) (x(d, i), d=1,SPH_dim),0,0, (0, d = 1, SPH_dim), 0, 0, (del_gamma(d, i), d = 1, SPH_dim), (delC(d, i), d = 1, SPH_dim)  
+                write(1,*) (x(d, a), d=1,SPH_dim)
                 text_print=.false.
             endif
         enddo
     endif
-
-!Here is a readable format in which the data is stored
-1001  format(12(2x,e22.10))    ! i am using Maximum, it was 9 before
-
-1002  FORMAT(I10, 12(2X, e22.10))    ! i am using Maximum, it was 9 before
-
-
-      
       close(1)
 
 end
