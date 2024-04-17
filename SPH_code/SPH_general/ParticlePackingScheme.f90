@@ -106,30 +106,8 @@ subroutine ParticlePackingScheme(iterStep)
         endif
     enddo
     
-    
-    
-    if (iterStep .eq. 1) then
-        write(x2name, '(A,A)') dataPackingPath,'/energy.dat'
-        open (1, file = x2name)
-        write(1,'(A)') 'variables = Iterations, TPD '
-        close(1)
-    elseif (mod(iterStep,100).eq. 0) then
-        write(x2name, '(A,A)') dataPackingPath,'/energy.dat'
-        open (1, file = x2name,  position='append')
-        write(1,*) iterStep, TPD
-        close(1)
-    endif
-    
-    if(mod(iterStep,100).eq. 0) then
-        write(xname, '(A, A, I7, A)') dataPackingPath, '/', iterStep + 1000000,'step_xv.dat'
-        open (1, file = xname) 
-        write(1,*) 'variables = x, y'
-        do a = 1,ntotal
-            write(1,*) (x(d, a), d=1,SPH_dim)
-        enddo
-        close(1)
-    endif
-    
+    call outputPacking(iterstep,100,TPD)
+  
     ! Now we check if for every 1000 steps if the TPD is unchanged compared to its previous value
     if( .not. FirstCutoffStep) then
         if(mod(iterstep,1000) .eq. 0) then
