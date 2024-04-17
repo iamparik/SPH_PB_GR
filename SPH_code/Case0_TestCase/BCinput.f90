@@ -14,7 +14,7 @@ subroutine BCinput(etype, tempType)
     
     if(tempType .eq. 3) etype = 3
         
-    if(tempType .eq. 3) etype = 3  
+    if(tempType .eq. 4) etype = 3  
 
 
 end subroutine
