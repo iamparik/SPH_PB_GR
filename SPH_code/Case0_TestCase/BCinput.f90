@@ -8,6 +8,8 @@
 !****************************************************************************
 subroutine BCinput(etype, tempType)
 
+integer etype, tempType
+
     if(tempType .eq. 1) etype = 3
         
     if(tempType .eq. 2) etype = 3
