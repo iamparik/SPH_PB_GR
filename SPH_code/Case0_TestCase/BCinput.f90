@@ -10,13 +10,13 @@ subroutine BCinput(etype, tempType)
 
 integer etype, tempType
 
-    if(tempType .eq. 1) etype = 3
+    if(tempType .eq. 1) etype = 2
         
-    if(tempType .eq. 2) etype = 3
+    if(tempType .eq. 2) etype = 2
     
-    if(tempType .eq. 3) etype = 3
+    if(tempType .eq. 3) etype = 2
         
-    if(tempType .eq. 4) etype = 3  
+    if(tempType .eq. 4) etype = 2  
 
 
 end subroutine

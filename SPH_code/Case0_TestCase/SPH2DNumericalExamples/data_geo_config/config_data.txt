@@ -4,7 +4,7 @@ save_step 1
 backup_step 1000000
 dx_r 1.D-2
 ExtInputMeshType 2
-packagingIterations 5000
+packagingIterations 0
 hsml_const 2.D-2
 rho_init 1000.D0
 mu_const 1.D1
