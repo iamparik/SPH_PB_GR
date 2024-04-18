@@ -2,10 +2,10 @@ time_step 1.D-5
 print_step 1
 save_step 1
 backup_step 1000000
-dx_r 1.D-2
+dx_r 1.6D-3
 ExtInputMeshType 2
 packagingIterations 0
-hsml_const 2.D-2
+hsml_const 3.2D-3
 rho_init 1000.D0
 mu_const 1.D1
 hydroStaticHeight 1.D0
