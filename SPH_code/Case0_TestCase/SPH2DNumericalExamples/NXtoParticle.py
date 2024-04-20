@@ -18,10 +18,10 @@ from concurrent.futures import ThreadPoolExecutor
 # ---- General variables defined for all functions ---
 
 # Approximate value of particle spacing
-dx_r = float(input("Enter particle spacing (size of grid) in the .dat file units \n"))
+dx_r = 2.0 #float(input("Enter particle spacing (size of grid) in the .dat file units \n"))
 
 #Converting Units to meters
-unitConversion = float(input("\nTo convert input units to new output units, \n enter for 1 output units = ??? input units \n"))
+unitConversion = 1000 #float(input("\nTo convert input units to new output units, \n enter for 1 output units = ??? input units \n"))
 
 #tolerance to cutoff a grid point wrt bdry edge
 bdry_tol=dx_r/8.0
@@ -429,7 +429,7 @@ def main():
     output_cartesianfile_path = "data_geo_config/input_particles_cartesianMesh.dat"
     prlBool = True
     if os.path.exists(input_file_path_Bulkbdry):
-        print(" ****************************\n bulkBdry.dat file is processed to : \n generate particles on background grid and \n to process boundnary elements \n ****************************")
+        print(" ****************************\n bulkBdry.dat file is processed to : \n generate particles on background grid and \n to process boundary elements \n ****************************")
         totalNum1DElements_Bulkbdry, totalNum2DElements_Cartesian = bulkBdryCase2D(input_file_path_Bulkbdry,output_file_path_Bulkbdry, output_cartesianfile_path, dx_r, bdry_tol, prlBool)
     else:
         totalNum1DElements_Bulkbdry = 0
