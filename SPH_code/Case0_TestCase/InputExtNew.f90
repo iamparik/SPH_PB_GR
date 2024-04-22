@@ -48,8 +48,8 @@
     enddo
     close(1)
     
-    maxedge=nEdomainBdry
-    maxnv=3 *maxedge
+    maxedge=nEdomainBdry*2
+    maxnv=3 *maxedge *2
     additionalParticles= 100 ! This is necessary only if expect to use periodic particles, or unflow, outflow particles
     if (packagingIterations .eq. 0) then
         maxn= max(nrealMesh, nrealCartesian) +maxnv +additionalParticles

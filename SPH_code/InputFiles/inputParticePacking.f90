@@ -133,7 +133,7 @@
         s=s+1
         read(1,*) tempType, (tempX(d,1), d=1,SPH_dim), (tempX(d,2), d=1,SPH_dim) !, (tempbdry(d), d=1,5)
          
-        call BCinput(etype(s), NINT(tempType) )
+       etype(s)=NINT(tempType)
         
         do d=1,SPH_dim
             ke=ke+1
