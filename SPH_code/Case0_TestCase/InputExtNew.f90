@@ -305,7 +305,7 @@
     
     do k=1,ntotal
         !For changing density to hydrostatic
-        rho(k)=rho_init*((7.D0*9.81D0*(hydroStaticHeight-x(2,k))/(c_sound**2)+1.D0)**(1.D0/7.D0))
+        rho(k)=rho_init !*((7.D0*9.81D0*(hydroStaticHeight-x(2,k))/(c_sound**2)+1.D0)**(1.D0/7.D0))
         p(k)=(rho_init*c_sound**2/7.D0)*((rho(k)/rho_init)**7.D0-1.D0) 
         mass(k)= rho(k)*vol(k)
         hsml(k)=hsml_const
