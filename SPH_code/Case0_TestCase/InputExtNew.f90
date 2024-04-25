@@ -48,8 +48,8 @@
     enddo
     close(1)
     
-    maxedge=nEdomainBdry
-    maxnv=3 *maxedge
+    maxedge=nEdomainBdry*2
+    maxnv=3 *maxedge *2
     additionalParticles= 100 ! This is necessary only if expect to use periodic particles, or unflow, outflow particles
     if (packagingIterations .eq. 0) then
         maxn= max(nrealMesh, nrealCartesian) +maxnv +additionalParticles
@@ -305,7 +305,7 @@
     
     do k=1,ntotal
         !For changing density to hydrostatic
-        rho(k)=rho_init*((7.D0*9.81D0*(hydroStaticHeight-x(2,k))/(c_sound**2)+1.D0)**(1.D0/7.D0))
+        rho(k)=rho_init !*((7.D0*9.81D0*(hydroStaticHeight-x(2,k))/(c_sound**2)+1.D0)**(1.D0/7.D0))
         p(k)=(rho_init*c_sound**2/7.D0)*((rho(k)/rho_init)**7.D0-1.D0) 
         mass(k)= rho(k)*vol(k)
         hsml(k)=hsml_const

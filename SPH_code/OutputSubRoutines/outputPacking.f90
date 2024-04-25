@@ -88,12 +88,10 @@ subroutine  outputPacking(iterStep, saveStep, TPD)
     ! called edge particles
     
         do s=1,etotal 
-            if((etype(s) .le. etype_real_max) .and. (etype(s) .ge. etype_real_min)) then
-                if(text_print) write(1,'(A)')'ZONE T="Edge Particles",F=Point,C=Red'
-	            a=nedge_rel_edge(s)  ! this needs to be changed for edges with mroe than one poitn representation. This will then be itereated 
-                write(1,*) (x(d, a), d=1,SPH_dim)
-                text_print=.false.
-            endif                                       
+            if(text_print) write(1,'(A)')'ZONE T="Edge Particles",F=Point,C=Red'
+	        a=nedge_rel_edge(s)  ! this needs to be changed for edges with mroe than one poitn representation. This will then be itereated 
+            write(1,*) (x(d, a), d=1,SPH_dim)
+            text_print=.false.                                     
         enddo
 
         text_print=.true.       
