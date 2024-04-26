@@ -10,8 +10,7 @@
 !   Last Modified:  11/27/2023       by  PARIKSHIT BOREGOWDA 
 !****************************************************************************  
 subroutine link_list
-    use config_parameter, only:SPH_dim, itype_virtual
-    use config_geometry, only: hsml_const
+    use config_parameter, only:SPH_dim, itype_virtual, hsml_const
     use particle_data ,   only: niac,ntotal,itype,x,hsml,max_interaction, &     
         & simGridSize,pair_i,pair_j,w,dwdx       
     implicit none

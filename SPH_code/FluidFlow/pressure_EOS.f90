@@ -10,8 +10,8 @@
 
 subroutine pressureEOS
 
-    use config_parameter, only: itype_virtual
-    use config_geometry, only: rho_init, c_sound
+    use config_parameter, only: itype_virtual, &
+        & rho_init, c_sound
     use particle_data, only: rho, p, ntotal, itype
     
     implicit none

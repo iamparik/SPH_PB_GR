@@ -10,8 +10,8 @@
 
 subroutine LeapFrogKDKSchemeSPHOperations(maxtimestep)
 
-use config_parameter, only: SPH_dim
-use config_geometry, only: time_step ,NumericalSimCase, print_step, save_step             
+use config_parameter, only: SPH_dim, time_step ,NumericalSimCase, &
+        & print_step, save_step             
 use particle_data, only:itimestep, w_aa, w, dwdx, &
         & gamma_discrt, gamma_cont, del_gamma_as, del_gamma, &
         & xi1_mat, beta_mat,gamma_mat,xi_cont_mat, &

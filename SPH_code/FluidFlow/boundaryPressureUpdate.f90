@@ -12,8 +12,8 @@
 
 subroutine boundaryPressureUpdate
 
-    use config_parameter,   only: SPH_dim, etype_SolidWall1, etype_SolidWall2, etype_FreeSurface1,pi
-    use config_geometry,    only: dx_r,g_const,hsml_const, c_sound, prsrBdryType
+    use config_parameter,   only: SPH_dim, etype_SolidWall1, etype_SolidWall2, etype_FreeSurface1, &
+         & pi, dx_r,g_const,hsml_const, c_sound, prsrBdryType
     use particle_data,      only: ntotal,etotal,etype,&
         & epair_a, epair_s, eniac, p, hsml, mass, &
         & rho, nedge_rel_edge, x,vx, bdryVal_prs,surf_norm, &

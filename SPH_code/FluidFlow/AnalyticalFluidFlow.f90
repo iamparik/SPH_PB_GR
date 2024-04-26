@@ -11,8 +11,8 @@
     
 subroutine AnalyticalFluidFlow(itimestep,dt,vel,bdryVals)
 
-    use config_parameter, only: SPH_dim,pi, itype_real_min, itype_real_max
-    use config_geometry, only:  NumericalSimCase,F_ext, rho_init, mu_const
+    use config_parameter, only: SPH_dim,pi, itype_real_min, itype_real_max, &
+        & NumericalSimCase,F_ext, rho_init, mu_const
     use particle_data, only: ntotal, etotal, itype,x, rho, mu
     
     implicit none

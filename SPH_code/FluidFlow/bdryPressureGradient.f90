@@ -12,8 +12,7 @@
 !****************************************************************************
     
 subroutine bdryPressureGradient(d1f,f0, Gma)
-use config_parameter, only: SPH_dim
-use config_geometry,  only: g_const,c_sound, prsrBdryType, dx_r, rho_init, hsml_const
+use config_parameter, only: SPH_dim, g_const,c_sound, prsrBdryType, dx_r, rho_init, hsml_const
     use particle_data, only: epair_a, epair_s, eniac, etotal,mass,rho, &
         & etype, del_gamma_as, nedge_rel_edge, ntotal, x, vx, surf_norm, gamma_density_cont
     implicit none

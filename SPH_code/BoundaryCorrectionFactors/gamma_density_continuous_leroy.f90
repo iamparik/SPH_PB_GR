@@ -10,8 +10,7 @@
 !****************************************************************************
 subroutine gamma_density_continuous_leroy
     
-use config_parameter, only: SPH_dim,pi
-use config_geometry, only: dx_r
+use config_parameter, only: SPH_dim,pi, dx_r
 use particle_data, only: x,gamma_density_cont, eniac, epair_a, epair_s, &
                         & edge,hsml, surf_norm, maxn 
 

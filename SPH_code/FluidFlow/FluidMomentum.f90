@@ -9,8 +9,7 @@
 !****************************************************************************
 
 subroutine FluidMomentum(dstress, x, vx, rho, p, itype, ntotal)
-    use config_parameter, only: SPH_dim
-    use config_geometry, only: BILtype, PrsrGradtype, artViscType
+    use config_parameter, only: SPH_dim, BILtype, PrsrGradtype, artViscType
     use particle_data, only: maxn, pBC_edges
 
     implicit none

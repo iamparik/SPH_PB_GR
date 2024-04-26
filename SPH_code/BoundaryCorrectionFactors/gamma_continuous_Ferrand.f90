@@ -10,7 +10,6 @@
 subroutine gamma_continuous_Ferrand(dt)
 
     use config_parameter, only: SPH_dim, pi, itype_real_max, itype_real_min
-    !use config_geometry, only: time_step
     use particle_data, only:gamma_cont, eniac, epair_a, epair_s, &
                 & x,x_prev,vx, surf_norm, gamma_cont_prev, hsml, del_gamma, &
                 & del_gamma_as_prev, del_gamma_as,  &

@@ -11,8 +11,8 @@
     subroutine inputParticlePacking
         
     use config_parameter, only: SPH_dim, &
-        & DataConfigPath, itype_virtual, itype_real_min
-    use config_geometry, only: dx_r, hsml_const, &
+        & DataConfigPath, itype_virtual, itype_real_min, &
+        & dx_r, hsml_const, &
         & rho_init, packagingIterations, ExtInputMeshType
     use particle_data ,   only: maxn, max_interaction, max_e_interaction, maxnv,  &
         & x,mass,rho, vol,itype,hsml, nreal, nflow, nedge,nghost, ntotal, edge, &

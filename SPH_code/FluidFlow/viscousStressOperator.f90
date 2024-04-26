@@ -8,8 +8,8 @@
 !   Last Modified:  01/28/2023       by  PARIKSHIT BOREGOWDA 
 !****************************************************************************
 subroutine ViscousStressOperator(dstress,fncn,rho,oprtrTyype)
-    use config_parameter, only: SPH_dim, etype_periodic, etype_SolidWall1, etype_SolidWall2
-    use config_geometry, only: WallBoundaryLayer
+    use config_parameter, only: SPH_dim, etype_periodic, etype_SolidWall1, & 
+                & etype_SolidWall2, WallBoundaryLayer
     use particle_data, only: pair_i,pair_j,niac,ntotal,itype, dwdx, &
         & epair_a, epair_s, eniac, etotal, etype, del_gamma_as, nedge_rel_edge, surf_norm, &
         & gamma_cont,gamma_discrt, gamma_mat, gamma_mat_inv,del_gamma_as,xi1_mat_inv,xi_cont_mat_inv, &

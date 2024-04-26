@@ -10,8 +10,8 @@
 !****************************************************************************
 
 subroutine AnalyticalError(itimestep,maxtimestep,dt)
-use config_parameter, only:dataOutputErrors
-use config_geometry, only: BILtype, NumericalSimCase, save_step
+use config_parameter, only:dataOutputErrors, &
+            & BILtype, NumericalSimCase, save_step
 use particle_data, only: ErrorL2norm, ntotal, nreal, &
     & vx, temp, mass,rho, gamma_cont, f0max
 

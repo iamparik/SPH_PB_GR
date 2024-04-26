@@ -11,8 +11,8 @@
 !****************************************************************************
     
 subroutine DivergenceSummationBdry( d1f, f0, rho_in)
-    use config_parameter,   only: SPH_dim, itype_real_max, itype_real_min
-    use config_geometry, only:SumDenstype
+    use config_parameter,   only: SPH_dim, itype_real_max, &
+        & itype_real_min, SumDenstype
     use particle_data, only: pair_i,pair_j,niac,ntotal, w, w_aa, &
         & dwdx, &
         & mass, gamma_cont, gamma_discrt, itype, maxn, dgrho_prev

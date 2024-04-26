@@ -11,8 +11,7 @@
 
 subroutine thermalBoundaryConditionFerrandInspired
 
-    use config_parameter,   only: SPH_dim, etype_thermal_dirichlet, etype_thermal_neumann
-    use config_geometry,    only: dx_r
+    use config_parameter,   only: SPH_dim, etype_thermal_dirichlet, etype_thermal_neumann, dx_r
     use particle_data,      only: ntotal,etotal,etype,&
         & epair_a, epair_s, eniac, temp, hsml, mass, &
         & rho, nedge_rel_edge, x, bdryVal_temp,surf_norm

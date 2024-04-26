@@ -10,8 +10,8 @@
 
 subroutine EulerIntegration_fluid(itimestep,dt)
 
-    use config_parameter, only: SPH_dim, itype_real_max, itype_real_min
-    use config_geometry, only: ConDivtype,PSTtype, SumDenstype, summationDensity, MLS_density_bound,&
+    use config_parameter, only: SPH_dim, itype_real_max, itype_real_min, &
+        & ConDivtype,PSTtype, SumDenstype, summationDensity, MLS_density_bound,&
         & MLS_step, densDiffType, delta_SPH, rho_init, HG_density_correction, save_step, g_const
     use particle_data, only: ntotal, etotal, itype,&
         & p,rho, rho_prev,drho, temp, dtemp, temp_prev,  &

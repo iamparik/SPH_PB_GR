@@ -1,5 +1,5 @@
 subroutine BdryLayerVel(SPH_dim,bdryValWallVel)
-    use config_geometry, only: dx_r
+    use config_parameter, only: dx_r
     use particle_data, only: epair_a,epair_s, eniac, &
         & surf_norm,nedge_rel_edge, &
         & mu, x, vx

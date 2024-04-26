@@ -13,7 +13,7 @@ subroutine BILMEA(lapf, f0, fs0, x, xs, gma, SPH_dim, eniac, epair_a, epair_s, &
             & dgmas, etype, etotal, ntotal ,etype_periodic, Neumann, Dirichlet, &
             & bdryVal, bdryValDim, surf_norm, kk, kk_s)
 
-    use config_geometry, only: dx_r,WallBoundaryLayer
+    use config_parameter, only: dx_r,WallBoundaryLayer
     implicit none
     integer(4), intent(in):: SPH_dim, eniac, etotal, ntotal, &
                 & Neumann, Dirichlet, etype_periodic, bdryValDim

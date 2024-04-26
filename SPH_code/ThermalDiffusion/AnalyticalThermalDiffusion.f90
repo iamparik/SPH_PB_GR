@@ -11,8 +11,8 @@
     
 subroutine AnalyticalThermalDiffusion(itimestep,dt,temp,bdryVals)
 
-    use config_parameter, only: pi, itype_real_min, itype_real_max
-    use config_geometry, only: NumericalSimCase
+    use config_parameter, only: pi, itype_real_min, itype_real_max, &
+        & NumericalSimCase
     use particle_data, only: ntotal, etotal, itype,x
     
     implicit none

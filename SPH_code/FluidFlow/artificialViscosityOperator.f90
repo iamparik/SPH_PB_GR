@@ -10,8 +10,7 @@
 
 subroutine artificialViscosityOperator(dstress, vx, x, rho, oprtrType)
 
-    use config_parameter,   only:SPH_dim
-    use config_geometry,    only: hsml_const,c_sound
+    use config_parameter,   only:SPH_dim, hsml_const, c_sound
     use particle_data,      only: pair_i,pair_j,niac,ntotal,itype, dwdx, &
         & mass
     

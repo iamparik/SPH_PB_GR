@@ -35,3 +35,7 @@ WallBoundaryLayer 0
 nnps 1
 nnes 1
 FScutoff 1.5D0
+SPH_dim 2
+skf 5
+eos 2
+solver_type 1

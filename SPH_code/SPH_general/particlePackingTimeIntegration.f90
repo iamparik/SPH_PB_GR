@@ -10,8 +10,8 @@
 
 subroutine particlePackingTimeIntegration(packagingIterations)
 
-use config_parameter, only: SPH_dim, pi
-use config_geometry, only: print_step, save_step, hsml_const, dx_r    
+use config_parameter, only: SPH_dim, pi, &
+    & print_step, save_step, hsml_const, dx_r    
 use particle_data, only: nreal, w_aa, w, dwdx, &
         & gamma_discrt, gamma_cont, del_gamma_as, del_gamma, &
         & xi1_mat, beta_mat,gamma_mat,xi_cont_mat, &

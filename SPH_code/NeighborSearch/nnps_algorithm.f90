@@ -10,8 +10,7 @@
 !****************************************************************************
     
 subroutine nnps_algorithm
-    use config_parameter, only: SPH_dim
-    use config_geometry, only: nnps
+    use config_parameter, only: SPH_dim, nnps
     use particle_data ,   only: itimestep, max_interaction, &
         & pair_i,pair_j,w,dwdx, niac
     implicit none
