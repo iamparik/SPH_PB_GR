@@ -85,8 +85,6 @@
 		<Filter Name="InputFiles">
 		<File RelativePath="..\..\InputFiles\backupInput.f90"/>
 		<File RelativePath="..\BCinput.f90"/>
-		<File RelativePath="..\..\InputFiles\HydrostaticDam\ConfigDamExt.f90"/>
-		<File RelativePath="..\..\InputFiles\ConfigGeometry.f90"/>
 		<File RelativePath="..\InputExtNew.f90"/>
 		<File RelativePath="..\..\InputFiles\inputParticePacking.f90"/></Filter>
 		<Filter Name="MatrixInversion">
@@ -158,6 +156,7 @@
 		<File RelativePath="..\..\ThermalDiffusion\thermalDiffusionLaplacianOperator.f90"/></Filter>
 		<File RelativePath="..\..\SPH_general\AnalyticalError.f90"/>
 		<File RelativePath="..\..\SPH_general\boundaryConditionNtoD.f90"/>
+		<File RelativePath="..\..\SPH_general\ConfigParameter.f90"/>
 		<File RelativePath="..\..\SPH_general\EulerSchemeSPHOperations.f90"/>
 		<File RelativePath="..\..\SPH_general\evolvingVariables.f90"/>
 		<File RelativePath="..\..\SPH_general\kernel.f90"/>

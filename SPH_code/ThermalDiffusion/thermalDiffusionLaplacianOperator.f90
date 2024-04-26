@@ -9,8 +9,8 @@
 !****************************************************************************
     
 subroutine thermalDiffusionLaplacianOperator(fncn,lap_fncn,oprtrTyype) 
-    use config_parameter, only: SPH_dim, dataOutputPath, etype_thermal_dirichlet, etype_thermal_neumann, etype_periodic
-    use config_geometry, only:  dx_r
+    use config_parameter, only: SPH_dim, dataOutputPath, etype_thermal_dirichlet, &
+        & etype_thermal_neumann, etype_periodic, dx_r
     use particle_data ,   only: rho, mass, itype, x, nreal,nedge,nghost,ntotal,&
             & niac, pair_i, pair_j, w, w_aa, dwdx,     &
             & eniac, epair_a, epair_s,nedge_rel_edge, edge, surf_norm,  &

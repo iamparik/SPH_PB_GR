@@ -10,8 +10,8 @@
 
 subroutine LeapFrogKDKIntegration_fluid(itimestep,dt)
 
-    use config_parameter, only: SPH_dim, itype_real_max, itype_real_min
-    use config_geometry, only:ConDivtype,SumDenstype, summationDensity, save_step
+    use config_parameter, only: SPH_dim, itype_real_max, itype_real_min, &
+        & ConDivtype,SumDenstype, summationDensity, save_step
     use particle_data, only: ntotal, etotal, itype, maxn, &
         & p,rho, rho_prev,drho, temp, dtemp, temp_prev,  &
         & x,vx, dstress, &

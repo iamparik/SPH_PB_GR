@@ -12,8 +12,8 @@
         
     use config_parameter, only: SPH_dim,etype_periodic, etype_SolidWall1, etype_SolidWall2, &
         & etype_FreeSurface1, etype_thermal_neumann, etype_thermal_dirichlet, etype_FarWall, &
-        & DataConfigPath, itype_virtual, itype_real_min
-    use config_geometry, only: dx_r, hsml_const,hydrostaticHeight, rho_init, mu_const, &
+        & DataConfigPath, itype_virtual, itype_real_min, &
+        & dx_r, hsml_const,hydrostaticHeight, rho_init, mu_const, &
         &  g_const, c_sound, F_ext, ExtInputMeshType, packagingIterations
     use particle_data ,   only: maxn, max_interaction, max_e_interaction, maxnv,  &
         & x,vx,mass,rho, vol,p,itype,hsml,mu, temp, nreal, nflow, nedge,nghost, ntotal, edge, &

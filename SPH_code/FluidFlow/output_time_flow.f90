@@ -11,8 +11,8 @@
 !****************************************************************************      
 subroutine  output_time_flow(itimestep,dt)
     use config_parameter, only:dataOutputPath, SPH_dim, itype_real_max, itype_real_min, &
-        & etype_real_max, etype_real_min, etype_virtual, itype_virtual, itype_periodic
-    use config_geometry, only: save_step, g_const, hydroStaticHeight
+        & etype_real_max, etype_real_min, etype_virtual, itype_virtual, itype_periodic, &
+        & save_step, g_const, hydroStaticHeight
     use particle_data ,   only: x, mass, rho, p, vx, nedge_rel_edge, &
         & ntotal,etotal, itype, etype, gamma_cont, gamma_discrt,&
         &  max_vel, KE,PE, TE, del_gamma,delcAvg,delCMax, delCL2, delC

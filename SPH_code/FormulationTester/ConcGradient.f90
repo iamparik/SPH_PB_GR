@@ -11,8 +11,7 @@
 !****************************************************************************
     
 subroutine ConcGradient
-    use config_parameter, only: SPH_dim
-    use config_geometry, only: PSTtype,dx_r
+    use config_parameter, only: SPH_dim, PSTtype,dx_r
     use particle_data, only: niac, pair_i, pair_j, dwdx,x, &
         & eniac, epair_a,epair_s, del_gamma_as, mass, rho, itype, ntotal, etotal, &
         & nedge_rel_edge, surf_norm, gamma_cont,delC

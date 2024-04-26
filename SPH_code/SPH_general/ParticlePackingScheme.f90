@@ -10,8 +10,8 @@
 
 subroutine ParticlePackingScheme(iterStep)
 
-    use config_parameter, only: SPH_dim,dataPackingPath, itype_real_max, itype_real_min
-    use config_geometry, only: c_sound, hsml_const, packagingIterations,dx_r, &
+    use config_parameter, only: SPH_dim,dataPackingPath, itype_real_max, itype_real_min, &
+        & c_sound, hsml_const, packagingIterations,dx_r, &
         & save_step, PSTCoeff, delC_Cap
     use particle_data, only: avgVol, ntotal, nreal, etotal, itype,nedge_rel_edge,&
         & dstress, x, vx, del_gamma, gamma_cont, PE,KE,TE, mass, max_vel, gamma_cont,gamma_discrt, &

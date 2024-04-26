@@ -11,7 +11,7 @@
     
 subroutine BILMacia(lapf, f0, fs0, x, xs, gma, SPH_dim, eniac, epair_a, epair_s, dgmas, etype, &
                 & etotal, ntotal, kk_s)
-    use config_geometry, only: WallBoundaryLayer
+    use config_parameter, only: WallBoundaryLayer
     implicit none
     integer(4), intent(in):: SPH_dim, eniac, etotal, ntotal
     real(8), intent(in)::gma(ntotal), x(SPH_dim,ntotal) ,xs(SPH_dim,etotal)

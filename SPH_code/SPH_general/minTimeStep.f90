@@ -10,8 +10,8 @@
 
 subroutine minTimeStep
     
-    use config_parameter, only: SPH_dim
-    use config_geometry, only: time_step, hsml_const, rho_init, F_ext, g_const, mu_const, c_sound
+    use config_parameter, only: SPH_dim, time_step, hsml_const, &
+        & rho_init, F_ext, g_const, mu_const, c_sound
     
     implicit none
     

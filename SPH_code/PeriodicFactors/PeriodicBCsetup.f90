@@ -12,8 +12,7 @@
 !this subroutine needs to further generalized to be applied in other scenarios
 subroutine PeriodicBCsetup2D 
 use config_parameter, only:SPH_dim, itype_real_max, itype_real_min, &
-    & etype_periodic,etype_virtual, itype_periodic, itype_virtual
-use config_geometry, only:hsml_const
+    & etype_periodic,etype_virtual, itype_periodic, itype_virtual, hsml_const
 use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, nedge_rel_edge, &
             & pBC_edges, pBC_epair_a, pBC_epair_s, pBC_eniac, tangent_pBC, edge_pBC_pairs, &
             & x,rho,mass, itype, hsml, edge, etype, pBC_duplicate_pair, nperiodic, simGridSize

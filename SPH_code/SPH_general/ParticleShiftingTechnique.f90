@@ -10,8 +10,8 @@
 
 subroutine ParticleShiftingTechnique
 
-use config_parameter, only:SPH_dim, itype_real_max, itype_real_min
-use config_geometry, only:PSTCoeff,PSTtype, hsml_const, dx_r, FScutoff
+use config_parameter, only:SPH_dim, itype_real_max, itype_real_min, &
+        & PSTCoeff,PSTtype, hsml_const, dx_r, FScutoff
 use particle_data, only: niac,pair_i, pair_j,eniac,epair_a, epair_s, &
     & w, dwdx, delC, surf_norm, del_gamma_as, nedge_rel_edge, ntotal, etotal, &
     & mass, rho, x, vx, itype, gamma_cont, gamma_discrt, gamma_mat_inv, FreeSurfaceVar

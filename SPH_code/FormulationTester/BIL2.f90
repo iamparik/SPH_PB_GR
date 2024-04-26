@@ -11,7 +11,7 @@
     
 subroutine BIL2(lapf, dfs0, gma, SPH_dim, eniac, epair_a, epair_s, dgmas, etype, &
     & etotal, ntotal,etype_periodic, Neumann, Dirichlet, bdryVal, bdryValDim, coeff)
-    use config_geometry, only: WallBoundaryLayer
+    use config_parameter, only: WallBoundaryLayer
     implicit none
     integer(4), intent(in):: SPH_dim, eniac, etotal, ntotal, Neumann, Dirichlet, etype_periodic,bdryValDim
     real(8), intent(in)::gma(ntotal), bdryVal(bdryValDim), coeff

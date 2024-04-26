@@ -9,8 +9,8 @@
 !****************************************************************************
 subroutine ExternalForceAcceleration(dstress,rho, itype, ntotal)
 
-    use config_parameter, only: SPH_dim, itype_real_max, itype_real_min
-    use config_geometry, only: F_ext, g_const
+    use config_parameter, only: SPH_dim, itype_real_max, &
+        & itype_real_min, F_ext, g_const
     
     
     implicit none

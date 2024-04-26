@@ -10,7 +10,7 @@
 
 subroutine SPH_operator(maxtimestep)
 
-use config_geometry, only: timeIntegrationScheme             
+use config_parameter, only: timeIntegrationScheme             
 
 
 implicit none

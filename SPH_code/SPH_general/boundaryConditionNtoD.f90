@@ -11,8 +11,8 @@
     
 subroutine boundaryConditionNtoD(fncn_s,bdryVal,fncn)
     
-    use config_parameter,   only: SPH_dim, etype_SolidWall1, etype_SolidWall2
-    use config_geometry,    only: dx_r, hsml_const
+    use config_parameter,   only: SPH_dim, etype_SolidWall1, etype_SolidWall2, &
+                            & dx_r, hsml_const
     use particle_data,      only: ntotal,etotal,etype,&
         & epair_a, epair_s, eniac, hsml, mass, &
         & rho, nedge_rel_edge, x, surf_norm

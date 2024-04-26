@@ -12,8 +12,7 @@
 !****************************************************************************
 
 subroutine direct_find
-    use config_parameter, only:SPH_dim, itype_virtual
-    use config_geometry, only:hsml_const
+    use config_parameter, only:SPH_dim, itype_virtual, hsml_const
     use particle_data ,   only: niac,ntotal,itype,x,hsml,max_interaction, &     
         & pair_i,pair_j,w,dwdx       
     implicit none

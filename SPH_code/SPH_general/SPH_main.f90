@@ -11,8 +11,7 @@ program SPH3D
 use particle_data ,   only: rho,p,mu, x,vx,mass, temp, &
         & hsml,itype,surf_norm,edge,nedge_rel_edge,itimestep, etype, &
         & dgrho_prev, drho , rho_prev, xStart, ntotal
-use config_geometry
-use config_parameter, only: SPH_dim
+use config_parameter
 
 implicit none
 
@@ -32,8 +31,8 @@ integer(4) inputTimeStep,maxtimestep, yesorno
 integer(8) :: ic1, crate1, cmax1, ic2
 logical ::  runSPH = .true.
 
-
-    call read_config_file
+! Read parameters to configure the SPH simulation from config_data.dat
+call read_config_file
 
    
 !start system clock to evealuate time taken to run

@@ -9,8 +9,7 @@
 !****************************************************************************
 
 subroutine evolvingVariables(itimestep,max_step)
-    use config_parameter, only: itype_real_max, itype_real_min
-    use config_geometry, only:  g_const
+    use config_parameter, only: itype_real_max, itype_real_min, g_const
     use particle_data, only: ntotal, itype, delC, mass,rho, vx,x, gamma_cont, gamma_discrt, &
         & max_vel, KE, PE, TE, delC, delCAvg, delCMax, delCL2, xStart, KE_prev, &
         & ga_Max,ga_Avg,ga_L2, g_a_min, g_a_max,FirstCutoffStep,PP_variable

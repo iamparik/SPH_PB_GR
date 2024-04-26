@@ -10,8 +10,7 @@
     
 subroutine testForSPHApproxLapFormulations 
     use config_parameter, only: SPH_dim, dataOutputPath, &
-            & etype_periodic, etype_SolidWall1, etype_SolidWall2 
-    use config_geometry, only:  dx_r
+            & etype_periodic, etype_SolidWall1, etype_SolidWall2, dx_r
     use particle_data ,   only: rho, mass, itype, x, nreal,nedge,nghost,ntotal,&
             & niac, pair_i, pair_j, w, w_aa, dwdx,     &
             & eniac, epair_a, epair_s,nedge_rel_edge, edge, &

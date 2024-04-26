@@ -10,6 +10,7 @@
     
     module config_parameter
         implicit none
+        
         !SPH_dim : Dimension of the problem (1, 2 or 3)
         public SPH_dim
         integer(4),parameter :: SPH_dim=2

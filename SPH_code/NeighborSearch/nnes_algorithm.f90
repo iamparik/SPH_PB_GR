@@ -10,8 +10,7 @@
 !****************************************************************************
     
 subroutine nnes_algorithm
-    use config_parameter, only: SPH_dim
-    use config_geometry, only: nnes
+    use config_parameter, only: SPH_dim, nnes
     use particle_data ,   only: itimestep,epair_a, epair_s, max_e_interaction, &
             &   etotal, pBC_epair_a, pBC_epair_s
     

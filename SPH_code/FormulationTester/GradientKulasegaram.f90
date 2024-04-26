@@ -12,7 +12,7 @@
     
 subroutine GradientKulasegaram(d1f,f0, fs0, Gma, SPH_dim, niac, pair_i, pair_j, dwdx, eniac, epair_a, epair_s, dgmas, mass, rho, rhos, itype, ntotal, num_edges)
     use particle_data, only: vx    
-    use config_geometry,    only: dx_r,g_const
+    use config_parameter,    only: dx_r,g_const
 
     implicit none
     integer(4), intent(in):: ntotal, SPH_dim, niac, eniac, num_edges

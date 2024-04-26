@@ -11,8 +11,8 @@
 
 subroutine EulerIntegration_thermal(itimestep,dt)
 
-    use config_parameter, only: SPH_dim,itype_real_max, itype_real_min
-    use config_geometry, only: BILtype, save_step
+    use config_parameter, only: SPH_dim,itype_real_max, itype_real_min , &
+        & BILtype, save_step
     use particle_data, only: ntotal, etotal, itype,x, temp, dtemp, temp_prev,  &
         &  rho, gamma_mat_inv, pBC_edges
     
