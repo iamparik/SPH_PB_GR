@@ -41,7 +41,7 @@ call system_clock(count=ic1, count_rate=crate1, count_max=cmax1)
 call inputSPHConfig
 
 ! theoretical maximum for time step.
-call minTimeStep
+call maxTimeStep
 
 
 ! Maximum number of timesteps, and ith time step variables are initiatilized as 0 

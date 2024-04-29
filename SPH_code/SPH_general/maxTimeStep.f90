@@ -8,7 +8,7 @@
 !   Last Modified:  04/29/2024         by  PARIKSHIT BOREGOWDA 
 !****************************************************************************
 
-subroutine minTimeStep
+subroutine maxTimeStep
     
     use config_parameter, only: SPH_dim, time_step, hsml_const, &
         & rho_init, F_ext, g_const, mu_const, c_sound
