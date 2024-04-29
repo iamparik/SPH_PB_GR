@@ -27,7 +27,7 @@
     real(8) tempType
     integer(4) k,d,s,ke,periodicPairs,i , additionalParticles
     real(8) tempX(SPH_dim,SPH_dim), tempBdry(5), mn, scale_k
-    integer(4) nrealMesh, nrealCartesian, nEbulkBdry, nEdomainBdry
+    integer(4) nreal_mesh, nrealCartesian, nEbulkBdry, nEdomainBdry
     real(8) totVol
     real(8),DIMENSION(:,:),ALLOCATABLE :: xV_temp, edge_temp
    
@@ -44,7 +44,7 @@
     open(1,file= DataConfigPath // '/input_param_SimSize.dat',status='old')
     do while (.not.eof(1))
         ! I might have to modify below to strictly read as integers
-          read(1,*) nrealMesh, nrealCartesian, nEbulkBdry, nEdomainBdry, totVol
+          read(1,*) nreal_mesh, nrealCartesian, nEbulkBdry, nEdomainBdry, totVol
     enddo
     close(1)
     
@@ -52,7 +52,7 @@
     maxnv=3 *maxedge *2
     additionalParticles= 100 ! This is necessary only if expect to use periodic particles, or unflow, outflow particles
     if (packagingIterations .eq. 0) then
-        maxn= max(nrealMesh, nrealCartesian) +maxnv +additionalParticles
+        maxn= max(nreal_mesh, nrealCartesian) +maxnv +additionalParticles
     else
         maxn= nreal+maxnv + additionalParticles
     endif
@@ -74,81 +74,14 @@
     temp=0.D0
     vol=0.D0
     
-    ! Read input file containing particle/point information  if particle hasnt been packed already  
-    if( packagingIterations .eq. 0) then ! Use cartesian cordinate represent particles with area being average area
-       
-        ! Read input file containing particle/point information    
-        if( ExtInputMeshType .eq. 1) then ! Use cartesian cordinate represent particles with area being average area
-            open(1,file= DataConfigPath // '/input_particles_cartesianMesh.dat',status='old')
-            ! initialize particle number to 0  
-            k=0
-            do while (.not.eof(1))
-                k=k+1
-                read(1,*) tempType, (x(d, k), d=1,SPH_dim), vol(k)
-                itype(k) = NINT(tempType)        
-            enddo
-    
-        elseif(ExtInputMeshType .eq. 2) then
-            open(1,file= DataConfigPath // '/input_particles_cartesianMesh.dat',status='old')
-            ! initialize particle number to 0  
-            k=0
-            avgVol=dx_r**(SPh_dim)
+
+    ! initialize particle number to 0  
+    k=0
         
-            do while (.not.eof(1))
-                k=k+1
-                read(1,*) tempType, (x(d, k), d=1,SPH_dim), vol(k)
-                vol(k)=avgVol
-                itype(k) = NINT(tempType)        
-            enddo
-            
-        elseif ( ExtInputMeshType .eq. 3) then ! Use tri/quad mesh centroids with constant avg area for all particles
-            open(1,file= DataConfigPath // '/input_particles_bulkMesh.dat',status='old') 
-            ! initialize particle number to 0    
-            k=0
-            avgVol=totVol/dble(nrealMesh)
-            do while (.not.eof(1))
-                k=k+1
-                read(1,*) tempType, (x(d, k), d=1,SPH_dim), vol(k)
-                vol(k) =avgVol
-                itype(k) = NINT(tempType)        
-            enddo
-        elseif ( ExtInputMeshType .eq. 4) then ! Use tri/quad mesh centroids with their true 2D area
-            open(1,file= DataConfigPath // '/input_particles_bulkMesh.dat',status='old') 
-            ! initialize particle number to 0    
-            k=0
-            
-            do while (.not.eof(1))
-                k=k+1
-                read(1,*) tempType, (x(d, k), d=1,SPH_dim), vol(k)
-                itype(k) = NINT(tempType)        
-            enddo
-            
-        elseif(ExtInputMeshType .eq. 5) then
-            open(1,file= DataConfigPath // '/input_PP.dat',status='old')
-            ! initialize particle number to 0  
-            k=0
-            avgVol=dx_r**(SPh_dim)
-        
-            do while (.not.eof(1))
-                k=k+1
-                read(1,*) tempType, (x(d, k), d=1,SPH_dim), vol(k)
-                !vol(k)=avgVol
-                itype(k) = NINT(tempType)        
-            enddo
-        endif
-    
-    else
-        !if packing algorithm is already executed, simply retrieve the information of packed particles
-        k=0
-        do i=1,nreal
-            k=k+1
-            x(:,k)=packed_x(:,i)
-            itype(k)=packed_itype(i)
-            vol(k)=packed_vol(i)
-        enddo
-        
-    endif
-    
+    ! read approriate data file according to input type
+    call inputCADtoParticleData(k, nreal_mesh,totVol)
+
+
     nreal=k ! I can distinguish nreal and nedge here if needed
     close(1)
     write(*,*)'      Total number of Real particles : ', nreal    	

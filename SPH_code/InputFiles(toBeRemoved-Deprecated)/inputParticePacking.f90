@@ -24,7 +24,7 @@
     real(8) tempType
     integer(4) k,d,s,ke,i
     real(8) tempX(SPH_dim,SPH_dim), tempBdry(5), mn, scale_k
-    integer(4) nrealMesh, nrealCartesian, nEbulkBdry, nEdomainBdry
+    integer(4) nreal_mesh, nrealCartesian, nEbulkBdry, nEdomainBdry
     real(8) totVol
     real(8),DIMENSION(:,:),ALLOCATABLE :: xV_temp, edge_temp
     character (40) :: x2name
@@ -39,14 +39,14 @@
     open(1,file= DataConfigPath // '/input_param_SimSize.dat',status='old')
     do while (.not.eof(1))
         ! I might have to modify below to strictly read as integers
-          read(1,*) nrealMesh, nrealCartesian, nEbulkBdry, nEdomainBdry, totVol
+          read(1,*) nreal_mesh, nrealCartesian, nEbulkBdry, nEdomainBdry, totVol
     enddo
     close(1)
     
     maxedge= nEbulkBdry
     maxnv=3 *maxedge
     if (ExtInputMeshType .le. 2) maxn= nrealCartesian +maxnv
-    if (ExtInputMeshType .ge. 3) maxn= nrealMesh +maxnv
+    if (ExtInputMeshType .ge. 3) maxn= nreal_mesh +maxnv
     
     !vaiuables required to define geometry are particle propoerties are allocated
     ALLOCATE(x(SPH_dim,maxn))
@@ -61,53 +61,11 @@
     hsml=0.D0
     simGridSize=0.D0
     
-    ! Read input file containing particle/point information    
-    if( ExtInputMeshType .eq. 1) then ! Use cartesian cordinate represent particles with area being average area
-        open(1,file= DataConfigPath // '/input_particles_cartesianMesh.dat',status='old')
-        ! initialize particle number to 0  
-        k=0
-        avgVol=totVol/dble(nrealCartesian)
-        do while (.not.eof(1))
-            k=k+1
-            read(1,*) tempType, (x(d, k), d=1,SPH_dim), vol(k)
-            itype(k) = NINT(tempType)      
-        enddo
-    elseif(ExtInputMeshType .eq. 2) then
-        open(1,file= DataConfigPath // '/input_particles_cartesianMesh.dat',status='old')
-        ! initialize particle number to 0  
-        k=0
-        avgVol=dx_r**(SPh_dim)
+    ! initialize particle number to 0  
+    k=0
         
-        do while (.not.eof(1))
-            k=k+1
-            read(1,*) tempType, (x(d, k), d=1,SPH_dim), vol(k)
-            vol(k)=avgVol
-            itype(k) = NINT(tempType)        
-        enddo
-    
-    elseif ( ExtInputMeshType .eq. 3) then ! Use tri/quad mesh centroids with constant avg area for all particles
-        open(1,file= DataConfigPath // '/input_particles_bulkMesh.dat',status='old') 
-        ! initialize particle number to 0    
-        k=0
-        avgVol=totVol/dble(nrealMesh)
-        do while (.not.eof(1))
-            k=k+1
-            read(1,*) tempType, (x(d, k), d=1,SPH_dim), vol(k)
-            vol(k) =avgVol
-            itype(k) = NINT(tempType)        
-        enddo
-    elseif ( ExtInputMeshType .eq. 4) then ! Use tri/quad mesh centroids with their true 2D area
-        open(1,file= DataConfigPath // '/input_particles_bulkMesh.dat',status='old') 
-        ! initialize particle number to 0    
-        k=0
-        avgVol=totVol/dble(nrealMesh)
-
-        do while (.not.eof(1))
-            k=k+1
-            read(1,*) tempType, (x(d, k), d=1,SPH_dim), vol(k)
-            itype(k) = NINT(tempType)        
-        enddo
-    endif
+    ! read approriate data file according to inut type
+    call inputCADtoParticleData(k, nreal_mesh,totVol)
     
     nreal=k ! I can distinguish nreal and nedge here if needed
     close(1)
@@ -237,13 +195,9 @@
     open (1, file = x2name)
     
 
-    ! Change allocations of position, volume and  itype
-    allocate(packed_x(SPH_dim,nreal),packed_itype(nreal), packed_vol(nreal))
+    ! write particle data to the file input_PP.dat
     do i=1,nreal
         write(1,'(I10,4(e22.10,2x))') itype(i), (x(d, i), d=1,SPH_dim), vol(i)
-        packed_x(:,i)=x(:,i)
-        packed_itype(i) = itype(i)
-        packed_vol(i) = vol(i)
     enddo
     
     close(1)
