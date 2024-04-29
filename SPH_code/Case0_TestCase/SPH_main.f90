@@ -27,27 +27,21 @@ implicit none
 !--------------------------------------
 
 
-integer(4) input_timeStep,max_timeSteps, yesorno
+integer(4) input_timeStep,max_timeSteps, yesorno, input_file_type
 integer(8) :: ic1, crate1, cmax1, ic2
 logical ::  runSPH = .true.
 
-! Read parameters to configure the SPH simulation from config_data.dat
-call read_config_file
 
    
 !start system clock to evealuate time taken to run
 ! System_clock returns number of seconds from 00:00 CUT on 1 Jan 1970
 call system_clock(count=ic1, count_rate=crate1, count_max=cmax1)
 
+! input particle configuration data
+call inputSPHConfig
+
 ! theoretical maximum for time step.
 call minTimeStep
-
-!A series of subroutines are now run to initialize the particles, and obtain input file
-write(*,*)'  ***************************************************'
-write(*,*) 'Are you going to input external input file or back up file?'
-write(*,*) '(0=No Input file, 1=new external input file, 2=continue from backup file)'
-write(*,*)'  ***************************************************'
-read (*,*) yesorno
 
 
 ! Maximum number of timesteps, and ith time step variables are initiatilized as 0 
@@ -56,20 +50,20 @@ itimestep=0
 
 !The below requires the user to input on the terminal the maximum time step to run the simulation
   write(*,*)'  ***************************************************'
-  write(*,*)'          Please input the maximal time steps to run simulations'
+  write(*,*)'          Please input the total time steps to run simulations'
   write(*,*)'  ***************************************************'
   read(*,*) input_timeStep
 
 
 
 ! All particles are created, labeled, and retrieved to start calculations
-if(yesorno.eq.0) then    
+if(input_file_type.eq.0) then    
     !call input
-elseif(yesorno.eq.1) then
+elseif(input_file_type.eq.1) then
     ! run packing algorithm according to user input
     if(packagingIterations >0) call inputParticlePacking
     call inputExt
-elseif(yesorno.eq.2) then
+elseif(input_file_type.eq.2) then
     call backupInput(itimestep)
 endif
 

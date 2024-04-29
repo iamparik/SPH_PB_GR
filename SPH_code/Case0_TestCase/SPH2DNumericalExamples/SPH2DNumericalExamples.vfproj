@@ -159,6 +159,7 @@
 		<File RelativePath="..\..\SPH_general\ConfigParameter.f90"/>
 		<File RelativePath="..\..\SPH_general\EulerSchemeSPHOperations.f90"/>
 		<File RelativePath="..\..\SPH_general\evolvingVariables.f90"/>
+		<File RelativePath="..\..\SPH_general\inputSPHConfig.f90"/>
 		<File RelativePath="..\..\SPH_general\kernel.f90"/>
 		<File RelativePath="..\..\SPH_general\LeapFrogKDKSchemeSPHOperations.f90"/>
 		<File RelativePath="..\..\SPH_general\marker_point_value.f90"/>
