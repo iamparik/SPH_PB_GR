@@ -172,7 +172,7 @@
 		<File RelativePath="..\..\SPH_general\relErrorFormulation.f90"/>
 		<File RelativePath="..\..\SPH_general\sml_mult_factor.f90"/>
 		<File RelativePath="..\..\SPH_general\smoothing_w0.f90"/>
-		<File RelativePath="..\..\SPH_general\SPH_main.f90"/>
+		<File RelativePath="..\SPH_main.f90"/>
 		<File RelativePath="..\..\SPH_general\SPH_operator.f90"/>
 		<File RelativePath="..\..\SPH_general\testForSPHApproxLapFormulations.f90"/>
 		<File RelativePath="..\..\SPH_general\TimeIndependentSPHOperations.f90"/></Filter></Files>
