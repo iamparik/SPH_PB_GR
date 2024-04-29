@@ -16,7 +16,7 @@ use config_parameter
 implicit none
 
 !--------------------------------------
-!inputTimeStep : An integer Paramter that decides the number of time step iterations 
+!input_timeStep : An integer Paramter that decides the number of time step iterations 
 !                to be run for the simulation
 !maztimestep : An integer Paramter that logs the maximum time step iterations
 !yesorno :   An integer paramter,that implies no for 0
@@ -27,7 +27,7 @@ implicit none
 !--------------------------------------
 
 
-integer(4) inputTimeStep,maxtimestep, yesorno
+integer(4) input_timeStep,max_timeSteps, yesorno
 integer(8) :: ic1, crate1, cmax1, ic2
 logical ::  runSPH = .true.
 
@@ -39,6 +39,7 @@ call read_config_file
 ! System_clock returns number of seconds from 00:00 CUT on 1 Jan 1970
 call system_clock(count=ic1, count_rate=crate1, count_max=cmax1)
 
+! theoretical maximum for time step.
 call minTimeStep
 
 !A series of subroutines are now run to initialize the particles, and obtain input file
@@ -50,14 +51,14 @@ read (*,*) yesorno
 
 
 ! Maximum number of timesteps, and ith time step variables are initiatilized as 0 
-maxtimestep=0
+max_timeSteps=0
 itimestep=0
 
 !The below requires the user to input on the terminal the maximum time step to run the simulation
   write(*,*)'  ***************************************************'
   write(*,*)'          Please input the maximal time steps to run simulations'
   write(*,*)'  ***************************************************'
-  read(*,*) inputTimeStep
+  read(*,*) input_timeStep
 
 
 
@@ -75,13 +76,13 @@ endif
 Allocate(xStart(SPH_dim,ntotal))
 xStart=x
     
- maxtimestep=maxtimestep + inputTimeStep
-write(*,*)' Starting time step for simulation = ',itimestep, ' Ending time step for simulation = ', maxtimestep
+ max_timeSteps=max_timeSteps + input_timeStep
+write(*,*)' Starting time step for simulation = ',itimestep, ' Ending time step for simulation = ', max_timeSteps
   
 do while (runSPH)
-    call SPH_operator(maxtimestep)
+    call SPH_operator(max_timeSteps)
 
-    !call analytical_operator(maxtimestep)
+    !call analytical_operator(max_timeSteps)
 
     !Now net time is calculated
     call system_clock(count=ic2)
@@ -100,11 +101,11 @@ do while (runSPH)
         write(*,*)'  ***************************************************'
         write(*,*)'   Please input the additional time steps to continue running the simulation '
         write(*,*)' Current int for timestep is int 4 hence max value permissible is 2,147,483,647'
-        write(*,*)'           Current timesteps run is ', maxtimestep
+        write(*,*)'           Current timesteps run is ', max_timeSteps
         write(*,*)'  ***************************************************'
-        read(*,*) inputTimeStep
-        maxtimestep=maxtimestep + inputTimeStep
-        write(*,*)' This simulation will run for is ', maxtimestep , 'time steps'
+        read(*,*) input_timeStep
+        max_timeSteps=max_timeSteps + input_timeStep
+        write(*,*)' This simulation will run for is ', max_timeSteps , 'time steps'
     endif    
     
 end do
