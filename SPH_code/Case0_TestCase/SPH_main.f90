@@ -10,7 +10,8 @@ program SPH3D
 
 use particle_data ,   only: rho,p,mu, x,vx,mass, temp, &
         & hsml,itype,surf_norm,edge,nedge_rel_edge,itimestep, etype, &
-        & dgrho_prev, drho , rho_prev, xStart, ntotal
+        & dgrho_prev, drho , rho_prev, xStart, ntotal, etotal, &
+        & bdryVal_vel,bdryVal_prs, bdryVal_rho, bdryVal_temp, maxedge
 use config_parameter
 
 implicit none
@@ -28,7 +29,7 @@ implicit none
 
 
 integer(4) input_timeStep,max_timeSteps, yesorno, input_file_type
-integer(8) :: ic1, crate1, cmax1, ic2
+integer(8) :: ic1, crate1, cmax1, ic2,s 
 logical ::  runSPH = .true.
 
 
@@ -39,6 +40,14 @@ call system_clock(count=ic1, count_rate=crate1, count_max=cmax1)
 
 ! input particle configuration data
 call inputSPHConfig
+
+
+
+! Add boundary conditions to the boundary:
+allocate( bdryVal_vel(SPH_dim,maxedge),bdryVal_prs(maxedge), bdryVal_rho(maxedge), bdryVal_temp(maxedge))
+do s =1, etotal
+    call BCinputValue(etype(s),bdryVal_vel(:,s), bdryVal_prs(s), bdryVal_rho(s), bdryVal_temp(s))
+enddo
 
 ! theoretical maximum for time step.
 call maxTimeStep

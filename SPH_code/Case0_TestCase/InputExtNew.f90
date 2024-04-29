@@ -18,7 +18,7 @@
     use particle_data ,   only: maxn, max_interaction, max_e_interaction, maxnv,  &
         & x,vx,mass,rho, vol,p,itype,hsml,mu, temp, nreal, nflow, nedge,nghost, ntotal, edge, &
         & surf_norm, nedge_rel_edge, etype, etotal, maxedge, &
-        & pBC_edges,tangent_pBC, bdryVal_vel, bdryVal_prs, bdryVal_rho, bdryVal_temp, &
+        & pBC_edges,tangent_pBC, &
         &  f0max, dynamicProblem,avgVol, &
         & packed_x,packed_itype, packed_vol, simGridSize
     !use ifport, only:random
@@ -99,7 +99,7 @@
     
     ! Read input file containing edge_temp information
     open(1,file= DataConfigPath // '/input_domainBdryEdge.dat',status='old')
-    ! initialize particle number to 0    
+    ! initialize edge number to 0    
     s=0
     ke=0
     do while (.not.eof(1))
@@ -113,30 +113,20 @@
             edge_temp(d,s)=ke
         enddo
         
-        if(etype(s) .eq. etype_SolidWall1) then
-            if( .not. allocated(bdryVal_vel)) then 
-                allocate( bdryVal_vel(SPH_dim,maxedge),bdryVal_prs(maxedge), bdryVal_rho(maxedge), bdryVal_temp(maxedge))
-            endif
-            do d=1,SPH_dim
-                bdryVal_vel(d,s)= 0.D0!tempBdry(d)
-            enddo
-            bdryVal_prs(s)  = 0.D0 !tempBdry(3)
-            bdryVal_rho(s)  =rho_init !tempBdry(4)
-            bdryVal_temp(s) =300 !tempBdry(5)
-             
-        elseif(etype(s) .eq. etype_periodic) then  
+        if(etype(s) .eq. etype_periodic) then  
             write(*,*) "periodic BCS available for only one pair of periodic boundary"
             periodicPairs=1
-            
+                    
             if( .not. allocated(pBC_edges)) then                       
                 allocate(pBC_edges(2,periodicPairs))
                 pBC_edges(1,1)=s
             else
                 pBC_edges(2,1)=s
             endif
-            
-            
-        endif                  
+                    
+                    
+        endif 
+                
     enddo
     etotal=s
     close(1)
@@ -191,6 +181,8 @@
         endif 
  
     enddo
+    
+    
     nedge= k - nreal     
     write(*,*)'      Total number of edge_temp particles : ', nedge    	
     write(*,*)'**************************************************'      
