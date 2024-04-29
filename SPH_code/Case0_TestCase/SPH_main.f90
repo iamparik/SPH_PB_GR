@@ -41,8 +41,6 @@ call system_clock(count=ic1, count_rate=crate1, count_max=cmax1)
 ! input particle configuration data
 call inputSPHConfig
 
-
-
 ! Add boundary conditions to the boundary:
 allocate( bdryVal_vel(SPH_dim,maxedge),bdryVal_prs(maxedge), bdryVal_rho(maxedge), bdryVal_temp(maxedge))
 do s =1, etotal
@@ -61,57 +59,20 @@ itimestep=0
   write(*,*)'  ***************************************************'
   write(*,*)'          Please input the total time steps to run simulations'
   write(*,*)'  ***************************************************'
-  read(*,*) input_timeStep
-
-
-
-! All particles are created, labeled, and retrieved to start calculations
-if(input_file_type.eq.0) then    
-    !call input
-elseif(input_file_type.eq.1) then
-    ! run packing algorithm according to user input
-    if(packagingIterations >0) call inputParticlePacking
-    call inputExt
-elseif(input_file_type.eq.2) then
-    call backupInput(itimestep)
-endif
+  read(*,*) max_timeSteps
 
 Allocate(xStart(SPH_dim,ntotal))
 xStart=x
     
- max_timeSteps=max_timeSteps + input_timeStep
-write(*,*)' Starting time step for simulation = ',itimestep, ' Ending time step for simulation = ', max_timeSteps
-  
-do while (runSPH)
-    call SPH_operator(max_timeSteps)
 
-    !call analytical_operator(max_timeSteps)
+call SPH_operator(max_timeSteps)
 
-    !Now net time is calculated
-    call system_clock(count=ic2)
-    write (*,*)'        Elapsed time = ', (ic2-ic1)/real(crate1), 'sec'
- 
-    !computations completed for the maximum timesteps input, the user hits 0 on terminal to end simulation
-    ! or 1 on terminal to continue simulation.
-    write(*,*)'  ***************************************************'
-    write(*,*) 'Are you going to run more time steps ? (0=No, 1=yes)'
-    write(*,*)'  ***************************************************'
-    read (*,*) yesorno
-    
-    if(yesorno .eq. 0) then
-        runSPH =.false.
-    else
-        write(*,*)'  ***************************************************'
-        write(*,*)'   Please input the additional time steps to continue running the simulation '
-        write(*,*)' Current int for timestep is int 4 hence max value permissible is 2,147,483,647'
-        write(*,*)'           Current timesteps run is ', max_timeSteps
-        write(*,*)'  ***************************************************'
-        read(*,*) input_timeStep
-        max_timeSteps=max_timeSteps + input_timeStep
-        write(*,*)' This simulation will run for is ', max_timeSteps , 'time steps'
-    endif    
-    
-end do
+
+
+!Now net time is calculated
+call system_clock(count=ic2)
+write (*,*)'        Elapsed time = ', (ic2-ic1)/real(crate1), 'sec'
+
 !All allocated variables need to be deallocated so that the memory is freed
 
 DEALLOCATE(x,vx,mass, rho, p, hsml, itype, mu, temp, xStart) 
