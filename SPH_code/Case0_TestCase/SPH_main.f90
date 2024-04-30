@@ -8,10 +8,7 @@ program SPH3D
 !   Last Modified:  04/17/2022       by  PARIKSHIT BOREGOWDA 
 !-------------------------------------------------------
 
-use particle_data ,   only: rho,p,mu, x,vx,mass, temp, &
-        & hsml,itype,surf_norm,edge,nedge_rel_edge,itimestep, etype, &
-        & dgrho_prev, drho , rho_prev, xStart, ntotal, etotal, &
-        & bdryVal_vel,bdryVal_prs, bdryVal_rho, bdryVal_temp, maxedge
+use particle_data 
 use config_parameter
 
 implicit none
@@ -27,8 +24,8 @@ implicit none
 !                    and is used for calling function SYSTEM_CLOCK
 !--------------------------------------
 
-
-integer(4) input_timeStep,max_timeSteps, yesorno, input_file_type
+real(8) dt
+integer(4) input_timeStep,max_timeSteps, yesorno, input_file_type, current_ts
 integer(8) :: ic1, crate1, cmax1, ic2,s 
 logical ::  runSPH = .true.
 
@@ -36,36 +33,62 @@ logical ::  runSPH = .true.
    
 !start system clock to evealuate time taken to run
 ! System_clock returns number of seconds from 00:00 CUT on 1 Jan 1970
-call system_clock(count=ic1, count_rate=crate1, count_max=cmax1)
+    call system_clock(count=ic1, count_rate=crate1, count_max=cmax1)
 
 ! input particle configuration data
-call inputSPHConfig
+    call inputSPHConfig
 
 ! Add boundary conditions to the boundary:
-allocate( bdryVal_vel(SPH_dim,maxedge),bdryVal_prs(maxedge), bdryVal_rho(maxedge), bdryVal_temp(maxedge))
-do s =1, etotal
-    call BCinputValue(etype(s),bdryVal_vel(:,s), bdryVal_prs(s), bdryVal_rho(s), bdryVal_temp(s))
-enddo
+    allocate( bdryVal_vel(SPH_dim,maxedge),bdryVal_prs(maxedge), bdryVal_rho(maxedge), bdryVal_temp(maxedge))
+    do s =1, etotal
+        call BCinputValue(etype(s),bdryVal_vel(:,s), bdryVal_prs(s), bdryVal_rho(s), bdryVal_temp(s))
+    enddo
 
 ! theoretical maximum for time step.
-call maxTimeStep
+    call maxTimeStep
+    dt = time_step
 
 
 ! Maximum number of timesteps, and ith time step variables are initiatilized as 0 
-max_timeSteps=0
-itimestep=0
+    max_timeSteps=0
+    itimestep=0
 
 !The below requires the user to input on the terminal the maximum time step to run the simulation
-  write(*,*)'  ***************************************************'
-  write(*,*)'          Please input the total time steps to run simulations'
-  write(*,*)'  ***************************************************'
-  read(*,*) max_timeSteps
+    write(*,*)'  ***************************************************'
+    write(*,*)'          Please input the additional number of time steps to run simulations'
+    write(*,*)'  ***************************************************'
+    read(*,*) max_timeSteps
 
-Allocate(xStart(SPH_dim,ntotal))
-xStart=x
+!
+    max_timeSteps=max_timeSteps+itimestep
+    Allocate(xStart(SPH_dim,ntotal))
+    xStart=x
     
+    current_ts= itimestep
+    
+    do itimestep = current_ts+1, max_timesteps
+        
+        
+        call printTimeStep(itimestep,print_step)
+        
+        call PositionDependentFactors
+        
+        if (itimestep .eq. 1) call output_initial_config
+        
+        call EulerIntegration_fluid(itimestep,dt)
+        
+        if (Allocated(pBC_edges)) call PeriodicBCreset
+        
+        ! the below needs to be deallocated here because periodic bc can sometimes increase the total number of particles in next loop
+        deallocate(w_aa, gamma_discrt,del_gamma_as, del_gamma, xi1_mat, beta_mat,gamma_mat,xi_cont_mat, &
+                   & gamma_mat_inv,xi1_mat_inv,xi_cont_mat_inv,b_MLS )
+        
+        
+        ! if (mod(itimestep,backup_step).eq.0)  call backupOutput(itimestep)
+        
+    enddo
+        
 
-call SPH_operator(max_timeSteps)
 
 
 
@@ -74,6 +97,8 @@ call system_clock(count=ic2)
 write (*,*)'        Elapsed time = ', (ic2-ic1)/real(crate1), 'sec'
 
 !All allocated variables need to be deallocated so that the memory is freed
+
+if (Allocated(pBC_edges)) deallocate(pBC_epair_a, pBC_epair_s)
 
 DEALLOCATE(x,vx,mass, rho, p, hsml, itype, mu, temp, xStart) 
 Deallocate(surf_norm, edge,nedge_rel_edge, etype )

@@ -170,6 +170,7 @@
 		<File RelativePath="..\..\SPH_general\particlePackingTimeIntegration.f90"/>
 		<File RelativePath="..\..\SPH_general\ParticleShiftingTechnique.f90"/>
 		<File RelativePath="..\..\SPH_general\PositionDependentFactors.f90"/>
+		<File RelativePath="..\..\SPH_general\printTimeStep.f90"/>
 		<File RelativePath=".\ReadMe.txt"/>
 		<File RelativePath="..\..\SPH_general\relErrorFormulation.f90"/>
 		<File RelativePath="..\..\SPH_general\sml_mult_factor.f90"/>

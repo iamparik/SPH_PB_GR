@@ -23,9 +23,11 @@ subroutine maxTimeStep
     ! Maximum possible time step, is determined as the minimum value of the various theoretical criteria
     dt_max=minval((/ 0.25D0*hsml_const/c_sound, 0.25D0*(hsml_const/norm2(Fext_tot))**0.5D0,0.125D0*hsml_const**2*rho_init/mu_const /))
     write(*,*) ' -------------------time step -----------------------------'
-    write(*,*) 'the minimum permissible value of time step is : ', dt_max , 'for c_sound', c_sound
-    write(*,*) ' tiem step used in simulation is : ', time_Step
+    write(*,*) '  the minimum permissible value of time step : ', dt_max , 'for c_sound', c_sound
+    write(*,*) ' time step set to run simulation in config file : ', time_Step
     write(*,*) ' -------------------time step -----------------------------'
+    
+    
     
     end
     
