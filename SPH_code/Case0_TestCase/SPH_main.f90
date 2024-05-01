@@ -75,6 +75,18 @@ logical ::  runSPH = .true.
         
         if (itimestep .eq. 1) call output_initial_config
         
+        ! if there was periodic BC applied, for periodic particles and points update variables used 
+        if (Allocated(pBC_edges)) then
+            call PeriodicParameter(vx(1,:))
+            call PeriodicParameter(vx(2,:))
+            call PeriodicParameter(rho)
+            call PeriodicParameter(p)
+        endif
+        
+        !------------------------DENSITY UPDATE -----------------------------!
+        allocate(drho(ntotal),rho_prev(ntotal))
+        drho=0.D0
+        
         call EulerIntegration_fluid(itimestep,dt)
         
         if (Allocated(pBC_edges)) call PeriodicBCreset
