@@ -115,7 +115,7 @@ real(8), DIMENSION(:), allocatable :: div_vel
             call CorrectedKernelGradient(Cdwdx_b, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)    
             F_a = vx(:,a)
             F_b = vx(:,b)
-            call VectorDivergencePtoP(div_vel(a),div_vel(b),F_a,F_b,Cdwdx_a, Cdwdx_b, mass(a), mass(b), rho(a), rho(b), SPH_dim)
+            call VectorDivergencePtoP(div_vel(a),div_vel(b),F_a,F_b,Cdwdx_a, Cdwdx_b, mass(a), mass(b), rho(a), rho(b), SPH_dim, 2)
             
             
             
@@ -134,7 +134,7 @@ real(8), DIMENSION(:), allocatable :: div_vel
             call CorrectedKernelGradient(Cdgmas, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)  
             F_a = vx(:,a)
             F_b = vx(:,b)
-            call VectorDivergencePtoB(div_vel(a),F_a,F_b,Cdgmas,SPH_dim)
+            call VectorDivergencePtoB(div_vel(a),F_a,F_b,Cdgmas,SPH_dim, 2)
             
         enddo
         
