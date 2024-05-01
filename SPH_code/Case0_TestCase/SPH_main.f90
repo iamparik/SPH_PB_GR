@@ -107,7 +107,7 @@ real(8), DIMENSION(:), allocatable :: div_vel
             b= pair_j(k)
             
             call CorrectionFactorParsing(1,Scalar0Matrix1,scalar_factor,matrix_factor, &
-                & gamma_cont(a), gamma_discrt, gamma_mat, gamma_mat_inv, xi1_mat_inv, SPH_dim)
+                & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), SPH_dim)
             
             Cdwdx_a=dwdx(:,k)
             call CorrectedKernelGradient(Cdwdx_a, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)
@@ -128,7 +128,7 @@ real(8), DIMENSION(:), allocatable :: div_vel
             b= nedge_rel_edge(s)
 
             call CorrectionFactorParsing(1,Scalar0Matrix1,scalar_factor,matrix_factor, &
-                & gamma_cont(a), gamma_discrt, gamma_mat, gamma_mat_inv, xi1_mat_inv, SPH_dim)
+                & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), SPH_dim)
             
             Cdgmas=del_gamma_as(:,k)
             call CorrectedKernelGradient(Cdgmas, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)  
