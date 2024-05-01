@@ -106,6 +106,8 @@ real(8), DIMENSION(:), allocatable :: div_vel
             a= pair_i(k)
             b= pair_j(k)
             
+            call CorrectionFactorParsing(1,Scalar0Matrix1,scalar_factor,matrix_factor, &
+                & gamma_cont(a), gamma_discrt, gamma_mat, gamma_mat_inv, xi1_mat_inv, SPH_dim)
             Cdwdx_a=dwdx(:,k)
             call CorrectedKernelGradient(Cdwdx_a, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)
             Cdwdx_b=-dwdx(:,k)
