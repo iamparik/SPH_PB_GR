@@ -6,14 +6,13 @@ subroutine CorrectedKernelGradient(Cdwdx, scalar_factor, matrix_factor, Scalar0M
     integer(4) :: d
     real(8) :: GmaInvtemp(dim,dim)
     
+    
     if(Scalar0Matrix1 .eq. 0) then
-        do d=1,dim
-            GmaInvtemp(d,d)= 1.D0/scalar_factor
-        enddo            
         
-        Cdwdx= MATMUL(GmaInvtemp,Cdwdx)
+        Cdwdx= Cdwdx/scalar_factor
         
     else
+        GmaInvtemp=0.D0
         Cdwdx= MATMUL(matrix_factor,Cdwdx)
     endif
     

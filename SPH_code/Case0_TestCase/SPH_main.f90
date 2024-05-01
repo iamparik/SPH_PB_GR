@@ -110,12 +110,12 @@ real(8), DIMENSION(:), allocatable :: div_vel
             call CorrectionFactorParsing(1,Scalar0Matrix1,scalar_factor,matrix_factor, &
                 & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), SPH_dim)
             
-            Cdwdx_a=dwdx(:,k)
+            Cdwdx_a(:)=dwdx(:,k)
             call CorrectedKernelGradient(Cdwdx_a, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)
-            Cdwdx_b=-dwdx(:,k)
+            Cdwdx_b(:)=-dwdx(:,k)
             call CorrectedKernelGradient(Cdwdx_b, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)    
-            F_a = vx(:,a)
-            F_b = vx(:,b)
+            F_a(:) = vx(:,a)
+            F_b(:) = vx(:,b)
             call VectorDivergencePtoP(div_vel(a),div_vel(b),F_a,F_b,Cdwdx_a, Cdwdx_b, mass(a), mass(b), rho(a), rho(b), SPH_dim, 1)
             ! -------------------------------------------------------------------------------------------------------------!
             
@@ -124,9 +124,9 @@ real(8), DIMENSION(:), allocatable :: div_vel
             call CorrectionFactorParsing(1,Scalar0Matrix1,scalar_factor,matrix_factor, &
                 & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), SPH_dim)
             
-            Cdwdx_a=dwdx(:,k)
+            Cdwdx_a(:)=dwdx(:,k)
             call CorrectedKernelGradient(Cdwdx_a, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)
-            Cdwdx_b=-dwdx(:,k)
+            Cdwdx_b(:)=-dwdx(:,k)
             call CorrectedKernelGradient(Cdwdx_b, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)    
             call ScalarGradientPtoP(delP(:,a),div_vel(b),P(a),P(b),Cdwdx_a, Cdwdx_b, mass(a), mass(b), rho(a), rho(b), SPH_dim, 2)
             !-------------------------------------------------------------------------------------------------------------!
@@ -149,9 +149,9 @@ real(8), DIMENSION(:), allocatable :: div_vel
             
             Cdgmas=del_gamma_as(:,k)
             call CorrectedKernelGradient(Cdgmas, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)  
-            F_a = vx(:,a)
-            F_b = vx(:,b)
-            call VectorDivergencePtoB(div_vel(a),vx(:,a),vx(:,b),Cdgmas,SPH_dim, 1)
+            F_a(:) = vx(:,a)
+            F_b(:) = 0.D0!vx(:,b)
+            call VectorDivergencePtoB(div_vel(a),F_a,F_b,Cdgmas,SPH_dim, 1)
             ! -----------------------------------------------------------------------!
             
             !------ Find Pressure Gradient term (to be used in momentum equation) -------------!
@@ -184,7 +184,7 @@ real(8), DIMENSION(:), allocatable :: div_vel
                 
                 
                 !Update Velocity
-                vx(:,a) = vx(:,a) + dt* (delP(:,a)/rho(a))
+                vx(:,a) = vx(:,a) + dt* (delP(:,a)/rho(a) + F_ext(:))
             
             
                 !Update position
