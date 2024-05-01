@@ -83,7 +83,7 @@
 		<File RelativePath="..\..\FluidFlow\summationDensityOperator.f90"/>
 		<File RelativePath="..\..\FluidFlow\viscousStressOperator.f90"/></Filter>
 		<Filter Name="InputFiles">
-		<File RelativePath="..\..\InputFiles\backupInput.f90"/>
+		<File RelativePath="..\..\InputFiles(toBeRemoved-Deprecated)\backupInput.f90"/>
 		<File RelativePath="..\BCinput.f90"/>
 		<File RelativePath="..\..\SPH_general\inputCADtoParticleData.f90"/>
 		<File RelativePath="..\InputExtNew.f90"/>
@@ -100,6 +100,9 @@
 		<File RelativePath="..\..\NeighborSearch\nnes_algorithm.f90"/>
 		<File RelativePath="..\..\NeighborSearch\nnps_algorithm.f90"/>
 		<File RelativePath="..\..\NeighborSearch\particlePair.f90"/></Filter>
+		<Filter Name="NewOperators">
+		<File RelativePath="..\..\SPHOperators\CorrectedKernelGradient.f90"/>
+		<File RelativePath="..\..\SPHOperators\VectorDivergence.f90"/></Filter>
 		<Filter Name="Operators">
 		<File RelativePath="..\..\FormulationTester\BIL1.f90"/>
 		<File RelativePath="..\..\FormulationTester\BIL1Corrected.f90"/>

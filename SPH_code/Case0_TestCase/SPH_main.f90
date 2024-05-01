@@ -26,8 +26,13 @@ implicit none
 
 real(8) dt
 integer(4) input_timeStep,max_timeSteps, yesorno, input_file_type, current_ts
-integer(8) :: ic1, crate1, cmax1, ic2,s 
+integer(8) :: ic1, crate1, cmax1, ic2
 logical ::  runSPH = .true.
+integer(4) :: k, a, b , s, Scalar0Matrix1
+real(8) :: scalar_factor
+real(8), DIMENSION(:), allocatable  :: F_a, F_b, Cdwdx_a, Cdwdx_b, Cdgmas
+real(8), DIMENSION(:,:), allocatable :: matrix_factor
+real(8), DIMENSION(:), allocatable :: div_vel
 
 
    
@@ -37,6 +42,9 @@ logical ::  runSPH = .true.
 
 ! input particle configuration data
     call inputSPHConfig
+    
+    allocate(F_a(SPH_dim), F_b(SPH_dim), Cdwdx_a(SPH_dim), Cdwdx_b(SPH_dim), Cdgmas(SPH_dim), &
+    & matrix_factor(SPH_dim,SPH_dim))
 
 ! Add boundary conditions to the boundary:
     allocate( bdryVal_vel(SPH_dim,maxedge),bdryVal_prs(maxedge), bdryVal_rho(maxedge), bdryVal_temp(maxedge))
@@ -83,13 +91,52 @@ logical ::  runSPH = .true.
             call PeriodicParameter(p)
         endif
         
-        !------------------------DENSITY UPDATE -----------------------------!
-        allocate(drho(ntotal),rho_prev(ntotal))
-        drho=0.D0
+        ! Allocate variables necessary
+        ! Density updated related paramters
+        !allocate(drho(ntotal),rho_prev(ntotal))
+        !drho=0.D0
         
-        call EulerIntegration_fluid(itimestep,dt)
+        allocate(div_vel(ntotal)) ! this can be reduced by accoutnign for nreal and nedge correctly
+        
+!------------------- Update Density --------------------!
+        ! Currently only continuity density added
+        
+        ! Use all particle-particle interaction to find non boundary terms
+        do k= 1,niac
+            a= pair_i(k)
+            b= pair_j(k)
+            
+            Cdwdx_a=dwdx(:,k)
+            call CorrectedKernelGradient(Cdwdx_a, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)
+            Cdwdx_b=-dwdx(:,k)
+            call CorrectedKernelGradient(Cdwdx_b, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)    
+            F_a = vx(:,a)
+            F_b = vx(:,b)
+            call VectorDivergencePtoP(div_vel(a),div_vel(b),F_a,F_b,Cdwdx_a, Cdwdx_b, mass(a), mass(b), rho(a), rho(b), SPH_dim)
+            
+            
+            
+        enddo
+        
+        ! Use all particle-edge interactions to find boundary terms
+        do k= 1,eniac
+            a= epair_a(k)
+            s= epair_s(k)
+            b= nedge_rel_edge(s)
+
+            Cdgmas=del_gamma_as(:,k)
+            call CorrectedKernelGradient(Cdgmas, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)  
+            F_a = vx(:,a)
+            F_b = vx(:,b)
+            call VectorDivergencePtoB(div_vel(a),F_a,F_b,Cdgmas,SPH_dim)
+            
+        enddo
+        
+        !call EulerIntegration_fluid(itimestep,dt)
         
         if (Allocated(pBC_edges)) call PeriodicBCreset
+        
+        deallocate(div_vel)
         
         ! the below needs to be deallocated here because periodic bc can sometimes increase the total number of particles in next loop
         deallocate(w_aa, gamma_discrt,del_gamma_as, del_gamma, xi1_mat, beta_mat,gamma_mat,xi_cont_mat, &
