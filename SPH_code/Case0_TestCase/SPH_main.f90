@@ -29,9 +29,9 @@ integer(4) input_timeStep,max_timeSteps, yesorno, input_file_type, current_ts
 integer(8) :: ic1, crate1, cmax1, ic2
 logical ::  runSPH = .true.
 integer(4) :: k, a, b , s, Scalar0Matrix1
-real(8) :: scalar_factor
+real(8) :: scalar_factor, Pr_s
 real(8), DIMENSION(:), allocatable  :: F_a, F_b, Cdwdx_a, Cdwdx_b, Cdgmas
-real(8), DIMENSION(:,:), allocatable :: matrix_factor
+real(8), DIMENSION(:,:), allocatable :: matrix_factor, delP
 real(8), DIMENSION(:), allocatable :: div_vel
 
 
@@ -96,9 +96,10 @@ real(8), DIMENSION(:), allocatable :: div_vel
         !allocate(drho(ntotal),rho_prev(ntotal))
         !drho=0.D0
         
-        allocate(div_vel(ntotal), dstress(SPH_dim, ntotal)) ! this can be reduced by accoutnign for nreal and nedge correctly
-        
-
+        allocate(div_vel(ntotal), delP(SPH_dim, ntotal)) ! this can be reduced by accoutnign for nreal and nedge correctly
+        div_vel=0.D0
+        delP=0.D0
+    
         
         ! Use all particle-particle interaction to find non boundary terms
         do k= 1,niac
@@ -115,7 +116,7 @@ real(8), DIMENSION(:), allocatable :: div_vel
             call CorrectedKernelGradient(Cdwdx_b, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)    
             F_a = vx(:,a)
             F_b = vx(:,b)
-            call VectorDivergencePtoP(div_vel(a),div_vel(b),F_a,F_b,Cdwdx_a, Cdwdx_b, mass(a), mass(b), rho(a), rho(b), SPH_dim, 2)
+            call VectorDivergencePtoP(div_vel(a),div_vel(b),F_a,F_b,Cdwdx_a, Cdwdx_b, mass(a), mass(b), rho(a), rho(b), SPH_dim, 1)
             ! -------------------------------------------------------------------------------------------------------------!
             
             !-------------- Find Pressure Gradient term (to be used in momentum equation) --------------!
@@ -127,9 +128,7 @@ real(8), DIMENSION(:), allocatable :: div_vel
             call CorrectedKernelGradient(Cdwdx_a, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)
             Cdwdx_b=-dwdx(:,k)
             call CorrectedKernelGradient(Cdwdx_b, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)    
-            F_a = vx(:,a)
-            F_b = vx(:,b)
-            call VectorDivergencePtoP(div_vel(a),div_vel(b),F_a,F_b,Cdwdx_a, Cdwdx_b, mass(a), mass(b), rho(a), rho(b), SPH_dim, 2)
+            call ScalarGradientPtoP(delP(:,a),div_vel(b),P(a),P(b),Cdwdx_a, Cdwdx_b, mass(a), mass(b), rho(a), rho(b), SPH_dim, 2)
             !-------------------------------------------------------------------------------------------------------------!
             
             
@@ -152,7 +151,17 @@ real(8), DIMENSION(:), allocatable :: div_vel
             call CorrectedKernelGradient(Cdgmas, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)  
             F_a = vx(:,a)
             F_b = vx(:,b)
-            call VectorDivergencePtoB(div_vel(a),F_a,F_b,Cdgmas,SPH_dim, 2)
+            call VectorDivergencePtoB(div_vel(a),vx(:,a),vx(:,b),Cdgmas,SPH_dim, 1)
+            ! -----------------------------------------------------------------------!
+            
+            !------ Find Pressure Gradient term (to be used in momentum equation) -------------!
+            call CorrectionFactorParsing(1,Scalar0Matrix1,scalar_factor,matrix_factor, &
+                & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), SPH_dim)
+            
+            Cdgmas=del_gamma_as(:,k)
+            call CorrectedKernelGradient(Cdgmas, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)  
+            Pr_s = P(a) +rho(a)*c_sound*dot_product(vx(:,a)-vx(:,b), surf_norm(:,s))
+            call ScalarGradientPtoB(delP(:,a),P(a),Pr_s,Cdgmas,SPH_dim, 2)
             ! -----------------------------------------------------------------------!
             
         enddo
@@ -175,7 +184,7 @@ real(8), DIMENSION(:), allocatable :: div_vel
                 
                 
                 !Update Velocity
-                vx(:,a) = vx(:,a) + dt* dstress(:,a)
+                vx(:,a) = vx(:,a) + dt* (delP(:,a)/rho(a))
             
             
                 !Update position
@@ -184,7 +193,7 @@ real(8), DIMENSION(:), allocatable :: div_vel
             endif
         enddo
         
-         deallocate(div_vel,dstress)
+         deallocate(div_vel,delP)
         
         
         !---------------------- free surface detection and PST algorithm -------------------------------------!
