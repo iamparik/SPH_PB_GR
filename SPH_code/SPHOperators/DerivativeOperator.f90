@@ -34,15 +34,15 @@ subroutine DerivativeOperatorB(dF_a,F_a,F_s,Cdgmas, id)
     
     if(id .eq. 0) then
         
-        dF_a= dF_a + F_s*Cdgmas
+        dF_a= dF_a - F_s*Cdgmas
         
     elseif(id .eq. 1) then
         
-        dF_a= dF_a + (F_s-F_a)*Cdgmas
+        dF_a= dF_a - (F_s-F_a)*Cdgmas
         
     elseif(id .eq. 2) then
         
-        dF_a= dF_a + (F_s+F_a)*Cdgmas
+        dF_a= dF_a - (F_s+F_a)*Cdgmas
         
     endif
 

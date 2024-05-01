@@ -23,7 +23,7 @@ module config_parameter
 !   itype_real_max  = all real particles are currently defined to be between 1-99, so max is 99
 !   itype_real_min  = all real particles are currently defined to be between 1-99, so min is 1        
     public itype_virtual, itype_real_max, itype_real_min, itype_periodic
-    integer(4), parameter :: itype_virtual=100  
+    integer(2), parameter :: itype_virtual=100  
     integer(4), parameter :: itype_real_max=99
     integer(4), parameter :: itype_real_min=1
     integer(4), parameter :: itype_periodic=200

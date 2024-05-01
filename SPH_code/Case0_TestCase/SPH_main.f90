@@ -1,4 +1,4 @@
-program SPH3D
+﻿program SPH3D
  
 !-------------------------------------------------------
 ! Program for running Boundary Integral SPH
@@ -96,15 +96,29 @@ real(8), DIMENSION(:), allocatable :: div_vel
         !allocate(drho(ntotal),rho_prev(ntotal))
         !drho=0.D0
         
-        allocate(div_vel(ntotal)) ! this can be reduced by accoutnign for nreal and nedge correctly
+        allocate(div_vel(ntotal), dstress(SPH_dim, ntotal)) ! this can be reduced by accoutnign for nreal and nedge correctly
         
-!------------------- Update Density --------------------!
-        ! Currently only continuity density added
+
         
         ! Use all particle-particle interaction to find non boundary terms
         do k= 1,niac
             a= pair_i(k)
             b= pair_j(k)
+            
+            !------------------- Find divergence of velocity (to be used in continuity equation) -------------------------!
+            call CorrectionFactorParsing(1,Scalar0Matrix1,scalar_factor,matrix_factor, &
+                & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), SPH_dim)
+            
+            Cdwdx_a=dwdx(:,k)
+            call CorrectedKernelGradient(Cdwdx_a, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)
+            Cdwdx_b=-dwdx(:,k)
+            call CorrectedKernelGradient(Cdwdx_b, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)    
+            F_a = vx(:,a)
+            F_b = vx(:,b)
+            call VectorDivergencePtoP(div_vel(a),div_vel(b),F_a,F_b,Cdwdx_a, Cdwdx_b, mass(a), mass(b), rho(a), rho(b), SPH_dim, 2)
+            ! -------------------------------------------------------------------------------------------------------------!
+            
+            !-------------- Find Pressure Gradient term (to be used in momentum equation) --------------!
             
             call CorrectionFactorParsing(1,Scalar0Matrix1,scalar_factor,matrix_factor, &
                 & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), SPH_dim)
@@ -116,6 +130,8 @@ real(8), DIMENSION(:), allocatable :: div_vel
             F_a = vx(:,a)
             F_b = vx(:,b)
             call VectorDivergencePtoP(div_vel(a),div_vel(b),F_a,F_b,Cdwdx_a, Cdwdx_b, mass(a), mass(b), rho(a), rho(b), SPH_dim, 2)
+            !-------------------------------------------------------------------------------------------------------------!
+            
             
             
             
@@ -127,6 +143,8 @@ real(8), DIMENSION(:), allocatable :: div_vel
             s= epair_s(k)
             b= nedge_rel_edge(s)
 
+            
+            !------ Find divergence of velocity for calculating density -------------!
             call CorrectionFactorParsing(1,Scalar0Matrix1,scalar_factor,matrix_factor, &
                 & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), SPH_dim)
             
@@ -135,14 +153,56 @@ real(8), DIMENSION(:), allocatable :: div_vel
             F_a = vx(:,a)
             F_b = vx(:,b)
             call VectorDivergencePtoB(div_vel(a),F_a,F_b,Cdgmas,SPH_dim, 2)
+            ! -----------------------------------------------------------------------!
             
         enddo
         
-        !call EulerIntegration_fluid(itimestep,dt)
+        
+        ! Update variables for the next time step
+        do a =1, ntotal
+            if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min)) then
+                ! Calcualate density as (𝐷𝜌_𝑎)/𝐷𝑡=− 𝜌_𝑎  ∇∙𝑣_𝑎
+                rho(a) = rho(a) - dt* rho(a) * div_vel(a)
+                ! Use Hughes density correction if necessary
+                if ((HG_density_correction) .and. (rho(a) .le. rho_init)) rho(a)=rho_init
+            
+            
+                ! Update Pressure as it depends on density for WCSPH
+                call ParticlePressureEOS(p(a), rho(a), itype(a), itype_virtual) 
+                
+                
+                !Update acceleration terms
+                
+                
+                !Update Velocity
+                vx(:,a) = vx(:,a) + dt* dstress(:,a)
+            
+            
+                !Update position
+                x(:,a) = x(:,a) + dt* vx(:,a)
+            
+            endif
+        enddo
+        
+         deallocate(div_vel,dstress)
+        
+        
+        !---------------------- free surface detection and PST algorithm -------------------------------------!
+        call FreeSurfaceDetection
+        if(PSTtype .gt. 0) then
+            call ParticleShiftingTechnique
+        endif
+        
+        if( .not. allocated(delC)) call ConcGradient  
+        
+        
+        if ((mod(itimestep,save_step).eq.0) .or. (itimestep.eq.1)) call output_flow_simplified(itimestep,dt)   
+        deallocate(delC)
+        deallocate(FreeSurfaceVar)
+        
+       !call EulerIntegration_fluid(itimestep,dt)
         
         if (Allocated(pBC_edges)) call PeriodicBCreset
-        
-        deallocate(div_vel)
         
         ! the below needs to be deallocated here because periodic bc can sometimes increase the total number of particles in next loop
         deallocate(w_aa, gamma_discrt,del_gamma_as, del_gamma, xi1_mat, beta_mat,gamma_mat,xi_cont_mat, &

@@ -78,6 +78,7 @@
 		<File RelativePath="..\..\FluidFlow\FluidMomentum.f90"/>
 		<File RelativePath="..\..\FluidFlow\FreeSurfaceDetection.f90"/>
 		<File RelativePath="..\..\FluidFlow\LeapFrogKDKIntegration_fluid.f90"/>
+		<File RelativePath="..\..\FluidFlow\ParticlePressureEOS.f90"/>
 		<File RelativePath="..\..\FluidFlow\pressure_EOS.f90"/>
 		<File RelativePath="..\..\FluidFlow\pressureGradientOperator.f90"/>
 		<File RelativePath="..\..\FluidFlow\summationDensityOperator.f90"/>
