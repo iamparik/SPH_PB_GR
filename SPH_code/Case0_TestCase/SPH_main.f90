@@ -160,7 +160,7 @@ real(8), DIMENSION(:), allocatable :: div_vel
             
             Cdgmas=del_gamma_as(:,k)
             call CorrectedKernelGradient(Cdgmas, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)  
-            Pr_s = P(a) +rho(a)*c_sound*dot_product(vx(:,a)-vx(:,b), surf_norm(:,s))
+            Pr_s = P(a) -rho(a)*c_sound*dot_product(vx(:,a)-vx(:,b), surf_norm(:,s))
             call ScalarGradientPtoB(delP(:,a),P(a),Pr_s,Cdgmas,SPH_dim, 2)
             ! -----------------------------------------------------------------------!
             
@@ -170,10 +170,7 @@ real(8), DIMENSION(:), allocatable :: div_vel
         ! Update variables for the next time step
         do a =1, ntotal
             if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min)) then
-                ! Calcualate density as (𝐷𝜌_𝑎)/𝐷𝑡=− 𝜌_𝑎  ∇∙𝑣_𝑎
-                rho(a) = rho(a) - dt* rho(a) * div_vel(a)
-                ! Use Hughes density correction if necessary
-                if ((HG_density_correction) .and. (rho(a) .le. rho_init)) rho(a)=rho_init
+                
             
             
                 ! Update Pressure as it depends on density for WCSPH
@@ -184,11 +181,17 @@ real(8), DIMENSION(:), allocatable :: div_vel
                 
                 
                 !Update Velocity
-                vx(:,a) = vx(:,a) + dt* (delP(:,a)/rho(a) + F_ext(:))
+                vx(:,a) = vx(:,a) + dt* (-delP(:,a)/rho(a) + F_ext(:))
             
             
                 !Update position
                 x(:,a) = x(:,a) + dt* vx(:,a)
+                
+                
+                ! Calcualate density as (𝐷𝜌_𝑎)/𝐷𝑡=− 𝜌_𝑎  ∇∙𝑣_𝑎
+                rho(a) = rho(a) - dt* rho(a) * div_vel(a)
+                ! Use Hughes density correction if necessary
+                if ((HG_density_correction) .and. (rho(a) .le. rho_init)) rho(a)=rho_init
             
             endif
         enddo
