@@ -4,9 +4,9 @@ subroutine CorrectionFactorParsing(id,Scalar0Matrix1,scalar_factor,matrix_factor
     integer(4), intent(in) :: dim,id
     integer(4), intent(out) :: Scalar0Matrix1
     real(8), intent(out) :: scalar_factor, matrix_factor(dim,dim)
-    real(8), intent(inout) :: g_c, g_d, g_m(dim,dim),g_m_i(dim,dim), xi_m_i(dim,dim)
+    real(8), intent(in) :: g_c, g_d, g_m(dim,dim),g_m_i(dim,dim), xi_m_i(dim,dim)
     integer(4) :: d
-    real(8) :: GmaInvtemp(dim,dim)
+
     
     matrix_factor = 0.D0
     scalar_factor = 0.D0

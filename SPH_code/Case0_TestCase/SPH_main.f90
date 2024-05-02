@@ -103,21 +103,14 @@ real(8), DIMENSION(:), allocatable :: div_vel
         ! Use all particle-particle interaction to find non boundary terms
         do k= 1,niac
             a= pair_i(k)
-            b= pair_j(k)            
+            b= pair_j(k)  
+
+           
             !------------------- Find divergence of velocity (to be used in continuity equation) -------------------------!
-            call CorrectionFactorParsing(1,Scalar0Matrix1,scalar_factor,matrix_factor, &
-                & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), SPH_dim)            
-            Cdwdx_a(:)=dwdx(:,k)
-            call CorrectedKernelGradient(Cdwdx_a, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)
-            
-            call CorrectionFactorParsing(1,Scalar0Matrix1,scalar_factor,matrix_factor, &
-                & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), SPH_dim)
-            Cdwdx_b(:)=-dwdx(:,k)
-            call CorrectedKernelGradient(Cdwdx_b, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)    
-            
-            F_a(:) = vx(:,a)
-            F_b(:) = vx(:,b)
-            call VectorDivergencePtoP(div_vel(a),div_vel(b),F_a,F_b,Cdwdx_a, Cdwdx_b, mass(a), mass(b), rho(a), rho(b), SPH_dim, 1)
+            call CorrectedVecDivPtoP(div_vel(a),div_vel(b),vx(:,a),vx(:,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
+                    & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                    & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
+                    & SPH_dim, 1, 1) ! SPH_dim, correctionFactorID, divType
             ! -------------------------------------------------------------------------------------------------------------!
             
         enddo
@@ -127,15 +120,15 @@ real(8), DIMENSION(:), allocatable :: div_vel
             a= epair_a(k)
             s= epair_s(k)
             b= nedge_rel_edge(s)
-            !------ Find divergence of velocity for calculating density -------------!
-            call CorrectionFactorParsing(1,Scalar0Matrix1,scalar_factor,matrix_factor, &
-                & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), SPH_dim)
             
-            Cdgmas(:)=del_gamma_as(:,k)
-            call CorrectedKernelGradient(Cdgmas, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)  
+            
+            !------ Find divergence of velocity for calculating density -------------!
             F_a(:) = vx(:,a)
             F_b(:) = 0.D0!vx(:,b)
-            call VectorDivergencePtoB(div_vel(a),F_a,F_b,Cdgmas,SPH_dim, 1)
+
+             call CorrectedVecDivPtoB(div_vel(a),F_a,F_b,del_gamma_as(:,k),  &
+                    & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                    & SPH_dim, 1, 1) ! SPH_dim, correctionFactorID, divType
             ! -----------------------------------------------------------------------!
         enddo
         
@@ -166,20 +159,15 @@ real(8), DIMENSION(:), allocatable :: div_vel
         do k= 1,niac
             a= pair_i(k)
             b= pair_j(k)
+            
+             
 
             !-------------- Find Pressure Gradient term (to be used in momentum equation) --------------!
             
-            call CorrectionFactorParsing(1,Scalar0Matrix1,scalar_factor,matrix_factor, &
-                & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), SPH_dim)
-            Cdwdx_a(:)=dwdx(:,k)
-            call CorrectedKernelGradient(Cdwdx_a, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)
-            
-            call CorrectionFactorParsing(1,Scalar0Matrix1,scalar_factor,matrix_factor, &
-                & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), SPH_dim)
-            Cdwdx_b(:)=-dwdx(:,k)
-            call CorrectedKernelGradient(Cdwdx_b, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)    
-            
-            call ScalarGradientPtoP(delP(:,a),delP(:,b),P(a),P(b),Cdwdx_a, Cdwdx_b, mass(a), mass(b), rho(a), rho(b), SPH_dim, 2)
+            call CorrectedScaGradPtoP(delP(:,a),delP(:,b),P(a),P(b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
+                    & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                    & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
+                    & SPH_dim, 1, 2) ! SPH_dim, correctionFactorID, grad_type
             !-------------------------------------------------------------------------------------------------------------!
 
         enddo
@@ -191,14 +179,14 @@ real(8), DIMENSION(:), allocatable :: div_vel
             s= epair_s(k)
             b= nedge_rel_edge(s)
             
-            !------ Find Pressure Gradient term (to be used in momentum equation) -------------!
-            call CorrectionFactorParsing(1,Scalar0Matrix1,scalar_factor,matrix_factor, &
-                & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), SPH_dim)
             
-            Cdgmas(:)=del_gamma_as(:,k)
-            call CorrectedKernelGradient(Cdgmas, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)  
+            
+            !------ Find Pressure Gradient term (to be used in momentum equation) -------------!
             Pr_s = P(a) -rho(a)*c_sound*dot_product(vx(:,a)-vx(:,b), surf_norm(:,s))
-            call ScalarGradientPtoB(delP(:,a),P(a),Pr_s,Cdgmas,SPH_dim, 2)
+            
+            call CorrectedScaGradPtoB(delP(:,a),P(a),Pr_s,del_gamma_as(:,k),  &
+                    & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                    & SPH_dim, 1, 2) ! SPH_dim, correctionFactorID, divType
             ! -----------------------------------------------------------------------!
             
         enddo
