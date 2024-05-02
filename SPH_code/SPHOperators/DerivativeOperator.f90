@@ -3,22 +3,22 @@ subroutine DerivativeOperator(dF_a,dF_b,F_a,F_b,Cdwdx_a, Cdwdx_b, mass_a, mass_b
     implicit none
     integer(4), intent(in) :: id
     real(8), intent(in) :: F_a, F_b, Cdwdx_a, Cdwdx_b, mass_a, mass_b, rho_a, rho_b
-    real(8), intent(out) :: dF_a,dF_b    
+    real(8), intent(inout) :: dF_a,dF_b    
     
     if(id .eq. 0) then
         
         dF_a= dF_a + F_b*Cdwdx_a*mass_b/rho_b
-        dF_b= dF_b + F_a*Cdwdx_b*mass_b/rho_b
+        dF_b= dF_b + F_a*Cdwdx_b*mass_a/rho_a
         
     elseif(id .eq. 1) then
         
         dF_a= dF_a + (F_b-F_a)*Cdwdx_a*mass_b/rho_b
-        dF_b= dF_b + (F_a-F_b)*Cdwdx_b*mass_b/rho_b
+        dF_b= dF_b + (F_a-F_b)*Cdwdx_b*mass_a/rho_a
         
     elseif(id .eq. 2) then
         
         dF_a= dF_a + (F_b+F_a)*Cdwdx_a*mass_b/rho_b
-        dF_b= dF_b + (F_a+F_b)*Cdwdx_b*mass_b/rho_b
+        dF_b= dF_b + (F_a+F_b)*Cdwdx_b*mass_a/rho_a
     endif
 
 endsubroutine
@@ -30,7 +30,7 @@ subroutine DerivativeOperatorB(dF_a,F_a,F_s,Cdgmas, id)
     implicit none
     integer(4), intent(in) :: id
     real(8), intent(in) :: F_a, F_s, Cdgmas
-    real(8), intent(out) :: dF_a  
+    real(8), intent(inout) :: dF_a  
     
     if(id .eq. 0) then
         
