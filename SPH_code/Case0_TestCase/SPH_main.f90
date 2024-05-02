@@ -179,7 +179,7 @@ real(8), DIMENSION(:), allocatable :: div_vel
             Cdwdx_b(:)=-dwdx(:,k)
             call CorrectedKernelGradient(Cdwdx_b, scalar_factor, matrix_factor, Scalar0Matrix1, SPH_dim)    
             
-            call ScalarGradientPtoP(delP(:,a),div_vel(b),P(a),P(b),Cdwdx_a, Cdwdx_b, mass(a), mass(b), rho(a), rho(b), SPH_dim, 2)
+            call ScalarGradientPtoP(delP(:,a),delP(:,b),P(a),P(b),Cdwdx_a, Cdwdx_b, mass(a), mass(b), rho(a), rho(b), SPH_dim, 2)
             !-------------------------------------------------------------------------------------------------------------!
 
         enddo
