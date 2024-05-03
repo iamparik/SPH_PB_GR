@@ -251,11 +251,12 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
             
             do d= 1,SPH_dim
                 
-                F_a(:) = 2.D0*grad_vel(d,:,a) !+ grad_vel(d,:,b)
-                Sca_Bdry_val= 0.D0
-                call BILapPtoB_PCG(visc_stress(d,a),F_a,Sca_Bdry_val, del_gamma_as(:,k), &
+                F_a(:) = 0.D0!2.D0*grad_vel(d,:,a) !+ grad_vel(d,:,b)
+                Sca_Bdry_val=2.D0*(vx(d,a)-vx(d,b))/dot_product(delx_ab, surf_norm(:,s)) !0.D0
+
+                call CorrectedBILapPtoB(visc_stress(d,a), F_a, Sca_Bdry_val, del_gamma_as(:,k), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                    & SPH_dim, 1, 0) ! SPH_dim, correctionFactorID, dirich0Neum1
+                    & SPH_dim, 1, 2, 0) ! SPH_dim, correctionFactorID, BIL_type, dirich0Neum1
             enddo
             ! -----------------------------------------------------------------------!
 

@@ -29,15 +29,19 @@ subroutine CorrectedBILapPtoP(dF_a,dF_b,F_a,F_b,dwdx, mass_a, mass_b, rho_a, rho
 endsubroutine
     
     
-subroutine BILapPtoB_PCG(dF_a, F_s, Dfdn_s, del_gamma_as,&
+    
+    
+    
+    
+subroutine CorrectedBILapPtoB(dF_a, vec_val, scalar_val, del_gamma_as,&
                     & gamma_cont_a, gamma_discrt_a, gamma_mat_a, gamma_mat_inv_a, xi1_mat_inv_a, &
-                    & dim, CF_ID ,dirich0Neum1) 
+                    & dim, CF_ID ,BIL_type, dirich0Neum1) 
 
-    !vector divergence for particle itneracting with boundary is calculated, by first correctign the kernel gradient
+    !vector divergence for particle itneracting with boundary is calculated, by first correcting the kernel gradient
 
     implicit none
-    integer(4), intent(in) :: dim, CF_ID, dirich0Neum1
-    real(8), intent(in) :: F_s (dim) ,Dfdn_s, del_gamma_as(dim), &
+    integer(4), intent(in) :: dim, CF_ID,BIL_type, dirich0Neum1
+    real(8), intent(in) :: vec_val(dim), scalar_val , del_gamma_as(dim), &
         & gamma_cont_a, gamma_discrt_a, gamma_mat_a(dim,dim), gamma_mat_inv_a(dim,dim), xi1_mat_inv_a(dim,dim)
     real(8), intent(inout) :: dF_a 
     integer(4) :: d, Scalar0Matrix1
@@ -48,12 +52,21 @@ subroutine BILapPtoB_PCG(dF_a, F_s, Dfdn_s, del_gamma_as,&
     Cdgmas(:)=del_gamma_as(:)
     call CorrectedKernelGradient(Cdgmas, scalar_factor, matrix_factor, Scalar0Matrix1, dim)  
     
-    if(dirich0Neum1 .eq. 0) then
-        dF_a= dF_a - dot_product(F_s,Cdgmas)
-    elseif(dirich0Neum1 .eq. 1) then
-        dF_a =dF_a - Dfdn_s*norm2(Cdgmas)
-    else
-        pause
+    if(BIL_type .eq. 1) then    
+        !The below allows implementing BIL-PCG directly for dirichlet and neumann bc
+        ! and other formulations that allow for delf input like Macia et. al approx
+        if(dirich0Neum1 .eq. 0) then
+            dF_a= dF_a - dot_product(vec_val,Cdgmas)
+        elseif(dirich0Neum1 .eq. 1) then
+            dF_a =dF_a - scalar_val*norm2(Cdgmas)
+        endif
+        
+    elseif(BIL_type .eq. 2) then
+        ! This is to implement BIL-NTG and other simplification of df/dn
+        dF_a =dF_a - scalar_val*norm2(Cdgmas)
+        
     endif
     
 endsubroutine
+    
+  
