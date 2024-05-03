@@ -175,7 +175,7 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
             
             !-------------- Find velocity gradient term (to be used to find viscous stress in momentum equation) --------------!
             do d =1, SPH_dim
-                call CorrectedScaGradPtoP(grad_vel(d,:,a),grad_vel(d,:,a),vx(d,a),vx(d,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
+                call CorrectedScaGradPtoP(grad_vel(d,:,a),grad_vel(d,:,b),vx(d,a),vx(d,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                         & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                         & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
                         & SPH_dim, 3, 1) ! SPH_dim, correctionFactorID, grad_type
@@ -196,14 +196,15 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
             
             call CorrectedScaGradPtoB(grad_P(:,a),P(a),Sca_Bdry_val,del_gamma_as(:,k),  &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                    & SPH_dim, 1, 2) ! SPH_dim, correctionFactorID, divType
+                    & SPH_dim, 1, 2) ! SPH_dim, correctionFactorID, grad_type
             ! -----------------------------------------------------------------------!
             
              !------ Find velocity gradient term (to be used to find viscous stress in momentum equation) ------------
+            F_b(:) = 0.D0!vx(:,b)
             do d = 1, SPH_dim
-                call CorrectedScaGradPtoB(grad_vel(d,:,a),vx(d,a),vx(d,b),del_gamma_as(:,k),  &
+                call CorrectedScaGradPtoB(grad_vel(d,:,a),vx(d,a),F_b(d),del_gamma_as(:,k),  &
                         & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                        & SPH_dim, 3, 1) ! SPH_dim, correctionFactorID, divType
+                        & SPH_dim, 3, 1) ! SPH_dim, correctionFactorID, grad_type
             enddo
             ! -----------------------------------------------------------------------!
             
