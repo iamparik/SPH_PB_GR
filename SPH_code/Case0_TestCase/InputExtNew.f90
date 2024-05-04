@@ -87,6 +87,8 @@
     write(*,*)'      Total number of Real particles : ', nreal    	
     write(*,*)'**************************************************'
 
+    ! s-0
+    ! inputCADtoEdgeData(s, maxedge, '/input_domainBdryEdge.dat',avgEdgeSize_ratio )
     
     
     Allocate(edge_temp(SPH_dim,maxedge))   

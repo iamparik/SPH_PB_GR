@@ -86,6 +86,7 @@
 		<Filter Name="InputFiles">
 		<File RelativePath="..\..\InputFiles(toBeRemoved-Deprecated)\backupInput.f90"/>
 		<File RelativePath="..\BCinput.f90"/>
+		<File RelativePath="..\..\SPH_general\inputCADtoEdgeData.f90"/>
 		<File RelativePath="..\..\SPH_general\inputCADtoParticleData.f90"/>
 		<File RelativePath="..\InputExtNew.f90"/>
 		<File RelativePath="..\..\InputFiles(toBeRemoved-Deprecated)\inputParticePacking.f90"/>

@@ -60,6 +60,10 @@ integer(4):: itimestep
     real(8):: KE_prev
     real(8),DIMENSION(:),ALLOCATABLE :: FreeSurfaceVar 
     
+
+    
+    
+    
     
     public packed_x,packed_itype, packed_vol, delC,delCMax,delCAvg, &
         & delCL2,ga_Max,ga_Avg,ga_L2, xStart, g_a_min, g_a_max, packableParticle, &
@@ -86,11 +90,13 @@ integer(4):: itimestep
 ![Input]            edge:   stores vertices of solid wall boudnary (edge in 2d and plane in 3d)    
 ![Output]           nedge_rel_edge:   Edge related to a boudnary particle (or reference point) on edge 
 ![Output]           surf_norm:     surface normals for wall edges
-    public edge,nedge_rel_edge,surf_norm
+![input/output]     x_ve:      coordinate of vertices  
+    public edge,nedge_rel_edge,surf_norm, x_ve
     integer(4), DIMENSION(:,:), ALLOCATABLE:: edge
     integer(4), DIMENSION(:), ALLOCATABLE:: nedge_rel_edge
     real(8),DIMENSION(:,:),ALLOCATABLE:: surf_norm  
-    
+    real(8),DIMENSION(:,:),ALLOCATABLE :: x_ve
+
 
 ![input/output]     nreal:  total number of real particles
 ![input/output]     nflow:  total number of flow boundary particles
