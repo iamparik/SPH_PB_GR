@@ -125,8 +125,7 @@
             else
                 pBC_edges(2,1)=s
             endif
-                    
-                    
+
         endif 
                 
     enddo
