@@ -179,9 +179,9 @@ use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, 
                 
                 
                 ! The copied particle/point and the copy are paired for future reference
-                kpBC=kpBC+1
-                pBC_duplicate_pair(1,kpBC)=v1
-                pBC_duplicate_pair(2,kpBC)=num_ver
+                !kpBC=kpBC+1
+                !pBC_duplicate_pair(1,kpBC)=v1
+                !pBC_duplicate_pair(2,kpBC)=num_ver
 
                 ns_as= dot_product(surf_norm(:,s_pBC1),dxr_v2(:))
                 ts_as= dot_product(ts_pBC1(:),dxr_v2(:))
@@ -193,9 +193,9 @@ use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, 
 
                 
                 ! The copied particle/point and the copy are paired for future reference
-                kpBC=kpBC+1
-                pBC_duplicate_pair(1,kpBC)=v2
-                pBC_duplicate_pair(2,kpBC)=num_ver
+                !kpBC=kpBC+1
+                !pBC_duplicate_pair(1,kpBC)=v2
+                !pBC_duplicate_pair(2,kpBC)=num_ver
                 
                 ns_as= dot_product(surf_norm(:,s_pBC1),dxr_as(:))
                 ts_as= dot_product(ts_pBC1(:),dxr_as(:))
@@ -241,9 +241,9 @@ use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, 
                 edge(1,ke)=num_ver
                 
                 ! The copied particle/point and the copy are paired for future reference
-                kpBC=kpBC+1
-                pBC_duplicate_pair(1,kpBC)=v1
-                pBC_duplicate_pair(2,kpBC)=num_ver
+                !kpBC=kpBC+1
+                !pBC_duplicate_pair(1,kpBC)=v1
+                !pBC_duplicate_pair(2,kpBC)=num_ver
                 
                 ns_as= dot_product(surf_norm(:,s_pBC2),dxr_v2(:))
                 ts_as= dot_product(ts_pBC2(:),dxr_v2(:))
@@ -254,9 +254,9 @@ use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, 
                 edge(2,ke)=num_ver
 
                 ! The copied particle/point and the copy are paired for future reference
-                kpBC=kpBC+1
-                pBC_duplicate_pair(1,kpBC)=v2
-                pBC_duplicate_pair(2,kpBC)=kn
+                !kpBC=kpBC+1
+                !pBC_duplicate_pair(1,kpBC)=v2
+                !pBC_duplicate_pair(2,kpBC)=num_ver
                 
                 ns_as= dot_product(surf_norm(:,s_pBC2),dxr_as(:))
                 ts_as= dot_product(ts_pBC2(:),dxr_as(:))
