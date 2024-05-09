@@ -12,7 +12,7 @@ subroutine gamma_continuous_leroy
     
 use config_parameter, only: SPH_dim,pi
 use particle_data, only: x,gamma_cont, eniac, epair_a, epair_s, &
-                        & edge,hsml, surf_norm, maxn 
+                        & edge,hsml, surf_norm, maxn, x_ve 
 
 implicit none
 
@@ -38,7 +38,7 @@ do k=1,eniac
     if( SPH_dim .eq. 2) then
     
         do v=1,size(edge,1)
-            xs_v(:,v) = x(:,edge(v,s))
+            xs_v(:,v) = x_ve(:,edge(v,s))
         enddo
         
         call gamma_analytical_leroy_2D(x(:,a),xs_v,surf_norm(:,s),gamma_as(k),hsml(a),pi)

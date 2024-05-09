@@ -123,12 +123,11 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
         do k= 1,eniac
             a= epair_a(k)
             s= epair_s(k)
-            b= nedge_rel_edge(s)
             
             
             !------ Find divergence of velocity for calculating density -------------!
             F_a(:) = vx(:,a)
-            F_b(:) = 0.D0!vx(:,b)
+            F_b(:) = 0.D0!bdryVal_vel(:,s)
 
              call CorrectedVecDivPtoB(div_vel(a),F_a,F_b,del_gamma_as(:,k),  &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
@@ -189,10 +188,9 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
         do k= 1,eniac
             a= epair_a(k)
             s= epair_s(k)
-            b= nedge_rel_edge(s)
             
             !------ Find Pressure Gradient term (to be used in momentum equation) -------------!
-            Sca_Bdry_val = P(a) -rho(a)*c_sound*dot_product(vx(:,a)-vx(:,b), surf_norm(:,s))
+            Sca_Bdry_val = P(a) -rho(a)*c_sound*dot_product(vx(:,a)-bdryVal_vel(:,s), surf_norm(:,s))
             
             call CorrectedScaGradPtoB(grad_P(:,a),P(a),Sca_Bdry_val,del_gamma_as(:,k),  &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
@@ -200,7 +198,7 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
             ! -----------------------------------------------------------------------!
             
              !------ Find velocity gradient term (to be used to find viscous stress in momentum equation) ------------
-            F_b(:) = 0.D0!vx(:,b)
+            F_b(:) = 0.D0!bdryVal_vel(:,b)
             do d = 1, SPH_dim
                 call CorrectedScaGradPtoB(grad_vel(d,:,a),vx(d,a),F_b(d),del_gamma_as(:,k),  &
                         & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
@@ -252,7 +250,7 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
             do d= 1,SPH_dim
                 
                 F_a(:) = 0.D0!2.D0*grad_vel(d,:,a) !+ grad_vel(d,:,b)
-                Sca_Bdry_val=2.D0*(vx(d,a)-vx(d,b))/dot_product(delx_ab, surf_norm(:,s)) !0.D0
+                Sca_Bdry_val=2.D0*(vx(d,a)-bdryVal_vel(d,s))/dot_product(delx_ab, surf_norm(:,s)) !0.D0
 
                 call CorrectedBILapPtoB(visc_stress(d,a), F_a, Sca_Bdry_val, del_gamma_as(:,k), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &

@@ -14,7 +14,7 @@ subroutine direct_edge_find
     use config_parameter, only: SPH_dim, etype_virtual, itype_virtual, etype_periodic
     use particle_data ,   only: eniac,edge,ntotal,itype, &  
         & hsml, surf_norm, epair_a,epair_s,max_e_interaction, x , etotal, &
-        & etype, pBC_epair_a, pBC_epair_s, pBC_eniac  
+        & etype, pBC_epair_a, pBC_epair_s, pBC_eniac, x_ve
         
     implicit none
 
@@ -67,7 +67,7 @@ subroutine direct_edge_find
             ! in other words,
             !the itneraction occurs only if particles kernel is truncated (atleast for symmetric kernels)
             if (SPH_dim .eq. 2) then
-                call edge_particle_pair_2D(khsml,x(:,i),x(:,edge(1,s)),x(:,edge(2,s)),surf_norm(:,s),interact_edge_particle,err_tol)
+                call edge_particle_pair_2D(khsml,x(:,i),x_ve(:,edge(1,s)),x_ve(:,edge(2,s)),surf_norm(:,s),interact_edge_particle,err_tol)
             else
                 write(*,*) ' >>> ERROR <<< : Edge_particle pairing algorithm not defined for dimension', SPH_dim
                 pause    
