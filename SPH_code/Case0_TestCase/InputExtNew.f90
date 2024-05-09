@@ -16,11 +16,12 @@
         & dx_r, hsml_const,hydrostaticHeight, rho_init, mu_const, &
         &  g_const, c_sound, F_ext, ExtInputMeshType, packagingIterations
     use particle_data ,   only: maxn, max_interaction, max_e_interaction, maxnv,  &
-        & x,vx,mass,rho, vol,p,itype,hsml,mu, temp, nreal, nflow, nedge,nghost, ntotal, edge, &
+        & x,vx,mass,rho, vol,p,itype,hsml,mu, temp, nreal, nedge, nflow, nghost, ntotal, edge, &
         & surf_norm, nedge_rel_edge, etype, etotal, maxedge, &
         & pBC_edges,tangent_pBC, &
         &  f0max, dynamicProblem,avgVol, &
-        & packed_x,packed_itype, packed_vol, simGridSize
+        & packed_x,packed_itype, packed_vol, simGridSize, &
+        & x_ve
     !use ifport, only:random
     
     implicit none
@@ -28,8 +29,8 @@
     integer(4) k,d,s,ke,periodicPairs,i , additionalParticles
     real(8) tempX(SPH_dim,SPH_dim), tempBdry(5), mn, scale_k
     integer(4) nreal_mesh, nrealCartesian, nEbulkBdry, nEdomainBdry
-    real(8) totVol
-    real(8),DIMENSION(:,:),ALLOCATABLE :: xV_temp, edge_temp
+    real(8) totVol, x_ve_temp(SPH_dim,SPH_dim)
+    character(40) :: input_file_name
    
     
     ! Confirm if the SPH particles are static/Eulerian or Dynamic/Lagrangian
@@ -87,130 +88,58 @@
     write(*,*)'      Total number of Real particles : ', nreal    	
     write(*,*)'**************************************************'
 
-    ! s-0
-    ! inputCADtoEdgeData(s, maxedge, '/input_domainBdryEdge.dat',avgEdgeSize_ratio )
-    
-    
-    Allocate(edge_temp(SPH_dim,maxedge))   
-    Allocate(etype(maxedge))
-    ALLOCATE(xV_temp(SPH_dim,maxnv))
-    
-    edge_temp=0
-    etype=0
-    xV_temp=0.D0
-    
-    ! Read input file containing edge_temp information
-    open(1,file= DataConfigPath // '/input_domainBdryEdge.dat',status='old')
-    ! initialize edge number to 0    
+    ! initialize edges to 0
     s=0
-    ke=0
-    do while (.not.eof(1))
-        s=s+1
-        read(1,*) tempType, (tempX(d,1), d=1,SPH_dim), (tempX(d,2), d=1,SPH_dim) !, (tempbdry(d), d=1,5)
-        !etype(s) = NINT(tempType)      
-        call BCinput(etype(s), NINT(tempType) )
-        do d=1,SPH_dim
-            ke=ke+1
-            xV_temp(:,ke)=tempX(:,d)
-            edge_temp(d,s)=ke
-        enddo
-        
-        if(etype(s) .eq. etype_periodic) then  
-            write(*,*) "periodic BCS available for only one pair of periodic boundary"
-            periodicPairs=1
-                    
-            if( .not. allocated(pBC_edges)) then                       
-                allocate(pBC_edges(2,periodicPairs))
-                pBC_edges(1,1)=s
-            else
-                pBC_edges(2,1)=s
-            endif
-
-        endif 
-                
-    enddo
+    
+    input_file_name = '/input_domainBdryEdge.dat'
+    ! read bdry data file and store bdry information
+    call inputCADtoEdgeData(s, maxedge, input_file_name, 10)
+    
     etotal=s
     close(1)
-    write(*,*)'      Total number of boundary segments : ', nedge    	
+    write(*,*)'      Total number of boundary segments : ', etotal    	
     write(*,*)'**************************************************'      
 
-        
-    ! Define surface normals of walls, with normal per edge_temp
-    ! ** this can be made a function/seperate subroutine
-    ALLOCATE(surf_norm(SPH_dim, maxedge))    
-    do s = 1, etotal   
-        surf_norm(1,s)= -(xV_temp(2,edge_temp(2,s))- xV_temp(2,edge_temp(1,s)))
-        surf_norm(2,s)= (xV_temp(1,edge_temp(2,s))- xV_temp(1,edge_temp(1,s)))
-        mn= norm2(surf_norm(:,s))
-        surf_norm(1,s)= surf_norm(1,s)/mn
-        surf_norm(2,s)= surf_norm(2,s)/mn
-    enddo 
-    
     ! Define the tangent for the periodic boundary, 
     ! One needs to make sure the normals of the boundary should be pointing awat from
     ! real domain for below to work
     !Now, to determine the tangential sense of the periodic edges we calcualte tangent_pBC
     if (allocated(pBC_edges)) then
         Allocate(tangent_pBC(SPH_dim,2,1))
-        tangent_pBC(1,1,1)= xV_temp(1,edge_temp(2,pBC_edges(1,1)))- xV_temp(1,edge_temp(1,pBC_edges(1,1)))
-        tangent_pBC(2,1,1)= xV_temp(2,edge_temp(2,pBC_edges(1,1)))- xV_temp(2,edge_temp(1,pBC_edges(1,1)))
+        tangent_pBC(1,1,1)= x_ve(1,edge(2,pBC_edges(1,1)))- x_ve(1,edge(1,pBC_edges(1,1)))
+        tangent_pBC(2,1,1)= x_ve(2,edge(2,pBC_edges(1,1)))- x_ve(2,edge(1,pBC_edges(1,1)))
         mn= norm2(tangent_pBC(:,1,1))
         tangent_pBC(:,1,1)=tangent_pBC(:,1,1)/mn
         
         ! We change the tengent direction of one of the periodic edge of a given pair.
-        tangent_pBC(1,2,1)= xV_temp(1,edge_temp(1,pBC_edges(2,1)))- xV_temp(1,edge_temp(2,pBC_edges(2,1)))
-        tangent_pBC(2,2,1)= xV_temp(2,edge_temp(1,pBC_edges(2,1)))- xV_temp(2,edge_temp(2,pBC_edges(2,1)))
+        tangent_pBC(1,2,1)= x_ve(1,edge(1,pBC_edges(2,1)))- x_ve(1,edge(2,pBC_edges(2,1)))
+        tangent_pBC(2,2,1)= x_ve(2,edge(1,pBC_edges(2,1)))- x_ve(2,edge(2,pBC_edges(2,1)))
         mn= norm2(tangent_pBC(:,2,1))
         tangent_pBC(:,2,1)=tangent_pBC(:,2,1)/mn
     endif
 
-    
+    !Now create particle per edge (this needs to be deleted when nedge_rel_Edge is decommisioned)
     ALLOCATE(nedge_rel_edge(maxedge))
     ! Now we will find the center of edges, which in Method 1 of Parikshit et. al will work as virtual points
     ! In method 2 it will be used as a real boundary particle 
     ! The below needs to be modified slightly to include more than one edge_temp particle per edge_temp (and to include different dx_v
+    nedge=0
     do s=1,etotal
         k= k+1
         nedge_rel_edge(s)=k ! Here nedge_rel_edge(i)=i  is a simple case of one edge_temp particle per edge_temp
-        x(:,k)=0.D0        
-        do d=1,SPH_dim
-            x(:,k)= x(:,k)+xV_temp(:,edge_temp(d,s))/dble(SPH_dim) !this defines the location of edge_temp points/particles we need per edge_temp
-        enddo
         
+        do d =1,SPH_dim
+            x_ve_temp(:,d)=x_ve(:,edge(d,s))
+        enddo        
+        call centroidBdrySegment(x(:,k), x_ve_temp, SPH_dim)
+
          if(etype(s) .eq. etype_SolidWall1) then             
             itype(k)= itype_virtual+itype_real_min
         endif 
- 
+        nedge=nedge+1
     enddo
     
-    
-    nedge= k - nreal     
-    write(*,*)'      Total number of edge_temp particles : ', nedge    	
-    write(*,*)'**************************************************'      
-
-    !Let us define the edge_temp vertices by ghost points to visually demonstrate edges on tecplot
-    !This also lets us uniquely label ghost points in a global sense
-    do i=1,ke
-        k=k+1
-        x(:,k)=xV_temp(:,i)  
-        itype(k)=0    
-    enddo
-    
-    allocate(edge(SPH_dim,maxedge))
-    do s=1,etotal
-        do i=1,SPH_dim
-            edge(i,s)= edge_temp(i,s) +nreal+nedge
-        enddo
-    enddo
-    
-    deallocate(xV_temp,edge_temp)
-    
-    ! The total ghost points is stored and then printed on screen
-    nghost=k-(nreal+nedge)      
-    write(*,*)'      Total number of Vertex Points for edges / ghost points ', nghost    	
-    write(*,*)'**************************************************'      
-
-    ntotal=nreal+nedge+nghost
+    ntotal=nreal+nedge
     
     ! Maximum interactions for particle-particle and edge_temp-particle is defined
     max_interaction= 10*maxn*(ceiling((hsml_const/dx_r)*scale_k*2))**SPH_dim
@@ -222,8 +151,8 @@
     
     ! find size of the simulation
     ALLOCATE( simGridSize(SPH_dim,2))
-    simGridSize(:,1)= MINVAL(x,2) 
-    simGridSize(:,2)= MAXVAL(x,2) 
+    simGridSize(:,1)= MINVAL(x_ve,2) 
+    simGridSize(:,2)= MAXVAL(x_ve,2) 
     write(*,*)'**************************************************'   
     write(*,*) "simulation domain size is ", simGridSize, "with xmin = ", simGridSize(1,1), "xmax=",simGridSize(1,2)
     write(*,*) "with ymin = ", simGridSize(2,1), "ymax=",simGridSize(2,2)

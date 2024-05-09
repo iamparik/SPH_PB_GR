@@ -169,6 +169,7 @@
 		<File RelativePath="..\..\ThermalDiffusion\thermalDiffusionLaplacianOperator.f90"/></Filter>
 		<File RelativePath="..\..\SPH_general\AnalyticalError.f90"/>
 		<File RelativePath="..\..\SPH_general\boundaryConditionNtoD.f90"/>
+		<File RelativePath="..\..\SPH_general\centroidBdrySegment.f90"/>
 		<File RelativePath="..\..\SPH_general\ConfigParameter.f90"/>
 		<File RelativePath="..\..\SPH_general\EulerSchemeSPHOperations.f90"/>
 		<File RelativePath="..\..\SPH_general\evolvingVariables.f90"/>

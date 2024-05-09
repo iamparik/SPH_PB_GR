@@ -24,6 +24,9 @@ subroutine inputCADtoEdgeData(s, max_edge, input_file_name, avgEdgeSize_ratio )
     open(1,file= DataConfigPath // input_file_name ,status='old')
     
     do while (.not. eof(1))
+        
+        
+        
         read(1,*) tempType, (tempX(d,1), d=1,SPH_dim), (tempX(d,2), d=1,SPH_dim) !, (temp_surf_norm(d), d=1,SPH_dim) ! this can be generalized with x_temp(d1,d2)
         
         !obtain the surface normal for the bodry type from the given order of vertices
@@ -38,6 +41,14 @@ subroutine inputCADtoEdgeData(s, max_edge, input_file_name, avgEdgeSize_ratio )
                 
             ! each division above is a boudanry element
             s=s+1
+            
+            ! make sure the array size is big enough
+            if(max_edge .eq. num_vertex_pts) then
+                write(*,*) "Increase value of max edge and rerun simulation"
+                write(*,*) "current maxedge =", max_edge 
+                write(*,*) "current num_vertex_pts =", num_vertex_pts 
+                pause
+            endif
                 
             do d= 1,SPH_dim
                 
@@ -71,7 +82,10 @@ subroutine inputCADtoEdgeData(s, max_edge, input_file_name, avgEdgeSize_ratio )
             ! check if the distance between any two vertices representing the edge too big.
             call MaxEdgeSize(max_edge_size,tempX,SPH_dim)
         
-            if(max_edge_size .gt. dx_edge_reqd) then            
+            ! check if the current maximum edge size connecting any two vertices is bigger than
+            ! required edge size.
+            ! we use a tolerance of 0.01%, ie. (max_edge_size - dx_edge_reqd)/max_edge_size = 10^-2
+            if(max_edge_size .gt. dx_edge_reqd/(1.D0-1.D-2)) then            
                 
                 ! Find how many divisions of hte element are required
                 if(SPH_dim .eq. 2) then
@@ -97,6 +111,14 @@ subroutine inputCADtoEdgeData(s, max_edge, input_file_name, avgEdgeSize_ratio )
             do i = 1, num_divisions                 
                 ! each division above is a boudanry element
                 s=s+1
+
+                ! make sure the array size is big enough
+                if(max_edge .eq. num_vertex_pts) then
+                    write(*,*) "Increase value of max edge and rerun simulation"
+                    write(*,*) "current maxedge =", max_edge 
+                    write(*,*) "current num_vertex_pts =", num_vertex_pts 
+                    pause
+                endif
                 
                 do d= 1,SPH_dim
                     !the below can be optimized to avoid duplicating the vertices
