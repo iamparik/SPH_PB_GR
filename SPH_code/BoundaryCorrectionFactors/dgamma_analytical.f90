@@ -11,7 +11,7 @@
 subroutine dgamma_analytical
 use config_parameter, only: SPH_dim, pi
 use particle_data, only: del_gamma_as, del_gamma, edge, &
-            &  surf_norm, eniac, epair_a, epair_s, x, hsml, ntotal
+            &  surf_norm, eniac, epair_a, epair_s, x, hsml, ntotal, x_ve
 
 implicit none
 
@@ -39,7 +39,7 @@ do k= 1, eniac
         ! assosciated to an edge. This will need to be updated, if different 
         ! types of boundary elements are present (like triangles and rectangles)
         do v=1,size(edge,1)
-            xs_v(:,v)=x(:,edge(v,s))    
+            xs_v(:,v)=x_ve(:,edge(v,s))    
         enddo
         
         call dgamma_analytical_Ferrand_2D(xa,xs_v,surf_norm(:,s), del_gamma_as(:,k),hsml(a), pi, scale_k) 

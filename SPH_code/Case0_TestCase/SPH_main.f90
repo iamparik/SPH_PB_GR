@@ -32,7 +32,7 @@ integer(4) :: k, a, b , d, s, i, j, Scalar0Matrix1
 real(8) :: scalar_factor, Sca_Bdry_val
 real(8), DIMENSION(:), allocatable  :: F_a, F_b, Cdwdx_a, Cdwdx_b, Cdgmas
 real(8), DIMENSION(:,:,:), allocatable :: grad_vel
-real(8), DIMENSION(:,:), allocatable :: matrix_factor, grad_P, visc_stress
+real(8), DIMENSION(:,:), allocatable :: matrix_factor, grad_P, visc_stress, x_ve_temp
 real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
 
 
@@ -98,11 +98,12 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
         !drho=0.D0
         
         allocate(div_vel(ntotal), grad_P(SPH_dim, ntotal), visc_stress(SPH_dim, ntotal), &
-            & grad_vel(SPH_dim, SPH_dim, ntotal)) ! this can be reduced by accoutnign for nreal and nedge correctly
+            & grad_vel(SPH_dim, SPH_dim, ntotal), x_ve_temp(SPH_dim,SPH_dim)) ! this can be reduced by accoutnign for nreal and nedge correctly
         div_vel=0.D0
         grad_P=0.D0
         grad_vel =0.D0
         visc_stress =0.D0
+        x_ve_temp=0.D0
         
         ! Use all particle-particle interaction to find non boundary terms
         do k= 1,niac
@@ -123,12 +124,11 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
         do k= 1,eniac
             a= epair_a(k)
             s= epair_s(k)
-            b= nedge_rel_edge(s)
             
             
             !------ Find divergence of velocity for calculating density -------------!
             F_a(:) = vx(:,a)
-            F_b(:) = 0.D0!vx(:,b)
+            F_b(:) = bdryVal_vel(:,s)
 
              call CorrectedVecDivPtoB(div_vel(a),F_a,F_b,del_gamma_as(:,k),  &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
@@ -189,10 +189,9 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
         do k= 1,eniac
             a= epair_a(k)
             s= epair_s(k)
-            b= nedge_rel_edge(s)
             
             !------ Find Pressure Gradient term (to be used in momentum equation) -------------!
-            Sca_Bdry_val = P(a) -rho(a)*c_sound*dot_product(vx(:,a)-vx(:,b), surf_norm(:,s))
+            Sca_Bdry_val = P(a) -rho(a)*c_sound*dot_product(vx(:,a)-bdryVal_vel(:,s), surf_norm(:,s))
             
             call CorrectedScaGradPtoB(grad_P(:,a),P(a),Sca_Bdry_val,del_gamma_as(:,k),  &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
@@ -200,7 +199,7 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
             ! -----------------------------------------------------------------------!
             
              !------ Find velocity gradient term (to be used to find viscous stress in momentum equation) ------------
-            F_b(:) = 0.D0!vx(:,b)
+            F_b(:) = bdryVal_vel(:,s)
             do d = 1, SPH_dim
                 call CorrectedScaGradPtoB(grad_vel(d,:,a),vx(d,a),F_b(d),del_gamma_as(:,k),  &
                         & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
@@ -251,12 +250,12 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
             
             do d= 1,SPH_dim
                 
-                F_a(:) = 0.D0!2.D0*grad_vel(d,:,a) !+ grad_vel(d,:,b)
-                Sca_Bdry_val=2.D0*(vx(d,a)-vx(d,b))/dot_product(delx_ab, surf_norm(:,s)) !0.D0
+                F_a(:) = 2.D0*grad_vel(d,:,a) !+ grad_vel(d,:,b) !0.D0
+                !Sca_Bdry_val=2.D0*(vx(d,a)-bdryVal_vel(d,s))/dot_product(delx_ab, surf_norm(:,s)) !0.D0
 
                 call CorrectedBILapPtoB(visc_stress(d,a), F_a, Sca_Bdry_val, del_gamma_as(:,k), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                    & SPH_dim, 1, 2, 0) ! SPH_dim, correctionFactorID, BIL_type, dirich0Neum1
+                    & SPH_dim, 1, 1, 0) ! SPH_dim, correctionFactorID, BIL_type(1 = BIL-PCg, Macia, 2=BIL-NTG), dirich0Neum1
             enddo
             ! -----------------------------------------------------------------------!
 
@@ -281,7 +280,31 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
             endif
         enddo
         
-         deallocate(div_vel,grad_P, grad_vel, visc_stress)
+        
+        ! Update edges for next step
+        do s = 1,etotal
+            if((etype(s) .le. etype_real_max) .and. (etype(s) .gt. etype_real_min)) then
+                
+                 !Update the vertex positions
+                do d=1,SPH_dim
+                    a= edge(d,s)
+                    !Update position
+                    x_ve(:,a) = x_ve(:,a) + dt* bdryVal_vel(:,s)
+                enddo
+                
+                ! now update the midpoint of edge, or poitns,
+                ! which are used in numerical integrations
+                k=nedge_rel_edge(s)        
+                do d =1,SPH_dim
+                    x_ve_temp(:,d)=x_ve(:,edge(d,s))
+                enddo        
+                call centroidBdrySegment(x(:,k), x_ve_temp, SPH_dim)
+
+            
+            endif
+        enddo
+        
+         deallocate(div_vel,grad_P, grad_vel, visc_stress, x_ve_temp)
         
         
         !---------------------- free surface detection and PST algorithm -------------------------------------!

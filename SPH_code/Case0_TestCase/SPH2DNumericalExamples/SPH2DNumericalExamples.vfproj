@@ -86,6 +86,7 @@
 		<Filter Name="InputFiles">
 		<File RelativePath="..\..\InputFiles(toBeRemoved-Deprecated)\backupInput.f90"/>
 		<File RelativePath="..\BCinput.f90"/>
+		<File RelativePath="..\..\SPH_general\inputCADtoEdgeData.f90"/>
 		<File RelativePath="..\..\SPH_general\inputCADtoParticleData.f90"/>
 		<File RelativePath="..\InputExtNew.f90"/>
 		<File RelativePath="..\..\InputFiles(toBeRemoved-Deprecated)\inputParticePacking.f90"/>
@@ -168,6 +169,7 @@
 		<File RelativePath="..\..\ThermalDiffusion\thermalDiffusionLaplacianOperator.f90"/></Filter>
 		<File RelativePath="..\..\SPH_general\AnalyticalError.f90"/>
 		<File RelativePath="..\..\SPH_general\boundaryConditionNtoD.f90"/>
+		<File RelativePath="..\..\SPH_general\centroidBdrySegment.f90"/>
 		<File RelativePath="..\..\SPH_general\ConfigParameter.f90"/>
 		<File RelativePath="..\..\SPH_general\EulerSchemeSPHOperations.f90"/>
 		<File RelativePath="..\..\SPH_general\evolvingVariables.f90"/>
@@ -187,6 +189,7 @@
 		<File RelativePath="..\..\SPH_general\smoothing_w0.f90"/>
 		<File RelativePath="..\SPH_main.f90"/>
 		<File RelativePath="..\..\SPH_general\SPH_operator.f90"/>
+		<File RelativePath="..\..\SPH_general\surfaceNormalBdry.f90"/>
 		<File RelativePath="..\..\SPH_general\testForSPHApproxLapFormulations.f90"/>
 		<File RelativePath="..\..\SPH_general\TimeIndependentSPHOperations.f90"/></Filter></Files>
 	<Globals/></VisualStudioProject>

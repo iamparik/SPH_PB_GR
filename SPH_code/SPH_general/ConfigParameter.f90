@@ -35,9 +35,11 @@ module config_parameter
 !   etype_SolidWall1 = Solid wall with velocity Dirichlet BC, and neumann Pressure and density
 !   etype_SolidWall2 = Solid wall with Velocity Neumann BC, and Neumann Pressure and density
 !   etype_FreeSurface1= Free surface
+!   periodic_pairs   = number of periodic pairs - only 1 is tested
     public etype_virtual, etype_periodic, etype_real_max, etype_real_min, &
         & etype_thermal_dirichlet, etype_thermal_neumann, &
-        & etype_SolidWall1,etype_SolidWall2,etype_FarWall, etype_FreeSurface1
+        & etype_SolidWall1,etype_SolidWall2,etype_FarWall, etype_FreeSurface1, &
+        & periodic_pairs
         
     integer(4), parameter :: etype_virtual=100
     integer(4), parameter :: etype_real_max=99
@@ -49,6 +51,7 @@ module config_parameter
     integer(4), parameter :: etype_thermal_dirichlet=51
     integer(4), parameter :: etype_thermal_neumann=52
     integer(4), parameter :: etype_periodic=200
+    integer(4), parameter :: periodic_pairs=1
 
 
 !dataOutputPath: Directory to store the output file

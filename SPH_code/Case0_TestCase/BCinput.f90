@@ -16,7 +16,7 @@ subroutine BCinput(etype, tempType)
     
     if(tempType .eq. 3) etype = 2
         
-    if(tempType .eq. 4) etype = 2  
+    if(tempType .eq. 4) etype = 4  
 
 
 end subroutine
@@ -33,6 +33,16 @@ subroutine BCinputValue(etype,bdryVal_vel, bdryVal_prs, bdryVal_rho, bdryVal_tem
     real(8), intent(out) :: bdryVal_temp
     
     if(etype .eq. 2) then
+        
+        bdryVal_vel(1)= 0.D0
+        bdryVal_vel(2)= 0.D0
+
+        bdryVal_prs  = 0.D0 
+        bdryVal_rho  = rho_init 
+        bdryVal_temp =300 
+    endif
+    
+    if(etype .eq. 4) then
         
         bdryVal_vel(1)= 0.D0
         bdryVal_vel(2)= 0.D0
