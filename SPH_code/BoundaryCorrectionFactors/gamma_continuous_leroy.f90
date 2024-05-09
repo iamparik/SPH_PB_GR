@@ -50,6 +50,8 @@ do k=1,eniac
     
     gamma_cont(a)= gamma_cont(a) - gamma_as(k)
     
+    if(isNAN(gamma_cont(a))) pause
+    
 enddo
 
     

@@ -249,7 +249,7 @@ use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, 
                 ts_as= dot_product(ts_pBC2(:),dxr_v2(:))
                 num_ver=num_ver+1
                 !determine location of the copied vertice
-                x(:,kn)=-ns_as*surf_norm(:,s_pBC1)+ ts_as*ts_pBC1(:) &
+                x_ve(:,num_ver)=-ns_as*surf_norm(:,s_pBC1)+ ts_as*ts_pBC1(:) &
                         & + x_PBC1(:)                
                 edge(2,ke)=num_ver
 
