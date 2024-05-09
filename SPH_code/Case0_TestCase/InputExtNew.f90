@@ -133,9 +133,9 @@
         enddo        
         call centroidBdrySegment(x(:,k), x_ve_temp, SPH_dim)
 
-         if(etype(s) .eq. etype_SolidWall1) then             
-            itype(k)= itype_virtual+itype_real_min
-        endif 
+       
+        itype(k)= itype_virtual+itype_real_min
+
         nedge=nedge+1
     enddo
     
