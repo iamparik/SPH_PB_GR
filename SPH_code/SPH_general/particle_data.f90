@@ -105,13 +105,15 @@ integer(4):: itimestep
 ![input/output]     ntotal: total number of all particles (and referecne points to be printed) 
 ![input/output]     etotal: total number of all edges  
 ![input/output]     ereal: total number of real edges  
-    public nreal,nflow,nedge,nghost, ntotal, etotal
+![input/output]     ve_total: total number of vertices
+    public nreal,nflow,nedge,nghost, ntotal, etotal, ve_total
     integer(4):: nreal
     integer(4):: nflow
     integer(4):: nedge
     integer(4):: nghost
     integer(4):: ntotal
     integer(4):: etotal
+    integer(4)::ve_total
     
 ![Output]           niac:   Total number of particle interactions
 ![Output]           pair_i: i'th particle of a given particle pair 
@@ -160,10 +162,11 @@ integer(4):: itimestep
     real(8), dimension(:), Allocatable :: gamma_density_cont
     
 !the below parameters are used in the context of periodic BC
-    public ntotal_prev,etotal_prev,pBC_edges, pBC_epair_a,pBC_epair_s,pBC_eniac,tangent_pBC, edge_pBC_pairs, &
-        & pBC_duplicate_pair, nperiodic
+    public ntotal_prev,etotal_prev, ve_total_prev, pBC_edges, pBC_epair_a,pBC_epair_s, &
+        & pBC_eniac,tangent_pBC, edge_pBC_pairs, pBC_duplicate_pair, nperiodic
     integer(4):: ntotal_prev
     integer(4):: etotal_prev
+    integer(4):: ve_total_prev
     integer(4), dimension(:,:),allocatable:: pBC_edges
     integer(4), dimension(:),allocatable::  pBC_epair_a
     integer(4), dimension(:),allocatable::  pBC_epair_s

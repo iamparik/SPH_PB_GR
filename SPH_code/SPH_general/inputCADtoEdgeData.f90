@@ -1,6 +1,6 @@
 subroutine inputCADtoEdgeData(s, max_edge, input_file_name, avgEdgeSize_ratio )
     use config_parameter, only : SPH_dim, ExtInputMeshType, DataConfigPath, dx_r, etype_periodic, periodic_pairs
-    use particle_data, only : x_ve, etype, edge, surf_norm, pBC_edges
+    use particle_data, only : x_ve, etype, edge, surf_norm, pBC_edges, ve_total, maxnv
     
     implicit none
     integer(4), intent(inout) :: s, max_edge
@@ -14,7 +14,7 @@ subroutine inputCADtoEdgeData(s, max_edge, input_file_name, avgEdgeSize_ratio )
     ! find minimum edge size, by using the preferred rtio of dx_r/dx_edge
     dx_edge_reqd = dx_r/dble(avgEdgeSize_ratio)
     
-    Allocate(x_ve(SPH_dim,max_edge),etype(max_edge), edge(SPH_dim, max_edge), surf_norm(SPH_dim, max_edge))
+    Allocate(x_ve(SPH_dim,maxnv),etype(max_edge), edge(SPH_dim, max_edge), surf_norm(SPH_dim, max_edge))
     num_vertex_pts=0
     x_ve=0
     etype=0
@@ -141,6 +141,7 @@ subroutine inputCADtoEdgeData(s, max_edge, input_file_name, avgEdgeSize_ratio )
         endif
     enddo
 
+    ve_total = num_vertex_pts
         
         !(ve_point_ID(d), d=1,SPH_dim) ! not used yet, but needs be implemented in next update
         
