@@ -44,7 +44,7 @@ subroutine BCinputValue(etype,bdryVal_vel, bdryVal_prs, bdryVal_rho, bdryVal_tem
     
     if(etype .eq. 4) then
         
-        bdryVal_vel(1)= 1.D0
+        bdryVal_vel(1)= 0.D0
         bdryVal_vel(2)= 0.D0
 
         bdryVal_prs  = 0.D0 
