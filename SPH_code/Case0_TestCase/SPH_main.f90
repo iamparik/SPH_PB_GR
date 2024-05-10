@@ -188,7 +188,7 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
                 call CorrectedScaGradPtoP(grad_vel(d,:,a),grad_vel(d,:,b),vx(d,a),vx(d,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                         & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                         & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
-                        & SPH_dim, CF_BIL_visc, 1) ! SPH_dim, correctionFactorID, grad_type
+                        & SPH_dim, CF_BIL_visc, 2) ! SPH_dim, correctionFactorID, grad_type
             enddo
             !-------------------------------------------------------------------------------------------------------------!
 
@@ -213,7 +213,7 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
             do d = 1, SPH_dim
                 call CorrectedScaGradPtoB(grad_vel(d,:,a),vx(d,a),F_b(d),del_gamma_as(:,k),  &
                         & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                        & SPH_dim, CF_BIL_visc, 1) ! SPH_dim, correctionFactorID, grad_type
+                        & SPH_dim, CF_BIL_visc, 2) ! SPH_dim, correctionFactorID, grad_type
             enddo
             ! -----------------------------------------------------------------------!
             
