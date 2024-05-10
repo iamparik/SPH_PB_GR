@@ -23,7 +23,7 @@ end subroutine
 
     
     
-subroutine BCinputValue(etype,bdryVal_vel, bdryVal_prs, bdryVal_rho, bdryVal_temp)
+subroutine BCinputValue(etype,bdryVal_vel, bdryVal_prs, bdryVal_rho, bdryVal_temp, time_step)
     use config_parameter , only : rho_init
     implicit none
     integer(4), intent(in) :: etype
@@ -31,6 +31,7 @@ subroutine BCinputValue(etype,bdryVal_vel, bdryVal_prs, bdryVal_rho, bdryVal_tem
     real(8), intent(out) :: bdryVal_prs
     real(8), intent(out) :: bdryVal_rho
     real(8), intent(out) :: bdryVal_temp
+    integer(4), intent(in) :: time_step
     
     if(etype .eq. 2) then
         

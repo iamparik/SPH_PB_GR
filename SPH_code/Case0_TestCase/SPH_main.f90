@@ -50,12 +50,6 @@ correction_types=10
     allocate(F_a(SPH_dim), F_b(SPH_dim), Cdwdx_a(SPH_dim), Cdwdx_b(SPH_dim), Cdgmas(SPH_dim), &
     & matrix_factor(SPH_dim,SPH_dim),  delx_ab(SPH_dim))
 
-! Add boundary conditions to the boundary:
-    allocate( bdryVal_vel(SPH_dim,maxedge),bdryVal_prs(maxedge), bdryVal_rho(maxedge), bdryVal_temp(maxedge))
-    do s =1, etotal
-        call BCinputValue(etype(s),bdryVal_vel(:,s), bdryVal_prs(s), bdryVal_rho(s), bdryVal_temp(s))
-    enddo
-
 ! theoretical maximum for time step.
     call maxTimeStep
     dt = time_step
@@ -78,8 +72,14 @@ correction_types=10
     
     current_ts= itimestep
     
+    allocate( bdryVal_vel(SPH_dim,maxedge),bdryVal_prs(maxedge), bdryVal_rho(maxedge), bdryVal_temp(maxedge))
+    
     do itimestep = current_ts+1, max_timesteps
         
+        ! Add time dependent boundary conditions to the boundary:
+        do s =1, etotal
+            call BCinputValue(etype(s),bdryVal_vel(:,s), bdryVal_prs(s), bdryVal_rho(s), bdryVal_temp(s), itimestep)
+        enddo
         
         call printTimeStep(itimestep,print_step)
         
