@@ -105,6 +105,10 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
         visc_stress =0.D0
         x_ve_temp=0.D0
         
+        
+        CF_density=mod( ConDivtype, correction_types)
+        ID_density=int( ConDivtype/correction_types)
+        
         ! Use all particle-particle interaction to find non boundary terms
         do k= 1,niac
             a= pair_i(k)
@@ -115,7 +119,7 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
             call CorrectedVecDivPtoP(div_vel(a),div_vel(b),vx(:,a),vx(:,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
-                    & SPH_dim, 1, 1) ! SPH_dim, correctionFactorID, divType
+                    & SPH_dim, CF_div, ID_div) ! SPH_dim, correctionFactorID, divType
             ! -------------------------------------------------------------------------------------------------------------!
             
         enddo
@@ -132,7 +136,7 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
 
              call CorrectedVecDivPtoB(div_vel(a),F_a,F_b,del_gamma_as(:,k),  &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                    & SPH_dim, 1, 1) ! SPH_dim, correctionFactorID, divType
+                    & SPH_dim, CF_div, ID_div) ! SPH_dim, correctionFactorID, divType
             ! -----------------------------------------------------------------------!
         enddo
         
@@ -160,6 +164,12 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
         endif
         
         
+        CF_pressure=mod( PrsrGradtype, correction_types)
+        ID_pressure=int( PrsrGradtype/correction_types)
+        
+        CF_BIL_visc=mod( BILtype, correction_types)
+        ID_BIL_visc=int( BILtype/correction_types)
+        
         ! Use all particle-particle interaction to find non boundary terms
         do k= 1,niac
             a= pair_i(k)
@@ -170,7 +180,7 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
             call CorrectedScaGradPtoP(grad_P(:,a),grad_P(:,b),P(a),P(b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
-                    & SPH_dim, 1, 2) ! SPH_dim, correctionFactorID, grad_type
+                    & SPH_dim, CF_pressure, ID_pressure) ! SPH_dim, correctionFactorID, grad_type
             !-------------------------------------------------------------------------------------------------------------!
             
             !-------------- Find velocity gradient term (to be used to find viscous stress in momentum equation) --------------!
@@ -178,7 +188,7 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
                 call CorrectedScaGradPtoP(grad_vel(d,:,a),grad_vel(d,:,b),vx(d,a),vx(d,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                         & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                         & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
-                        & SPH_dim, 3, 1) ! SPH_dim, correctionFactorID, grad_type
+                        & SPH_dim, CF_BIL_visc, 1) ! SPH_dim, correctionFactorID, grad_type
             enddo
             !-------------------------------------------------------------------------------------------------------------!
 
@@ -195,7 +205,7 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
             
             call CorrectedScaGradPtoB(grad_P(:,a),P(a),Sca_Bdry_val,del_gamma_as(:,k),  &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                    & SPH_dim, 1, 2) ! SPH_dim, correctionFactorID, grad_type
+                    & SPH_dim, CF_pressure, ID_pressure) ! SPH_dim, correctionFactorID, grad_type
             ! -----------------------------------------------------------------------!
             
              !------ Find velocity gradient term (to be used to find viscous stress in momentum equation) ------------
@@ -203,7 +213,7 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
             do d = 1, SPH_dim
                 call CorrectedScaGradPtoB(grad_vel(d,:,a),vx(d,a),F_b(d),del_gamma_as(:,k),  &
                         & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                        & SPH_dim, 3, 1) ! SPH_dim, correctionFactorID, grad_type
+                        & SPH_dim, CF_BIL_visc, 1) ! SPH_dim, correctionFactorID, grad_type
             enddo
             ! -----------------------------------------------------------------------!
             
@@ -231,7 +241,7 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
                 call CorrectedBILapPtoP(visc_stress(d,a),visc_stress(d,b),vx(d,a),vx(d,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                         & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                         & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
-                        & SPH_dim, delx_ab(:), 1)
+                        & SPH_dim, delx_ab(:))
             enddo
             !-------------------------------------------------------------------------------------------------------------!
 
@@ -252,10 +262,12 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
                 
                 F_a(:) = 2.D0*grad_vel(d,:,a) !+ grad_vel(d,:,b) !0.D0
                 !Sca_Bdry_val=2.D0*(vx(d,a)-bdryVal_vel(d,s))/dot_product(delx_ab, surf_norm(:,s)) !0.D0
-
+                call BILViscousBdry(F_a,Sca_Bdry_val, grad_vel(d,:,a), grad_vel(d,:,b), vx(d,a), bdryVal_vel(d,s), delx_ab, &
+                    & surf_norm(:,s), ID_BIL_visc)
+                
                 call CorrectedBILapPtoB(visc_stress(d,a), F_a, Sca_Bdry_val, del_gamma_as(:,k), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                    & SPH_dim, 1, 1, 0) ! SPH_dim, correctionFactorID, BIL_type(1 = BIL-PCg, Macia, 2=BIL-NTG), dirich0Neum1
+                    & SPH_dim) ! SPH_dim, correctionFactorID, BIL_type(1 = BIL-PCg, Macia, 2=BIL-NTG), dirich0Neum1
             enddo
             ! -----------------------------------------------------------------------!
 

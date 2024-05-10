@@ -1,17 +1,20 @@
 subroutine CorrectedBILapPtoP(dF_a,dF_b,F_a,F_b,dwdx, mass_a, mass_b, rho_a, rho_b, &
                     & gamma_cont_a, gamma_discrt_a, gamma_mat_a, gamma_mat_inv_a, xi1_mat_inv_a, &
                     & gamma_cont_b, gamma_discrt_b, gamma_mat_b, gamma_mat_inv_b, xi1_mat_inv_b, &
-                    & dim, x_ab, CF_ID) 
+                    & dim, x_ab) 
     !Morris/Brookshaw's Laplacian for two particles is calculated, by first correctign the kernel gradient
     
     implicit none
-    integer(4), intent(in) :: dim, CF_ID 
+    integer(4), intent(in) :: dim
     real(8), intent(in) :: x_ab(dim),F_a, F_b, dwdx(dim), mass_a, mass_b, rho_a, rho_b, &
         & gamma_cont_a, gamma_discrt_a, gamma_mat_a(dim,dim), gamma_mat_inv_a(dim,dim), xi1_mat_inv_a(dim,dim), &
         & gamma_cont_b, gamma_discrt_b, gamma_mat_b(dim,dim), gamma_mat_inv_b(dim,dim), xi1_mat_inv_b(dim,dim)
     real(8), intent(inout) :: dF_a,dF_b
-    integer(4) :: d, Scalar0Matrix1
+    integer(4) :: d, Scalar0Matrix1, CF_ID 
     real(8) :: Cdwdx_a(dim), Cdwdx_b(dim), matrix_factor(dim,dim), scalar_factor
+    
+    ! By default only gamma_cont is used for BILaplacian formulation
+    CF_ID=1
     
     call CorrectionFactorParsing(CF_ID,Scalar0Matrix1,scalar_factor,matrix_factor, &
         & gamma_cont_a, gamma_discrt_a, gamma_mat_a, gamma_mat_inv_a, xi1_mat_inv_a, dim)            
@@ -69,4 +72,3 @@ subroutine CorrectedBILapPtoB(dF_a, vec_val, scalar_val, del_gamma_as,&
     
 endsubroutine
     
-  
