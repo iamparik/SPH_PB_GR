@@ -29,6 +29,8 @@ integer(4) input_timeStep,max_timeSteps, yesorno, input_file_type, current_ts
 integer(8) :: ic1, crate1, cmax1, ic2
 logical ::  runSPH = .true.
 integer(4) :: k, a, b , d, s, i, j, Scalar0Matrix1
+integer(4) :: correction_types, CF_density, ID_density, CF_pressure, ID_pressure, &
+    & CF_BIL_visc, ID_BIL_visc,dirich0Neum1
 real(8) :: scalar_factor, Sca_Bdry_val
 real(8), DIMENSION(:), allocatable  :: F_a, F_b, Cdwdx_a, Cdwdx_b, Cdgmas
 real(8), DIMENSION(:,:,:), allocatable :: grad_vel
@@ -36,6 +38,7 @@ real(8), DIMENSION(:,:), allocatable :: matrix_factor, grad_P, visc_stress, x_ve
 real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
 
 
+correction_types=10
    
 !start system clock to evealuate time taken to run
 ! System_clock returns number of seconds from 00:00 CUT on 1 Jan 1970
@@ -119,7 +122,7 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
             call CorrectedVecDivPtoP(div_vel(a),div_vel(b),vx(:,a),vx(:,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
-                    & SPH_dim, CF_div, ID_div) ! SPH_dim, correctionFactorID, divType
+                    & SPH_dim, CF_density, ID_density) ! SPH_dim, correctionFactorID, divType
             ! -------------------------------------------------------------------------------------------------------------!
             
         enddo
@@ -136,7 +139,7 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
 
              call CorrectedVecDivPtoB(div_vel(a),F_a,F_b,del_gamma_as(:,k),  &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                    & SPH_dim, CF_div, ID_div) ! SPH_dim, correctionFactorID, divType
+                    & SPH_dim, CF_density, ID_density) ! SPH_dim, correctionFactorID, divType
             ! -----------------------------------------------------------------------!
         enddo
         
@@ -241,7 +244,7 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
                 call CorrectedBILapPtoP(visc_stress(d,a),visc_stress(d,b),vx(d,a),vx(d,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                         & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                         & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
-                        & SPH_dim, delx_ab(:))
+                        & SPH_dim, delx_ab(:),1)
             enddo
             !-------------------------------------------------------------------------------------------------------------!
 
@@ -257,17 +260,15 @@ real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
             
             !------ Find viscous stress term (to be used in momentum equation) -------------!
             delx_ab(:)= x(:,a)- x(:,b)
-            
+                      
             do d= 1,SPH_dim
                 
-                F_a(:) = 2.D0*grad_vel(d,:,a) !+ grad_vel(d,:,b) !0.D0
-                !Sca_Bdry_val=2.D0*(vx(d,a)-bdryVal_vel(d,s))/dot_product(delx_ab, surf_norm(:,s)) !0.D0
-                call BILViscousBdry(F_a,Sca_Bdry_val, grad_vel(d,:,a), grad_vel(d,:,b), vx(d,a), bdryVal_vel(d,s), delx_ab, &
-                    & surf_norm(:,s), ID_BIL_visc)
+                call BILViscousBdry(F_a,Sca_Bdry_val, dirich0Neum1, grad_vel(d,:,a), grad_vel(d,:,b), vx(d,a), bdryVal_vel(:,s), &
+                    & delx_ab, dx_r, surf_norm(:,s), d, SPH_dim, ID_BIL_visc)
                 
                 call CorrectedBILapPtoB(visc_stress(d,a), F_a, Sca_Bdry_val, del_gamma_as(:,k), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                    & SPH_dim) ! SPH_dim, correctionFactorID, BIL_type(1 = BIL-PCg, Macia, 2=BIL-NTG), dirich0Neum1
+                    & SPH_dim, dirich0Neum1,1) ! SPH_dim, correctionFactorID, BIL_type(1 = BIL-PCg, Macia, 2=BIL-NTG), dirich0Neum1
             enddo
             ! -----------------------------------------------------------------------!
 
