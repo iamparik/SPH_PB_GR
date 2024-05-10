@@ -16,9 +16,9 @@ F_ext_x	1.D2
 F_ext_y	0.D0
 NumericalSimCase 4
 timeIntegrationScheme 1
-BILtype 9
-PrsrGradtype 15
-ConDivtype 3
+BILtype 23
+PrsrGradtype 31
+ConDivtype 21
 SumDenstype 3
 summationDensity 0
 artViscType 0
