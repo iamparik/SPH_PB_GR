@@ -31,7 +31,7 @@ logical ::  runSPH = .true.
 integer(4) :: k, a, b , d, s, i, j, Scalar0Matrix1
 integer(4) :: correction_types, CF_density, ID_density, CF_pressure, ID_pressure, &
     & CF_BIL_visc, ID_BIL_visc,dirich0Neum1
-real(8) :: scalar_factor, Sca_Bdry_val
+real(8) :: scalar_factor, Sca_Bdry_val, current_time
 real(8), DIMENSION(:), allocatable  :: F_a, F_b, Cdwdx_a, Cdwdx_b, Cdgmas
 real(8), DIMENSION(:,:,:), allocatable :: grad_vel
 real(8), DIMENSION(:,:), allocatable :: matrix_factor, grad_P, visc_stress, x_ve_temp
@@ -76,9 +76,11 @@ correction_types=10
     
     do itimestep = current_ts+1, max_timesteps
         
+        current_time=dble(itimestep)*dt
+        
         ! Add time dependent boundary conditions to the boundary:
         do s =1, etotal
-            call BCinputValue(etype(s),bdryVal_vel(:,s), bdryVal_prs(s), bdryVal_rho(s), bdryVal_temp(s), itimestep)
+            call BCinputValue(etype(s),bdryVal_vel(:,s), bdryVal_prs(s), bdryVal_rho(s), bdryVal_temp(s), current_time)
         enddo
         
         call printTimeStep(itimestep,print_step)
