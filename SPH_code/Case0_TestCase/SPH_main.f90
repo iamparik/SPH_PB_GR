@@ -31,7 +31,7 @@ logical ::  runSPH = .true.
 integer(4) :: k, a, b , d, s, i, j, Scalar0Matrix1
 integer(4) :: correction_types, CF_density, ID_density, CF_pressure, ID_pressure, &
     & CF_BIL_visc, ID_BIL_visc,dirich0Neum1
-real(8) :: scalar_factor, Sca_Bdry_val
+real(8) :: scalar_factor, Sca_Bdry_val, current_time
 real(8), DIMENSION(:), allocatable  :: F_a, F_b, Cdwdx_a, Cdwdx_b, Cdgmas
 real(8), DIMENSION(:,:,:), allocatable :: grad_vel
 real(8), DIMENSION(:,:), allocatable :: matrix_factor, grad_P, visc_stress, x_ve_temp
@@ -49,12 +49,6 @@ correction_types=10
     
     allocate(F_a(SPH_dim), F_b(SPH_dim), Cdwdx_a(SPH_dim), Cdwdx_b(SPH_dim), Cdgmas(SPH_dim), &
     & matrix_factor(SPH_dim,SPH_dim),  delx_ab(SPH_dim))
-
-! Add boundary conditions to the boundary:
-    allocate( bdryVal_vel(SPH_dim,maxedge),bdryVal_prs(maxedge), bdryVal_rho(maxedge), bdryVal_temp(maxedge))
-    do s =1, etotal
-        call BCinputValue(etype(s),bdryVal_vel(:,s), bdryVal_prs(s), bdryVal_rho(s), bdryVal_temp(s))
-    enddo
 
 ! theoretical maximum for time step.
     call maxTimeStep
@@ -78,8 +72,16 @@ correction_types=10
     
     current_ts= itimestep
     
+    allocate( bdryVal_vel(SPH_dim,maxedge),bdryVal_prs(maxedge), bdryVal_rho(maxedge), bdryVal_temp(maxedge))
+    
     do itimestep = current_ts+1, max_timesteps
         
+        current_time=dble(itimestep)*dt
+        
+        ! Add time dependent boundary conditions to the boundary:
+        do s =1, etotal
+            call BCinputValue(etype(s),bdryVal_vel(:,s), bdryVal_prs(s), bdryVal_rho(s), bdryVal_temp(s), current_time)
+        enddo
         
         call printTimeStep(itimestep,print_step)
         
