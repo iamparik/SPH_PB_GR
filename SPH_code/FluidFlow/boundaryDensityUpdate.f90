@@ -13,7 +13,7 @@ subroutine boundaryDensityUpdate
         & dx_r,g_const,hsml_const, rho_init
     use particle_data,      only: ntotal,etotal,etype,&
         & epair_a, epair_s, eniac, p, hsml, mass, &
-        & rho, nedge_rel_edge, x,vx, bdryVal_rho
+        & rho, nedge_rel_edge, x,vx !, bdryVal_rho
     
     implicit none
       
@@ -80,7 +80,7 @@ subroutine boundaryDensityUpdate
         
         if ( etype(s) .eq. etype_FreeSurface1) then                    
             ! change below to
-            rho(a)=bdryVal_rho(s)
+            rho(a)= rho_init !bdryVal_rho(s)
         
         endif
         

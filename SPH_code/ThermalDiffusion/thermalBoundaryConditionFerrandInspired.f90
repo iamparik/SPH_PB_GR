@@ -14,11 +14,11 @@ subroutine thermalBoundaryConditionFerrandInspired
     use config_parameter,   only: SPH_dim, etype_thermal_dirichlet, etype_thermal_neumann, dx_r
     use particle_data,      only: ntotal,etotal,etype,&
         & epair_a, epair_s, eniac, temp, hsml, mass, &
-        & rho, nedge_rel_edge, x, bdryVal_temp,surf_norm
+        & rho, nedge_rel_edge, x,surf_norm !, bdryVal_temp
     
     implicit none
       
-    real(8) :: tdwdx(SPH_dim), dxiac(SPH_dim), driac, w ,fn, mv_in, scale_k
+    real(8) :: tdwdx(SPH_dim), dxiac(SPH_dim), driac, w ,fn, mv_in, scale_k , bdryVal_temp(etotal)    
     real(8),DIMENSION(:),ALLOCATABLE :: alpha, T   
     integer(4) :: a,b,s,k,d      
 

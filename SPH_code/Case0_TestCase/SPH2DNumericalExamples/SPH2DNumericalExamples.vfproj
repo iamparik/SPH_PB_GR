@@ -84,7 +84,6 @@
 		<File RelativePath="..\..\FluidFlow\summationDensityOperator.f90"/>
 		<File RelativePath="..\..\FluidFlow\viscousStressOperator.f90"/></Filter>
 		<Filter Name="InputFiles">
-		<File RelativePath="..\..\InputFiles(toBeRemoved-Deprecated)\backupInput.f90"/>
 		<File RelativePath="..\BCinput.f90"/>
 		<File RelativePath="..\..\SPH_general\inputCADtoEdgeData.f90"/>
 		<File RelativePath="..\..\SPH_general\inputCADtoParticleData.f90"/>

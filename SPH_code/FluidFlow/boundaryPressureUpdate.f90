@@ -16,8 +16,8 @@ subroutine boundaryPressureUpdate
          & pi, dx_r,g_const,hsml_const, c_sound, prsrBdryType
     use particle_data,      only: ntotal,etotal,etype,&
         & epair_a, epair_s, eniac, p, hsml, mass, &
-        & rho, nedge_rel_edge, x,vx, bdryVal_prs,surf_norm, &
-        & p_counter, gamma_cont
+        & rho, nedge_rel_edge, x,vx,surf_norm, &
+        & p_counter, gamma_cont !, bdryVal_prs
     
     
     implicit none
@@ -128,7 +128,7 @@ subroutine boundaryPressureUpdate
         
         !Apply Dirichlet boundary condition for wall with psi= P_boundary        
         if ( etype(s) .eq. etype_FreeSurface1) then                    
-            p(a)=bdryVal_prs(s)
+            p(a)= 0.D0 !bdryVal_prs(s)
         
         endif
         
