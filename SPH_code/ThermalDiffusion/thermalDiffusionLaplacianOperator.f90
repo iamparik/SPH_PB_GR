@@ -16,13 +16,13 @@ subroutine thermalDiffusionLaplacianOperator(fncn,lap_fncn,oprtrTyype)
             & eniac, epair_a, epair_s,nedge_rel_edge, edge, surf_norm,  &
             & gamma_cont, gamma_mat, gamma_discrt, del_gamma_as, &
             & gamma_mat_inv, xi1_mat_inv, xi_cont_mat_inv, etotal,etype, &
-            & nperiodic,pBC_duplicate_pair, pBC_edges, bdryVal_temp
+            & nperiodic,pBC_duplicate_pair, pBC_edges !, bdryVal_temp
     implicit none
     
     real(8) :: fncn(ntotal), lap_fncn(ntotal)
     integer(4) :: oprtrTyype
     integer(4) a, k, d, s
-    real(8) kk(ntotal), kk_s(etotal), G(ntotal)
+    real(8) kk(ntotal), kk_s(etotal), G(ntotal), bdryVal_temp(etotal)
     real(8),DIMENSION(:),ALLOCATABLE:: fncn_s, gamma_approx
     real(8),DIMENSION(:,:),ALLOCATABLE:: dfncn
     real(8),DIMENSION(:,:),ALLOCATABLE:: dfncn_s, x_s

@@ -23,34 +23,34 @@ end subroutine
 
     
     
-subroutine BCinputValue(etype,bdryVal_vel, bdryVal_prs, bdryVal_rho, bdryVal_temp, current_time)
+subroutine BCinputValue(bdryVal_seg,num_bdry_seg, bdryVal_ve, num_bdry_ve, etype, dim, current_time)
     use config_parameter , only : rho_init
     implicit none
-    integer(4), intent(in) :: etype
-    real(8), dimension(2), intent(out) :: bdryVal_vel
-    real(8), intent(out) :: bdryVal_prs
-    real(8), intent(out) :: bdryVal_rho
-    real(8), intent(out) :: bdryVal_temp
+    integer(4), intent(in) :: etype, num_bdry_seg, num_bdry_ve, dim
+    real(8), dimension(num_bdry_seg), intent(inout) :: bdryVal_seg
+    real(8), dimension(num_bdry_ve,dim), intent(inout) :: bdryVal_ve
     real(8), intent(in) :: current_time
+    integer(4) :: d
+    
     
     if(etype .eq. 2) then
         
-        bdryVal_vel(1)= 0.D0
-        bdryVal_vel(2)= 0.D0
-
-        bdryVal_prs  = 0.D0 
-        bdryVal_rho  = rho_init 
-        bdryVal_temp =300 
+        bdryVal_seg(1)= 0.D0
+        bdryVal_seg(2)= 0.D0
+        bdryVal_seg(3)= rho_init 
     endif
     
     if(etype .eq. 4) then
         
-        bdryVal_vel(1)= 0.D0
-        bdryVal_vel(2)= 1.D-2*1.D2*cos(current_time/(1.D-2))
-
-        bdryVal_prs  = 0.D0 
-        bdryVal_rho  = rho_init 
-        bdryVal_temp =300 
+        do d=1,dim
+            bdryVal_ve(3,d)= 1.D-2*1.D2*cos(current_time/(1.D-2))*cos(atan2(bdryVal_ve(2,d)-4.D-2,bdryVal_ve(1,d)-6.D-2))
+            bdryVal_ve(4,d)= 1.D-2*1.D2*cos(current_time/(1.D-2))*sin(atan2(bdryVal_ve(2,d)-4.D-2,bdryVal_ve(1,d)-6.D-2))
+        enddo
+        
+        bdryVal_seg(1)= (bdryVal_ve(3,1)+bdryVal_ve(3,2))/2.D0
+        bdryVal_seg(2)= (bdryVal_ve(4,1)+bdryVal_ve(4,2))/2.D0
+        !bdryVal_seg(2)= 1.D-2*1.D2*cos(current_time/(1.D-2))
+        bdryVal_seg(3)= rho_init
     endif
     
 end subroutine

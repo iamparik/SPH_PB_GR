@@ -187,12 +187,8 @@ integer(4):: itimestep
     real(8), dimension(:),allocatable:: dgrho_prev
     
 ! paramter/s for boundary values
-    public bdryVal_temp, bdryVal_prs, bdryVal_vel, &
-    & bdryVal_rho, p_counter
-    real(8), dimension(:), allocatable:: bdryVal_temp
-    real(8), dimension(:), allocatable:: bdryVal_prs
-    real(8), dimension(:,:), allocatable:: bdryVal_vel
-    real(8), dimension(:), allocatable:: bdryVal_rho
+    public bdryVal_seg, p_counter
+    real(8), dimension(:,:), allocatable:: bdryVal_seg
     real(8), dimension(:), allocatable:: p_counter
     
     
