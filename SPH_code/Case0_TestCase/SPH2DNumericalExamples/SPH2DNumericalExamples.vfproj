@@ -102,6 +102,7 @@
 		<File RelativePath="..\..\NeighborSearch\nnps_algorithm.f90"/>
 		<File RelativePath="..\..\NeighborSearch\particlePair.f90"/></Filter>
 		<Filter Name="NewOperators">
+		<File RelativePath="..\..\SPHOperators\artificialViscosityOperatorNew.f90"/>
 		<File RelativePath="..\..\SPHOperators\CorrectedBILaplacian.f90"/>
 		<File RelativePath="..\..\SPHOperators\CorrectedKernelGradient.f90"/>
 		<File RelativePath="..\..\SPHOperators\CorrectedVectorDivergence.f90"/>
