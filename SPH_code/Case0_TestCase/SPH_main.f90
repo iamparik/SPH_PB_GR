@@ -30,11 +30,11 @@ integer(8) :: ic1, crate1, cmax1, ic2
 logical ::  runSPH = .true.
 integer(4) :: k, a, b , d, s, i, j, Scalar0Matrix1
 integer(4) :: correction_types, CF_density, ID_density, CF_pressure, ID_pressure, &
-    & CF_BIL_visc, ID_BIL_visc,dirich0Neum1, num_bdry_var_seg
+    & CF_BIL_visc, ID_BIL_visc,dirich0Neum1, num_bdry_var_seg, num_bdry_var_ve
 real(8) :: scalar_factor, Sca_Bdry_val, current_time
 real(8), DIMENSION(:), allocatable  :: F_a, F_b, Cdwdx_a, Cdwdx_b, Cdgmas
 real(8), DIMENSION(:,:,:), allocatable :: grad_vel
-real(8), DIMENSION(:,:), allocatable :: matrix_factor, grad_P, visc_stress, x_ve_temp
+real(8), DIMENSION(:,:), allocatable :: matrix_factor, grad_P, visc_stress, x_ve_temp, vx_ve,bdryVal_ve
 real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
 
 
@@ -77,7 +77,10 @@ correction_types=10
     !num_bdry_var_seg = (SPH_dim)*vector_vaiables + scalar variables
     num_bdry_var_seg = (SPH_dim)*1 + 1
     
-    allocate(bdryVal_seg(num_bdry_var_seg,maxedge))
+    !dimilarly define number of boudnary variables consdiered at vertices
+    num_bdry_var_ve = (SPH_dim)*2 + 1
+
+    allocate(bdryVal_seg(num_bdry_var_seg,maxedge), bdryVal_ve(num_bdry_var_ve, SPH_dim), vx_ve(SPH_dim,ve_total))
     
     do itimestep = current_ts+1, max_timesteps
         
@@ -85,7 +88,18 @@ correction_types=10
         
         ! Add time dependent boundary conditions to the boundary:
         do s =1, etotal
-            call BCinputValue(etype(s),bdryVal_seg(:,s),num_bdry_var_seg, current_time)
+            bdryVal_ve = 0.D0
+            do d=1,SPH_dim
+                a= edge(d,s)
+                bdryVal_ve(1:SPH_dim,d)=x_ve(:,a)
+            enddo
+            
+            call BCinputValue(bdryVal_seg(:,s),num_bdry_var_seg,bdryVal_ve,num_bdry_var_ve,etype(s),SPH_dim,current_time)
+            
+            do d=1,SPH_dim
+                a= edge(d,s)
+                vx_ve(:,a)=bdryVal_ve(SPH_dim+1:SPH_dim*2,d)
+            enddo
         enddo
         
         call printTimeStep(itimestep,print_step)
@@ -311,7 +325,7 @@ correction_types=10
                 do d=1,SPH_dim
                     a= edge(d,s)
                     !Update position
-                    x_ve(:,a) = x_ve(:,a) + dt* bdryVal_seg(1:SPH_dim,s)
+                    x_ve(:,a) = x_ve(:,a) + dt* vx_ve(:,a)
                 enddo
                 
                 ! now update the midpoint of edge, or poitns,
@@ -355,7 +369,8 @@ correction_types=10
         
     enddo
         
-
+    
+deallocate(bdryVal_seg, bdryVal_ve, vx_ve)
 
 
 
