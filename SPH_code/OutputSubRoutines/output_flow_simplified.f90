@@ -13,7 +13,7 @@ subroutine  output_flow_simplified(itimestep,dt)
         & save_step, g_const, hydroStaticHeight
     use particle_data ,   only: x, mass, rho, p, vx, nedge_rel_edge, &
         & ntotal,etotal, itype, etype, gamma_cont, gamma_discrt,del_gamma, delC, &
-        & FreeSurfaceVar, gamma_density_cont
+        & FreeSurfaceVar, gamma_density_cont, ve_total, x_ve
     
     implicit none
 !----------------------------------------------------------------------           
@@ -122,12 +122,10 @@ text_print=.true.
     
 ! Export all Ghost particles/ponts.
     
-    do i=1, ntotal
-        if(itype(i) .eq. 0) then
-            if(text_print)  write(1,'(A)')'ZONE T="Edge vertices",F=Point,C=Black'
-            write(1,1001) (x(d, i), d=1,SPH_dim),0,0, (0, d = 1, SPH_dim), 0, gamma_cont(i), gamma_discrt(i), (del_gamma(d, i), d = 1, SPH_dim), (0, d = 1, SPH_dim)  , FreeSurfaceVar(i)     
-            text_print=.false.
-        endif
+    do i=1, ve_total
+        if(text_print)  write(1,'(A)')'ZONE T="Edge vertices",F=Point,C=Black'
+        write(1,1001) (x_ve(d, i), d=1,SPH_dim),0,0, (0, d = 1, SPH_dim), 0, gamma_cont(i), gamma_discrt(i), (del_gamma(d, i), d = 1, SPH_dim), (0, d = 1, SPH_dim)  , FreeSurfaceVar(i)     
+        text_print=.false.
     enddo
    
     text_print=.true.

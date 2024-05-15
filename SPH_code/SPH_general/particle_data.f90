@@ -60,6 +60,10 @@ integer(4):: itimestep
     real(8):: KE_prev
     real(8),DIMENSION(:),ALLOCATABLE :: FreeSurfaceVar 
     
+
+    
+    
+    
     
     public packed_x,packed_itype, packed_vol, delC,delCMax,delCAvg, &
         & delCL2,ga_Max,ga_Avg,ga_L2, xStart, g_a_min, g_a_max, packableParticle, &
@@ -86,11 +90,13 @@ integer(4):: itimestep
 ![Input]            edge:   stores vertices of solid wall boudnary (edge in 2d and plane in 3d)    
 ![Output]           nedge_rel_edge:   Edge related to a boudnary particle (or reference point) on edge 
 ![Output]           surf_norm:     surface normals for wall edges
-    public edge,nedge_rel_edge,surf_norm
+![input/output]     x_ve:      coordinate of vertices  
+    public edge,nedge_rel_edge,surf_norm, x_ve
     integer(4), DIMENSION(:,:), ALLOCATABLE:: edge
     integer(4), DIMENSION(:), ALLOCATABLE:: nedge_rel_edge
     real(8),DIMENSION(:,:),ALLOCATABLE:: surf_norm  
-    
+    real(8),DIMENSION(:,:),ALLOCATABLE :: x_ve
+
 
 ![input/output]     nreal:  total number of real particles
 ![input/output]     nflow:  total number of flow boundary particles
@@ -99,13 +105,15 @@ integer(4):: itimestep
 ![input/output]     ntotal: total number of all particles (and referecne points to be printed) 
 ![input/output]     etotal: total number of all edges  
 ![input/output]     ereal: total number of real edges  
-    public nreal,nflow,nedge,nghost, ntotal, etotal
+![input/output]     ve_total: total number of vertices
+    public nreal,nflow,nedge,nghost, ntotal, etotal, ve_total
     integer(4):: nreal
     integer(4):: nflow
     integer(4):: nedge
     integer(4):: nghost
     integer(4):: ntotal
     integer(4):: etotal
+    integer(4)::ve_total
     
 ![Output]           niac:   Total number of particle interactions
 ![Output]           pair_i: i'th particle of a given particle pair 
@@ -154,10 +162,11 @@ integer(4):: itimestep
     real(8), dimension(:), Allocatable :: gamma_density_cont
     
 !the below parameters are used in the context of periodic BC
-    public ntotal_prev,etotal_prev,pBC_edges, pBC_epair_a,pBC_epair_s,pBC_eniac,tangent_pBC, edge_pBC_pairs, &
-        & pBC_duplicate_pair, nperiodic
+    public ntotal_prev,etotal_prev, ve_total_prev, pBC_edges, pBC_epair_a,pBC_epair_s, &
+        & pBC_eniac,tangent_pBC, edge_pBC_pairs, pBC_duplicate_pair, nperiodic
     integer(4):: ntotal_prev
     integer(4):: etotal_prev
+    integer(4):: ve_total_prev
     integer(4), dimension(:,:),allocatable:: pBC_edges
     integer(4), dimension(:),allocatable::  pBC_epair_a
     integer(4), dimension(:),allocatable::  pBC_epair_s
@@ -178,12 +187,8 @@ integer(4):: itimestep
     real(8), dimension(:),allocatable:: dgrho_prev
     
 ! paramter/s for boundary values
-    public bdryVal_temp, bdryVal_prs, bdryVal_vel, &
-    & bdryVal_rho, p_counter
-    real(8), dimension(:), allocatable:: bdryVal_temp
-    real(8), dimension(:), allocatable:: bdryVal_prs
-    real(8), dimension(:,:), allocatable:: bdryVal_vel
-    real(8), dimension(:), allocatable:: bdryVal_rho
+    public bdryVal_seg, p_counter
+    real(8), dimension(:,:), allocatable:: bdryVal_seg
     real(8), dimension(:), allocatable:: p_counter
     
     

@@ -39,11 +39,31 @@ NumericalSimCase 4
 
 timeIntegrationScheme 1
 
-BILtype 10
+BILtype 23:
+Values in terms of p=aq+r, by passing value p, and modulo is used to obtain r & q
+currently a=10 
+r=1 => gamma_cont as correction factor with F_b-F_a 
+	for vel gradient near bdry
+r=2 => gamma_discrt as correction factor with F_b-F_a 
+	for vel gradient near bdry
+r=3 => PCBI_correction as correction factor with F_b-F_a 
+	for vel gradient near bdry
+r=4 => diagonal terms of PCBI matrix correction with F_b-F_a factor 
+	for vel gradient near bdry
+r=5 => Xi correction (PCBI without boundary terms) as correction factor 
+	with F_b-F_a for vel gradient near bdry
+q=1 => use vel gradient directly at bdry (BIL-PCG) as del_fa+del_fs
+q=2 => use vel gradient directly at bdry (BIL-PCG) as 2*del_fa
+q=3 => use vel gradient directly at bdry (BIL-PCG) as 2*del_fs
+q=4 => use BIL-Macia formulation to simplify vel gradient
+q=5 => use BIL-NTG formulation to simpify vel gradient
+q=6 => use BIL-wallbdry USAW to simpliy vel gradient
 
-PrsrGradtype 14
+PrsrGradtype 31
+Check explanation on derivatives below
 
-ConDivtype 8
+ConDivtype 21
+Check explanation on derivatives below
 
 SumDenstype 3
 
@@ -64,3 +84,16 @@ prsrBdryType 4
 HG_density_correction 1
 
 PSTGradtype 1
+
+Derivatives:
+For any derivative based formulation like gradient and derivative, we use,
+Values in terms of p=aq+r, by passing value p, and modulo is used to obtain r & q
+currently a=10
+r=1 => gamma_cont as correction factor 
+r=2 => gamma_discrt as correction factor 
+r=3 => PCBI_correction as correction factor
+r=4 => diagonal terms of PCBI matrix correction factor 
+r=5 => Xi correction (PCBI without boundary terms) as correction factor
+q=1 => Strictly Kernel consistent formulation with only F_b
+q=2 => F_b-F_a formulation
+q=3 => F_b+F_a formulation

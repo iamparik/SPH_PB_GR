@@ -13,14 +13,14 @@ subroutine ViscousStressOperator(dstress,fncn,rho,oprtrTyype)
     use particle_data, only: pair_i,pair_j,niac,ntotal,itype, dwdx, &
         & epair_a, epair_s, eniac, etotal, etype, del_gamma_as, nedge_rel_edge, surf_norm, &
         & gamma_cont,gamma_discrt, gamma_mat, gamma_mat_inv,del_gamma_as,xi1_mat_inv,xi_cont_mat_inv, &
-        & bdryval_Vel, mass, mu,x, pBC_edges
+        & mass, mu,x, pBC_edges !,bdryval_Vel
 
     implicit none
     
     real(8) :: dstress(SPH_dim,ntotal), fncn(SPH_dim,ntotal), rho(ntotal)
     integer(4) :: oprtrTyype
     integer(4) a, k, d, s, i,j
-    real(8) G_s(etotal), G(ntotal)
+    real(8) G_s(etotal), G(ntotal) , bdryVal_vel(SPH_dim,etotal)
     real(8),DIMENSION(:),ALLOCATABLE:: gamma_approx, temp1D_1, temp1D_2, temp1D_3, temp1D_4
     real(8),DIMENSION(:,:,:),ALLOCATABLE:: gamma_mat_approx_inv
     real(8),DIMENSION(:,:),ALLOCATABLE:: fncn_s,dfncn_s,dfncn, dstrain, x_s, bdryValWallVel, temp2D, temp2D_2
