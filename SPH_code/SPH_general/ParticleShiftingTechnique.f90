@@ -2,7 +2,7 @@
 !
 !  SUBROUTINE: ParticleShiftingTechnique
 !
-!  PURPOSE:  Subroutine to shift particles
+!  PURPOSE:  Subroutine to shift particles and update concentration gradient
 !****************************************************************************
 
 subroutine ParticleShiftingTechnique(PSTtype,PSTcoeff)
