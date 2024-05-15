@@ -345,12 +345,8 @@ correction_types=10
         
         !---------------------- free surface detection and PST algorithm -------------------------------------!
         call FreeSurfaceDetection
-        if(PSTtype .gt. 0) then
-            call ParticleShiftingTechnique
-        endif
-        
-        if( .not. allocated(delC)) call ConcGradient  
-        
+        call ParticleShiftingTechnique(PSTtype,PSTcoeff)
+               
         
         if ((mod(itimestep,save_step).eq.0) .or. (itimestep.eq.1)) call output_flow_simplified(itimestep,dt)   
         deallocate(delC)
