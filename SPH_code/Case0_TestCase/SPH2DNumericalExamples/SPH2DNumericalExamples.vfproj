@@ -84,7 +84,7 @@
 		<File RelativePath="..\..\FluidFlow\summationDensityOperator.f90"/>
 		<File RelativePath="..\..\FluidFlow\viscousStressOperator.f90"/></Filter>
 		<Filter Name="InputFiles">
-		<File RelativePath="..\BCinput.f90"/>
+		<File RelativePath="..\BCinput_0.f90"/>
 		<File RelativePath="..\..\SPH_general\inputCADtoEdgeData.f90"/>
 		<File RelativePath="..\..\SPH_general\inputCADtoParticleData.f90"/>
 		<File RelativePath="..\InputExtNew.f90"/>
@@ -186,7 +186,7 @@
 		<File RelativePath="..\..\SPH_general\relErrorFormulation.f90"/>
 		<File RelativePath="..\..\SPH_general\sml_mult_factor.f90"/>
 		<File RelativePath="..\..\SPH_general\smoothing_w0.f90"/>
-		<File RelativePath="..\SPH_main_2.f90"/>
+		<File RelativePath="..\SPH_main.f90"/>
 		<File RelativePath="..\..\SPH_general\SPH_operator.f90"/>
 		<File RelativePath="..\..\SPH_general\surfaceNormalBdry.f90"/>
 		<File RelativePath="..\..\SPH_general\testForSPHApproxLapFormulations.f90"/>
