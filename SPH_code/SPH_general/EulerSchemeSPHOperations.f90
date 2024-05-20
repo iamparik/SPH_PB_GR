@@ -96,7 +96,7 @@ do itimestep= current_ts+1, current_ts+maxtimestep
 
         !gamma_cont and gamma_cont_prev was initialized with maxn
 
-    if (mod(itimestep,backup_step).eq.0)  call backupOutput(itimestep)
+    !if (mod(itimestep,backup_step).eq.0)  call backupOutput(itimestep)
 enddo
 
 deallocate(gamma_cont, epair_a, epair_s, pair_i, pair_j, w,dwdx)
