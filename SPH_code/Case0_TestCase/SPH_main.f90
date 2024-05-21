@@ -287,7 +287,7 @@ correction_types=10
             DF_a=0.D0
             DF_b=0.D0
             call artViscOperatorPtoP(DF_a,DF_b,vx(:,a),vx(:,b),dwdx(:,k),mass(a), mass(b), rho(a), rho(b), &
-                    & SPH_dim, hsml_const, c_sound, delx_ab(:),artViscType )  
+                    & SPH_dim, hsml_const, c_sound, delx_ab,artViscType )  
             stress(:,a) = stress(:,a)+ DF_a(:)
             stress(:,b) = stress(:,b)+ DF_b(:)
             !-------------------------------------------------------------------------------------------------------------!

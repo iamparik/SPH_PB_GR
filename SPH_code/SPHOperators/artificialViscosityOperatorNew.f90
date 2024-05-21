@@ -21,13 +21,17 @@ subroutine artViscOperatorPtoP(dF_a,dF_b,F_a,F_b,dwdx, mass_a, mass_b, rho_a, rh
             alpha = 1.D0
             beta = 2.D0
         
-            MU_ab= hsml*dot_product(F_a-F_b,x_ab)/(norm2(x_ab)+eta**2)
+            MU_ab= hsml*dot_product(F_a-F_b,x_ab)/(norm2(x_ab)**2+eta**2)
+            
+            if(MU_ab .lt. 0.D0) then
         
-            PI_ab=(-alpha*c_sound*MU_ab+ beta* MU_ab**2)/((rho_a+rho_b)/2.D0)
+                PI_ab=(-alpha*c_sound*MU_ab+ beta* MU_ab**2)/((rho_a+rho_b)/2.D0)
         
-        
-            dF_a(:)= dF_a(:) + PI_ab*Cdwdx_a*mass_a*rho_a
-            dF_b(:)= dF_b(:) + PI_ab*Cdwdx_b*mass_b*rho_b
+                do d=1,dim
+                    dF_a(d)= dF_a(d) + PI_ab*Cdwdx_a(d)*mass_b*rho_a
+                    dF_b(d)= dF_b(d) + PI_ab*Cdwdx_b(d)*mass_a*rho_b
+                enddo
+            endif
         endif
     
     endif
