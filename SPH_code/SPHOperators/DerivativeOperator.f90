@@ -5,6 +5,8 @@ subroutine DerivativeOperator(dF_a,dF_b,F_a,F_b,Cdwdx_a, Cdwdx_b, mass_a, mass_b
     real(8), intent(in) :: F_a, F_b, Cdwdx_a, Cdwdx_b, mass_a, mass_b, rho_a, rho_b
     real(8), intent(inout) :: dF_a,dF_b    
     
+    !if id =0 no operation is performed
+    
     if(id .eq. 1) then
         
         dF_a= dF_a + F_b*Cdwdx_a*mass_b/rho_b
@@ -31,6 +33,8 @@ subroutine DerivativeOperatorB(dF_a,F_a,F_s,Cdgmas, id)
     integer(4), intent(in) :: id
     real(8), intent(in) :: F_a, F_s, Cdgmas
     real(8), intent(inout) :: dF_a  
+    
+    !if id =0 no operation is performed
     
     if(id .eq. 1) then
         

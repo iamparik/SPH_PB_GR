@@ -89,6 +89,7 @@ Derivatives:
 For any derivative based formulation like gradient and derivative, we use,
 Values in terms of p=aq+r, by passing value p, and modulo is used to obtain r & q
 currently a=10
+r=0 => no correction factor
 r=1 => gamma_cont as correction factor 
 r=2 => gamma_discrt as correction factor 
 r=3 => PCBI_correction as correction factor

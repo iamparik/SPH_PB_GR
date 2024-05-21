@@ -137,7 +137,6 @@ correction_types=10
             a= pair_i(k)
             b= pair_j(k)  
 
-           
             !------------------- Find divergence of velocity (to be used in continuity equation) -------------------------!
             call CorrectedVecDivPtoP(div_vel(a),div_vel(b),vx(:,a),vx(:,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
@@ -153,7 +152,7 @@ correction_types=10
             s= epair_s(k)
             
             
-            !------ Find divergence of velocity for calculating density -------------!
+            !------ Find divergence of velocity (to be used in continuity equation)-------------!
             F_a(:) = vx(:,a)
             F_b(:) = bdryVal_seg(1:SPH_dim,s)
 
@@ -275,7 +274,7 @@ correction_types=10
                 call CorrectedBILapPtoP(DF_a(d),DF_b(d),vx(d,a),vx(d,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                         & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                         & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
-                        & SPH_dim, delx_ab(:),1)
+                        & SPH_dim, delx_ab(:),ID_BIL_visc)
             enddo
             
             stress(:,a) = stress(:,a)- mu(a)*DF_a(:)
