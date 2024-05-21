@@ -21,14 +21,14 @@ PrsrGradtype 31
 ConDivtype 21
 SumDenstype 3
 summationDensity 0
-artViscType 1
+artViscType 0
 MLS_density_bound 0
 MLS_step 1
 densDiffType 6
 delta_SPH 0.1D0
 prsrBdryType 11
 HG_density_correction 0
-PSTtype 1
+PSTtype 0
 PSTCoeff 5.D-1
 delC_Cap 1.D-4
 WallBoundaryLayer 0

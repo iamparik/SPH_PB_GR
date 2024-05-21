@@ -39,7 +39,7 @@ NumericalSimCase 4
 
 timeIntegrationScheme 1
 
-BILtype 23:
+BILtype 23(preferred value):
 Values in terms of p=aq+r, by passing value p, and modulo is used to obtain r & q
 currently a=10 
 r=1 => gamma_cont as correction factor with F_b-F_a 
@@ -59,10 +59,10 @@ q=4 => use BIL-Macia formulation to simplify vel gradient
 q=5 => use BIL-NTG formulation to simpify vel gradient
 q=6 => use BIL-wallbdry USAW to simpliy vel gradient
 
-PrsrGradtype 31
+PrsrGradtype 31(preferred value)
 Check explanation on derivatives below
 
-ConDivtype 21
+ConDivtype 21(preferred value)
 Check explanation on derivatives below
 
 SumDenstype 3
