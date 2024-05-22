@@ -1,32 +1,35 @@
 ﻿subroutine CorrectedBILapPtoP(dF_a,dF_b,F_a,F_b,dwdx, mass_a, mass_b, rho_a, rho_b, &
                     & gamma_cont_a, gamma_discrt_a, gamma_mat_a, gamma_mat_inv_a, xi1_mat_inv_a, &
                     & gamma_cont_b, gamma_discrt_b, gamma_mat_b, gamma_mat_inv_b, xi1_mat_inv_b, &
-                    & dim, x_ab,CF_ID) 
+                    & dim, x_ab,BIL_type) 
     !Morris/Brookshaw's Laplacian for two particles is calculated, by first correctign the kernel gradient
     
     implicit none
-    integer(4), intent(in) :: dim, CF_ID
+    integer(4), intent(in) :: dim, BIL_type
     real(8), intent(in) :: x_ab(dim),F_a, F_b, dwdx(dim), mass_a, mass_b, rho_a, rho_b, &
         & gamma_cont_a, gamma_discrt_a, gamma_mat_a(dim,dim), gamma_mat_inv_a(dim,dim), xi1_mat_inv_a(dim,dim), &
         & gamma_cont_b, gamma_discrt_b, gamma_mat_b(dim,dim), gamma_mat_inv_b(dim,dim), xi1_mat_inv_b(dim,dim)
     real(8), intent(inout) :: dF_a,dF_b
-    integer(4) :: d, Scalar0Matrix1 
+    integer(4) :: d, Scalar0Matrix1 , CF_ID
     real(8) :: Cdwdx_a(dim), Cdwdx_b(dim), matrix_factor(dim,dim), scalar_factor
     
     ! By default only gamma_cont is used for BILaplacian formulation
+    CF_ID =1
     
-    call CorrectionFactorParsing(CF_ID,Scalar0Matrix1,scalar_factor,matrix_factor, &
+    call CorrectionFactorParsing(scalar_factor,matrix_factor,CF_ID,Scalar0Matrix1, &
         & gamma_cont_a, gamma_discrt_a, gamma_mat_a, gamma_mat_inv_a, xi1_mat_inv_a, dim)            
     Cdwdx_a(:)=dwdx(:)
     call CorrectedKernelGradient(Cdwdx_a, scalar_factor, matrix_factor, Scalar0Matrix1, dim)
             
-    call CorrectionFactorParsing(CF_ID,Scalar0Matrix1,scalar_factor,matrix_factor, &
+    call CorrectionFactorParsing(scalar_factor,matrix_factor,CF_ID,Scalar0Matrix1, &
         & gamma_cont_b, gamma_discrt_b, gamma_mat_b, gamma_mat_inv_b, xi1_mat_inv_b, dim)
     Cdwdx_b(:)=-dwdx(:)
     call CorrectedKernelGradient(Cdwdx_b, scalar_factor, matrix_factor, Scalar0Matrix1, dim)    
 
-    dF_a= dF_a + 2.D0*(F_a-F_b)*(dot_product(x_ab,Cdwdx_a)/norm2(x_ab)**2)*mass_b/rho_b
-    dF_b= dF_b + 2.D0*(F_b-F_a)*(dot_product(-x_ab,Cdwdx_b)/norm2(x_ab)**2)*mass_a/rho_a
+    if(BIL_type .gt. 0) then
+        dF_a= dF_a + 2.D0*(F_a-F_b)*(dot_product(x_ab,Cdwdx_a)/norm2(x_ab)**2)*mass_b/rho_b
+        dF_b= dF_b + 2.D0*(F_b-F_a)*(dot_product(-x_ab,Cdwdx_b)/norm2(x_ab)**2)*mass_a/rho_a
+    endif
 
 endsubroutine
     
@@ -49,7 +52,7 @@ subroutine CorrectedBILapPtoB(dF_a, vec_val, scalar_val, del_gamma_as,&
     integer(4) :: d, Scalar0Matrix1
     real(8) :: Cdgmas(dim), matrix_factor(dim,dim), scalar_factor
     
-    call CorrectionFactorParsing(CF_ID,Scalar0Matrix1,scalar_factor,matrix_factor, &
+    call CorrectionFactorParsing(scalar_factor,matrix_factor,CF_ID,Scalar0Matrix1, &
                 & gamma_cont_a, gamma_discrt_a, gamma_mat_a, gamma_mat_inv_a, xi1_mat_inv_a, dim)       
     Cdgmas(:)=del_gamma_as(:)
     call CorrectedKernelGradient(Cdgmas, scalar_factor, matrix_factor, Scalar0Matrix1, dim)  
@@ -78,8 +81,10 @@ subroutine BILViscousBdry(vec_val,scalar_val,dirich0Neum1, grad_vel_a, grad_vel_
     real(8), intent(out) :: vec_val(dim), scalar_val 
     real(8), intent(in) :: grad_vel_a(dim), grad_vel_s(dim), vx_a(dim), vx_s(dim), delx_ab(dim), surf_norm_s(dim), dx_r
 
-    
-    if(BIL_type .eq. 1) then    !BIL-PCG Formulation (using ∇v_a + ∇v_s)
+    if(BIL_type .eq. 0) then !Use this to mask BIL formulation in code
+        scalar_val = 0.D0
+        dirich0Neum1= 1.D0
+    elseif(BIL_type .eq. 1) then    !BIL-PCG Formulation (using ∇v_a + ∇v_s)
         vec_val(:)=grad_vel_a(:) + grad_vel_s(:) 
         dirich0Neum1=0
         

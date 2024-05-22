@@ -30,12 +30,13 @@ integer(8) :: ic1, crate1, cmax1, ic2
 logical ::  runSPH = .true.
 integer(4) :: k, a, b , d, s, i, j, Scalar0Matrix1
 integer(4) :: correction_types, CF_density, ID_density, CF_pressure, ID_pressure, &
-    & CF_BIL_visc, ID_BIL_visc,dirich0Neum1, num_bdry_var_seg, num_bdry_var_ve
+    & CF_BIL_visc, ID_BIL_visc,dirich0Neum1, num_bdry_var_seg, num_bdry_var_ve, &
+    & CF_densDiff, ID_densDiff
 real(8) :: scalar_factor, Sca_Bdry_val, current_time
-real(8), DIMENSION(:), allocatable  :: F_a, F_b, Cdwdx_a, Cdwdx_b, Cdgmas
+real(8), DIMENSION(:), allocatable  :: F_a, F_b,DF_a, DF_b, Cdwdx_a, Cdwdx_b, Cdgmas
 real(8), DIMENSION(:,:,:), allocatable :: grad_vel
-real(8), DIMENSION(:,:), allocatable :: matrix_factor, grad_P, visc_stress, x_ve_temp, vx_ve,bdryVal_ve
-real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
+real(8), DIMENSION(:,:), allocatable :: matrix_factor, stress, x_ve_temp, vx_ve,bdryVal_ve, grad_rho
+real(8), DIMENSION(:), allocatable :: div_vel, delx_ab, dens_diffusion
 
 
 correction_types=10
@@ -48,7 +49,7 @@ correction_types=10
     call inputSPHConfig
     
     allocate(F_a(SPH_dim), F_b(SPH_dim), Cdwdx_a(SPH_dim), Cdwdx_b(SPH_dim), Cdgmas(SPH_dim), &
-    & matrix_factor(SPH_dim,SPH_dim),  delx_ab(SPH_dim))
+    & matrix_factor(SPH_dim,SPH_dim),  delx_ab(SPH_dim), DF_a(SPH_dim), DF_b(SPH_dim))
 
 ! theoretical maximum for time step.
     call maxTimeStep
@@ -121,30 +122,39 @@ correction_types=10
         !allocate(drho(ntotal),rho_prev(ntotal))
         !drho=0.D0
         
-        allocate(div_vel(ntotal), grad_P(SPH_dim, ntotal), visc_stress(SPH_dim, ntotal), &
-            & grad_vel(SPH_dim, SPH_dim, ntotal), x_ve_temp(SPH_dim,SPH_dim)) ! this can be reduced by accoutnign for nreal and nedge correctly
+        allocate(div_vel(ntotal), stress(SPH_dim, ntotal),grad_rho(SPH_dim, ntotal) ,grad_vel(SPH_dim, SPH_dim, ntotal),  &
+            &  x_ve_temp(SPH_dim,SPH_dim), dens_diffusion(ntotal)) ! this can be reduced by accoutnign for nreal and nedge correctly
         div_vel=0.D0
-        grad_P=0.D0
         grad_vel =0.D0
-        visc_stress =0.D0
+        grad_rho=0.D0
+        stress =0.D0
         x_ve_temp=0.D0
-        
+        dens_diffusion=0.D0
         
         CF_density=mod( ConDivtype, correction_types)
         ID_density=int( ConDivtype/correction_types)
+        CF_densDiff= mod(densDiffType,correction_types)
+        ID_densDiff= int(densDiffType/correction_types)
         
         ! Use all particle-particle interaction to find non boundary terms
         do k= 1,niac
             a= pair_i(k)
             b= pair_j(k)  
 
-           
             !------------------- Find divergence of velocity (to be used in continuity equation) -------------------------!
             call CorrectedVecDivPtoP(div_vel(a),div_vel(b),vx(:,a),vx(:,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
                     & SPH_dim, CF_density, ID_density) ! SPH_dim, correctionFactorID, divType
             ! -------------------------------------------------------------------------------------------------------------!
+            
+            !-------------- Find density Gradient term (to be used in density diffusion equation) --------------!
+            call CorrectedScaGradPtoP(grad_rho(:,a), grad_rho(:,b),rho(a),rho(b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
+                    & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                    & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
+                    & SPH_dim, CF_densDiff, ID_densDiff) ! SPH_dim, correctionFactorID, grad_type
+            !-------------------------------------------------------------------------------------------------------------!
+            
             
         enddo
         
@@ -154,7 +164,7 @@ correction_types=10
             s= epair_s(k)
             
             
-            !------ Find divergence of velocity for calculating density -------------!
+            !------ Find divergence of velocity (to be used in continuity equation)-------------!
             F_a(:) = vx(:,a)
             F_b(:) = bdryVal_seg(1:SPH_dim,s)
 
@@ -162,15 +172,38 @@ correction_types=10
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & SPH_dim, CF_density, ID_density) ! SPH_dim, correctionFactorID, divType
             ! -----------------------------------------------------------------------!
+             
+            !------ Find density Gradient term (to be used in density diffusion equation) -------------!         
+            Sca_Bdry_val = rho(a)
+            
+            call CorrectedScaGradPtoB(grad_rho(:,a),rho(a),Sca_Bdry_val,del_gamma_as(:,k),  &
+                    & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                    & SPH_dim, CF_densDiff, ID_densDiff) ! SPH_dim, correctionFactorID, grad_type
+            ! -----------------------------------------------------------------------!
         enddo
         
+        
+         ! Use all particle-particle interaction to find non boundary terms
+        do k= 1,niac
+            a= pair_i(k)
+            b= pair_j(k)  
+            
+            delx_ab(:)= x(:,a)- x(:,b)
+            
+            call densDiffOperatorPtoP(dens_diffusion(a),dens_diffusion(b), &
+                & grad_rho(:,a),grad_rho(:,b),dwdx(:,k),mass(a), mass(b), rho(a), rho(b), &
+                & SPH_dim, hsml_const, c_sound, delx_ab, delta_SPH, ID_densDiff )  
+            
+        enddo
+
+        deallocate(grad_rho)
         
         ! Update variables for the next time step
         do a =1, ntotal
             if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min)) then
                 
                 ! Calcualate density as (𝐷𝜌_𝑎)/𝐷𝑡=− 𝜌_𝑎  ∇∙𝑣_𝑎
-                rho(a) = rho(a) - dt* rho(a) * div_vel(a)
+                rho(a) = rho(a) - dt* rho(a) * div_vel(a) + dt*dens_diffusion(a)
                 ! Use Hughes density correction if necessary
                 if ((HG_density_correction) .and. (rho(a) .le. rho_init)) rho(a)=rho_init
             
@@ -180,6 +213,7 @@ correction_types=10
             
             endif
         enddo
+        deallocate(dens_diffusion, div_vel)
         
         ! The varioables need to be updated for periodic particles
         if (Allocated(pBC_edges)) then
@@ -200,11 +234,14 @@ correction_types=10
             b= pair_j(k)
             
             !-------------- Find Pressure Gradient term (to be used in momentum equation) --------------!
-            
-            call CorrectedScaGradPtoP(grad_P(:,a),grad_P(:,b),P(a),P(b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
+            DF_a=0.D0
+            DF_b=0.D0
+            call CorrectedScaGradPtoP( DF_a, DF_b,P(a),P(b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
                     & SPH_dim, CF_pressure, ID_pressure) ! SPH_dim, correctionFactorID, grad_type
+            stress(:,a) = stress(:,a)+ DF_a(:)
+            stress(:,b) = stress(:,b)+ DF_b(:)
             !-------------------------------------------------------------------------------------------------------------!
             
             !-------------- Find velocity gradient term (to be used to find viscous stress in momentum equation) --------------!
@@ -216,6 +253,7 @@ correction_types=10
             enddo
             !-------------------------------------------------------------------------------------------------------------!
 
+                
         enddo
         
         
@@ -225,11 +263,15 @@ correction_types=10
             s= epair_s(k)
             
             !------ Find Pressure Gradient term (to be used in momentum equation) -------------!
+            DF_a=0.D0
+            
             Sca_Bdry_val = P(a) -rho(a)*c_sound*dot_product(vx(:,a)-bdryVal_seg(1:SPH_dim,s), surf_norm(:,s))
             
-            call CorrectedScaGradPtoB(grad_P(:,a),P(a),Sca_Bdry_val,del_gamma_as(:,k),  &
+            call CorrectedScaGradPtoB(DF_a,P(a),Sca_Bdry_val,del_gamma_as(:,k),  &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & SPH_dim, CF_pressure, ID_pressure) ! SPH_dim, correctionFactorID, grad_type
+            
+            stress(:,a) = stress(:,a)+ DF_a(:)
             ! -----------------------------------------------------------------------!
             
              !------ Find velocity gradient term (to be used to find viscous stress in momentum equation) ------------
@@ -259,17 +301,33 @@ correction_types=10
             a= pair_i(k)
             b= pair_j(k)
             
-            !-------------- Find viscous stress term (to be used in momentum equation) --------------!
             delx_ab(:)= x(:,a)- x(:,b)
+            
+            !-------------- Find viscous stress term (to be used in momentum equation) --------------!
+            DF_a=0.D0
+            DF_b=0.D0
             do d= 1,SPH_dim
-                call CorrectedBILapPtoP(visc_stress(d,a),visc_stress(d,b),vx(d,a),vx(d,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
+                call CorrectedBILapPtoP(DF_a(d),DF_b(d),vx(d,a),vx(d,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                         & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                         & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
-                        & SPH_dim, delx_ab(:),1)
+                        & SPH_dim, delx_ab(:),ID_BIL_visc)
             enddo
+            
+            stress(:,a) = stress(:,a)- mu(a)*DF_a(:)
+            stress(:,b) = stress(:,b)- mu(b)*DF_b(:)
+            
             !-------------------------------------------------------------------------------------------------------------!
 
+            !------------------ Artificial Viscosity term used if applicable -----------------------!
+            DF_a=0.D0
+            DF_b=0.D0
+            call artViscOperatorPtoP(DF_a,DF_b,vx(:,a),vx(:,b),dwdx(:,k),mass(a), mass(b), rho(a), rho(b), &
+                    & SPH_dim, hsml_const, c_sound, delx_ab,artViscType )  
+            stress(:,a) = stress(:,a)+ DF_a(:)
+            stress(:,b) = stress(:,b)+ DF_b(:)
+            !-------------------------------------------------------------------------------------------------------------!
 
+            
         enddo
         
         
@@ -279,20 +337,22 @@ correction_types=10
             s= epair_s(k)
             b= nedge_rel_edge(s)
             
-            !------ Find viscous stress term (to be used in momentum equation) -------------!
             delx_ab(:)= x(:,a)- x(:,b)
-            
+            !------ Find viscous stress term (to be used in momentum equation) -------------!           
             F_b(:) = bdryVal_seg(1:SPH_dim,s)
-                      
+            DF_a=0.D0          
             do d= 1,SPH_dim
                 
                 call BILViscousBdry(F_a,Sca_Bdry_val, dirich0Neum1, grad_vel(d,:,a), grad_vel(d,:,b), vx(d,a), F_b, &
                     & delx_ab, dx_r, surf_norm(:,s), d, SPH_dim, ID_BIL_visc)
                 
-                call CorrectedBILapPtoB(visc_stress(d,a), F_a, Sca_Bdry_val, del_gamma_as(:,k), &
+                call CorrectedBILapPtoB(DF_a(d), F_a, Sca_Bdry_val, del_gamma_as(:,k), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & SPH_dim, dirich0Neum1,1) ! SPH_dim, correctionFactorID, BIL_type(1 = BIL-PCg, Macia, 2=BIL-NTG), dirich0Neum1
             enddo
+            
+            stress(:,a) = stress(:,a)- mu(a)*DF_a(:)
+            
             ! -----------------------------------------------------------------------!
 
 
@@ -306,7 +366,7 @@ correction_types=10
                 
 
                 !Update Velocity
-                vx(:,a) = vx(:,a) + dt* (-grad_P(:,a)/rho(a) + (mu(a)/rho(a))*visc_stress(:,a) + F_ext(:))
+                vx(:,a) = vx(:,a) + dt* (-stress(:,a)/rho(a) + F_ext(:))
             
 
                 !Update position
@@ -340,17 +400,13 @@ correction_types=10
             endif
         enddo
         
-         deallocate(div_vel,grad_P, grad_vel, visc_stress, x_ve_temp)
+         deallocate(grad_vel, stress, x_ve_temp)
         
         
         !---------------------- free surface detection and PST algorithm -------------------------------------!
         call FreeSurfaceDetection
-        if(PSTtype .gt. 0) then
-            call ParticleShiftingTechnique
-        endif
-        
-        if( .not. allocated(delC)) call ConcGradient  
-        
+        call ParticleShiftingTechnique(PSTtype,PSTcoeff)
+               
         
         if ((mod(itimestep,save_step).eq.0) .or. (itimestep.eq.1)) call output_flow_simplified(itimestep,dt)   
         deallocate(delC)

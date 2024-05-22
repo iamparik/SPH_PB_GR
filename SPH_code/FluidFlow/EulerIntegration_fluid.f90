@@ -188,7 +188,7 @@ subroutine EulerIntegration_fluid(itimestep,dt)
 !---------------------- free surface detection and PST algorithm -------------------------------------!
     call FreeSurfaceDetection
     if(PSTtype .gt. 0) then
-        call ParticleShiftingTechnique
+        !call ParticleShiftingTechnique
     endif
     
 !------------ Update parameter evolution of a system ----------------------!

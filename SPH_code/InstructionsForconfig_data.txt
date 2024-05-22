@@ -39,7 +39,7 @@ NumericalSimCase 4
 
 timeIntegrationScheme 1
 
-BILtype 23:
+BILtype 23(preferred value):
 Values in terms of p=aq+r, by passing value p, and modulo is used to obtain r & q
 currently a=10 
 r=1 => gamma_cont as correction factor with F_b-F_a 
@@ -59,10 +59,10 @@ q=4 => use BIL-Macia formulation to simplify vel gradient
 q=5 => use BIL-NTG formulation to simpify vel gradient
 q=6 => use BIL-wallbdry USAW to simpliy vel gradient
 
-PrsrGradtype 31
+PrsrGradtype 31(preferred value)
 Check explanation on derivatives below
 
-ConDivtype 21
+ConDivtype 21(preferred value)
 Check explanation on derivatives below
 
 SumDenstype 3
@@ -75,7 +75,8 @@ MLS_density_bound 0
 
 MLS_step 1
 
-densDiffType 6
+densDiffType 25(preferred)
+Values in terms of p=aq+r, by passing value p, and modulo is used to obtain r & q. Here r represent density gradient formulation type and q represents the correction factor used. The q and r values are obtained with Derivative factors for density gradient. But 0 value of p indicates switching "off" the density diffusion factor.
 
 delta_SPH 0.1D0
 
@@ -89,6 +90,7 @@ Derivatives:
 For any derivative based formulation like gradient and derivative, we use,
 Values in terms of p=aq+r, by passing value p, and modulo is used to obtain r & q
 currently a=10
+r=0 => no correction factor
 r=1 => gamma_cont as correction factor 
 r=2 => gamma_discrt as correction factor 
 r=3 => PCBI_correction as correction factor

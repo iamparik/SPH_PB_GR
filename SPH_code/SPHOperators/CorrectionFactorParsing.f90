@@ -1,4 +1,4 @@
-subroutine CorrectionFactorParsing(id,Scalar0Matrix1,scalar_factor,matrix_factor,g_c, g_d, g_m, g_m_i, xi_m_i, dim)
+subroutine CorrectionFactorParsing(scalar_factor,matrix_factor,id,Scalar0Matrix1,g_c, g_d, g_m, g_m_i, xi_m_i, dim)
     !This subroutine helps identify the correction factor for a given id
     implicit None
     integer(4), intent(in) :: dim,id
@@ -38,6 +38,9 @@ subroutine CorrectionFactorParsing(id,Scalar0Matrix1,scalar_factor,matrix_factor
         matrix_factor=xi_m_i
         Scalar0Matrix1 = 1
         
+    else
+        scalar_factor = 1.D0
+        Scalar0Matrix1 = 0
     endif
     
 endsubroutine
