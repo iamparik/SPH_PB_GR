@@ -6,7 +6,7 @@ subroutine artViscOperatorPtoP(dF_a,dF_b,F_a,F_b,dwdx, mass_a, mass_b, rho_a, rh
     real(8), intent(in) :: x_ab(dim),F_a(dim), F_b(dim), dwdx(dim), &
         & mass_a, mass_b, rho_a, rho_b, hsml, c_sound
     real(8), intent(inout) :: dF_a(dim),dF_b(dim)
-    integer(4) :: d, Scalar0Matrix1 
+    integer(4) :: d 
     real(8) :: Cdwdx_a(dim), Cdwdx_b(dim), eta, alpha, beta, MU_ab, PI_ab
     
      

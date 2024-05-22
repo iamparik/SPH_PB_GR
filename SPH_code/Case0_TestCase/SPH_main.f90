@@ -30,12 +30,13 @@ integer(8) :: ic1, crate1, cmax1, ic2
 logical ::  runSPH = .true.
 integer(4) :: k, a, b , d, s, i, j, Scalar0Matrix1
 integer(4) :: correction_types, CF_density, ID_density, CF_pressure, ID_pressure, &
-    & CF_BIL_visc, ID_BIL_visc,dirich0Neum1, num_bdry_var_seg, num_bdry_var_ve
+    & CF_BIL_visc, ID_BIL_visc,dirich0Neum1, num_bdry_var_seg, num_bdry_var_ve, &
+    & CF_densDiff, ID_densDiff
 real(8) :: scalar_factor, Sca_Bdry_val, current_time
 real(8), DIMENSION(:), allocatable  :: F_a, F_b,DF_a, DF_b, Cdwdx_a, Cdwdx_b, Cdgmas
 real(8), DIMENSION(:,:,:), allocatable :: grad_vel
-real(8), DIMENSION(:,:), allocatable :: matrix_factor, stress, x_ve_temp, vx_ve,bdryVal_ve
-real(8), DIMENSION(:), allocatable :: div_vel, delx_ab
+real(8), DIMENSION(:,:), allocatable :: matrix_factor, stress, x_ve_temp, vx_ve,bdryVal_ve, grad_rho
+real(8), DIMENSION(:), allocatable :: div_vel, delx_ab, dens_diffusion
 
 
 correction_types=10
@@ -121,16 +122,19 @@ correction_types=10
         !allocate(drho(ntotal),rho_prev(ntotal))
         !drho=0.D0
         
-        allocate(div_vel(ntotal), stress(SPH_dim, ntotal),grad_vel(SPH_dim, SPH_dim, ntotal),  &
-            &  x_ve_temp(SPH_dim,SPH_dim)) ! this can be reduced by accoutnign for nreal and nedge correctly
+        allocate(div_vel(ntotal), stress(SPH_dim, ntotal),grad_rho(SPH_dim, ntotal) ,grad_vel(SPH_dim, SPH_dim, ntotal),  &
+            &  x_ve_temp(SPH_dim,SPH_dim), dens_diffusion(ntotal)) ! this can be reduced by accoutnign for nreal and nedge correctly
         div_vel=0.D0
         grad_vel =0.D0
+        grad_rho=0.D0
         stress =0.D0
         x_ve_temp=0.D0
-        
+        dens_diffusion=0.D0
         
         CF_density=mod( ConDivtype, correction_types)
         ID_density=int( ConDivtype/correction_types)
+        CF_densDiff= mod(densDiffType,correction_types)
+        ID_densDiff= int(densDiffType/correction_types)
         
         ! Use all particle-particle interaction to find non boundary terms
         do k= 1,niac
@@ -143,6 +147,14 @@ correction_types=10
                     & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
                     & SPH_dim, CF_density, ID_density) ! SPH_dim, correctionFactorID, divType
             ! -------------------------------------------------------------------------------------------------------------!
+            
+            !-------------- Find density Gradient term (to be used in density diffusion equation) --------------!
+            call CorrectedScaGradPtoP(grad_rho(:,a), grad_rho(:,b),rho(a),rho(b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
+                    & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                    & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
+                    & SPH_dim, CF_densDiff, ID_densDiff) ! SPH_dim, correctionFactorID, grad_type
+            !-------------------------------------------------------------------------------------------------------------!
+            
             
         enddo
         
@@ -160,15 +172,38 @@ correction_types=10
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & SPH_dim, CF_density, ID_density) ! SPH_dim, correctionFactorID, divType
             ! -----------------------------------------------------------------------!
+             
+            !------ Find density Gradient term (to be used in density diffusion equation) -------------!         
+            Sca_Bdry_val = rho(a)
+            
+            call CorrectedScaGradPtoB(grad_rho(:,a),rho(a),Sca_Bdry_val,del_gamma_as(:,k),  &
+                    & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                    & SPH_dim, CF_densDiff, ID_densDiff) ! SPH_dim, correctionFactorID, grad_type
+            ! -----------------------------------------------------------------------!
         enddo
         
+        
+         ! Use all particle-particle interaction to find non boundary terms
+        do k= 1,niac
+            a= pair_i(k)
+            b= pair_j(k)  
+            
+            delx_ab(:)= x(:,a)- x(:,b)
+            
+            call densDiffOperatorPtoP(dens_diffusion(a),dens_diffusion(b), &
+                & grad_rho(:,a),grad_rho(:,b),dwdx(:,k),mass(a), mass(b), rho(a), rho(b), &
+                & SPH_dim, hsml_const, c_sound, delx_ab, delta_SPH, ID_densDiff )  
+            
+        enddo
+
+        deallocate(grad_rho)
         
         ! Update variables for the next time step
         do a =1, ntotal
             if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min)) then
                 
                 ! Calcualate density as (𝐷𝜌_𝑎)/𝐷𝑡=− 𝜌_𝑎  ∇∙𝑣_𝑎
-                rho(a) = rho(a) - dt* rho(a) * div_vel(a)
+                rho(a) = rho(a) - dt* rho(a) * div_vel(a) + dt*dens_diffusion(a)
                 ! Use Hughes density correction if necessary
                 if ((HG_density_correction) .and. (rho(a) .le. rho_init)) rho(a)=rho_init
             
@@ -178,6 +213,7 @@ correction_types=10
             
             endif
         enddo
+        deallocate(dens_diffusion, div_vel)
         
         ! The varioables need to be updated for periodic particles
         if (Allocated(pBC_edges)) then
@@ -364,7 +400,7 @@ correction_types=10
             endif
         enddo
         
-         deallocate(div_vel, grad_vel, stress, x_ve_temp)
+         deallocate(grad_vel, stress, x_ve_temp)
         
         
         !---------------------- free surface detection and PST algorithm -------------------------------------!

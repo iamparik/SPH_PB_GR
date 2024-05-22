@@ -108,6 +108,7 @@
 		<File RelativePath="..\..\SPHOperators\CorrectedVectorDivergence.f90"/>
 		<File RelativePath="..\..\SPHOperators\CorrectionFactorParsing.f90"/>
 		<File RelativePath="..\..\SPHOperators\CorrectedScalarGradient.f90"/>
+		<File RelativePath="..\..\SPHOperators\densDiffusionOperator.f90"/>
 		<File RelativePath="..\..\SPHOperators\DerivativeOperator.f90"/>
 		<File RelativePath="..\..\FluidFlow\ScalarGradient.f90"/>
 		<File RelativePath="..\..\SPHOperators\VectorDivergence.f90"/></Filter>

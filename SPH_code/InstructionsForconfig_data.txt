@@ -75,7 +75,8 @@ MLS_density_bound 0
 
 MLS_step 1
 
-densDiffType 6
+densDiffType 25(preferred)
+Values in terms of p=aq+r, by passing value p, and modulo is used to obtain r & q. Here r represent density gradient formulation type and q represents the correction factor used. The q and r values are obtained with Derivative factors for density gradient. But 0 value of p indicates switching "off" the density diffusion factor.
 
 delta_SPH 0.1D0
 
