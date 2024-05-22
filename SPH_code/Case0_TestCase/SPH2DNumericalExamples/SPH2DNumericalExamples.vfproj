@@ -105,9 +105,9 @@
 		<File RelativePath="..\..\SPHOperators\artificialViscosityOperatorNew.f90"/>
 		<File RelativePath="..\..\SPHOperators\CorrectedBILaplacian.f90"/>
 		<File RelativePath="..\..\SPHOperators\CorrectedKernelGradient.f90"/>
+		<File RelativePath="..\..\SPHOperators\CorrectedScalarGradient.f90"/>
 		<File RelativePath="..\..\SPHOperators\CorrectedVectorDivergence.f90"/>
 		<File RelativePath="..\..\SPHOperators\CorrectionFactorParsing.f90"/>
-		<File RelativePath="..\..\SPHOperators\CorrectedScalarGradient.f90"/>
 		<File RelativePath="..\..\SPHOperators\densDiffusionOperator.f90"/>
 		<File RelativePath="..\..\SPHOperators\DerivativeOperator.f90"/>
 		<File RelativePath="..\..\FluidFlow\ScalarGradient.f90"/>
@@ -188,7 +188,7 @@
 		<File RelativePath="..\..\SPH_general\relErrorFormulation.f90"/>
 		<File RelativePath="..\..\SPH_general\sml_mult_factor.f90"/>
 		<File RelativePath="..\..\SPH_general\smoothing_w0.f90"/>
-		<File RelativePath="..\SPH_main.f90"/>
+		<File RelativePath="..\..\SPH_general\SPH_main_WCSPH_timeMarching0.f90"/>
 		<File RelativePath="..\..\SPH_general\SPH_operator.f90"/>
 		<File RelativePath="..\..\SPH_general\surfaceNormalBdry.f90"/>
 		<File RelativePath="..\..\SPH_general\testForSPHApproxLapFormulations.f90"/>

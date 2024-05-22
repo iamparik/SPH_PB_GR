@@ -21,7 +21,7 @@ PrsrGradtype 31
 ConDivtype 21
 SumDenstype 3
 summationDensity 0
-artViscType 0
+artViscType 1
 MLS_density_bound 0
 MLS_step 1
 densDiffType 25
