@@ -17,7 +17,7 @@
     use particle_data ,   only: maxn, max_interaction, max_e_interaction, maxnv,  &
         & x,mass,rho, vol,itype,hsml, nreal, nflow, nedge,nghost, ntotal, edge, &
         & surf_norm, nedge_rel_edge, etype, etotal, maxedge, &
-        & avgVol, packed_x,packed_itype, packed_vol, simGridSize
+        & avgVol, packed_x,packed_itype, packed_vol, simGridSize, xstart
     !use ifport, only:random
     
     implicit none
@@ -188,8 +188,14 @@
     write(*,*) "with ymin = ", simGridSize(2,1), "ymax=",simGridSize(2,2)
     write(*,*)'**************************************************'   
     
+    Allocate(xStart(SPH_dim,ntotal))
+    xStart=x        
+
     ! Now perform the particle packing algorithm 
-    call particlePackingTimeIntegration(packagingIterations)
+    call particlePackingTimeIntegration(.true.)
+    !input : quick_converge_step2C
+    
+    deallocate(xstart)
     
     write(x2name, '(A,A)') DataConfigPath,'/input_PP.dat'
     open (1, file = x2name)
@@ -202,7 +208,6 @@
     
     close(1)
         
-    
     
     deallocate(x, itype, vol,mass, rho, etype, surf_norm, nedge_rel_edge, edge, hsml, simGridSize)
 
