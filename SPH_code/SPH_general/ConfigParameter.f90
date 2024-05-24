@@ -109,7 +109,7 @@ module config_parameter
     
     integer(4) :: ExtInputMeshType
     
-    integer(4) :: packagingIterations
+    logical :: packagingIterations
     
     real(8) :: hsml_const
     
@@ -268,7 +268,11 @@ module config_parameter
             case ('ExtInputMeshType')   
                 ExtInputMeshType = param_value
             case ('packagingIterations')
-                packagingIterations = param_value
+                if(param_value .eq. 0) then
+                    packagingIterations = .false.
+                else
+                    packagingIterations = .true.    
+                endif  
             case ('hsml_const')
                 hsml_const = param_value
             case ('rho_init')

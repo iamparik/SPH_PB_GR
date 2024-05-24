@@ -1,5 +1,5 @@
 subroutine inputCADtoEdgeData(s, max_edge, input_file_name, avgEdgeSize_ratio )
-    use config_parameter, only : SPH_dim, ExtInputMeshType, DataConfigPath, dx_r, etype_periodic, periodic_pairs
+    use config_parameter, only : SPH_dim, ExtInputMeshType, DataConfigPath, dx_r, etype_periodic, periodic_pairs, packagingIterations
     use particle_data, only : x_ve, etype, edge, surf_norm, pBC_edges, ve_total, maxnv
     
     implicit none
@@ -34,7 +34,7 @@ subroutine inputCADtoEdgeData(s, max_edge, input_file_name, avgEdgeSize_ratio )
         call surfaceNormalBdry(temp_surf_norm, tempX, SPH_dim)
         
         !find edgetype 
-        call BCinput(temp_edgetype_int,NINT(tempType)) 
+        call BCinput(temp_edgetype_int,NINT(tempType), packagingIterations) 
         
         
         if(temp_edgetype_int .eq. etype_periodic) then ! this is to treat general open type boundaries like periodic, inlet/outlet flow etc.

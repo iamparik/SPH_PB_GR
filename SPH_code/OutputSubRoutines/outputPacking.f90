@@ -9,10 +9,10 @@
 !   CREATED:        09/13/2017       by  PARIKSHIT BOREGOWDA
 !   Last Modified:  10/17/2023        by  PARIKSHIT BOREGOWDA 
 !****************************************************************************      
-subroutine  outputPacking(iterStep, saveStep, TPD)
+subroutine  outputPacking(iterStep, saveStep, TPD, delC_avg)
     use config_parameter, only:dataPackingPath, SPH_dim, itype_real_max, itype_real_min, &
             & etype_real_max, etype_real_min, etype_virtual, itype_virtual, itype_periodic
-    use particle_data ,   only: x, itype, etype, nedge_rel_edge, ntotal, etotal
+    use particle_data ,   only: x, itype, etype, nedge_rel_edge, ntotal, etotal 
     
     implicit none
 !----------------------------------------------------------------------           
@@ -22,7 +22,7 @@ subroutine  outputPacking(iterStep, saveStep, TPD)
 !------------------------------------------------------------------------
     integer(4):: a,d,s, iterStep,f_dim,saveStep
     character (40) :: xname, x2name
-    real(8) :: TPD
+    real(8) :: TPD, delC_avg
     logical :: text_print
 
     if (iterStep .eq. 1) call createOutputFolder(dataPackingPath)
@@ -31,12 +31,12 @@ subroutine  outputPacking(iterStep, saveStep, TPD)
     if (iterStep .eq. 1) then
         write(x2name, '(A,A)') dataPackingPath,'/energy.dat'
         open (1, file = x2name)
-        write(1,'(A)') 'variables = Iterations, TPD '
+        write(1,'(A)') 'variables = Iterations, TPD , delC_avg'
         close(1)
     elseif (mod(iterStep,100).eq. 0) then
         write(x2name, '(A,A)') dataPackingPath,'/energy.dat'
         open (1, file = x2name,  position='append')
-        write(1,*) iterStep, TPD
+        write(1,*) iterStep, TPD, delC_avg
         close(1)
     endif
     

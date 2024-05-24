@@ -33,23 +33,23 @@ subroutine  output_initial_config
     endif
     
     call createOutputFolder(dataOutputPath)
-    
-    if( dynamicProblem) then 
-         call ConcGradient
-         call evolvingVariables(1,1)
-
-     !     output result in tecplot format
-            write(x2name, '(A,A)') dataOutputPath,'/energy.dat'
-            open (1, file = x2name)
-            write(1,*) 'variables = time, KE, PE, TE, u_max , delcAvg, delCMax, delCL2'        
-            write(1,1002) 0.D0, KE(1), PE(1), TE(1), max_vel(1), delcAvg(1), delCMax(1), delCL2(1)
-            close(1)   
-            
-        deallocate(delC,KE,PE,TE,max_vel, delcAvg, delCMax, delCL2, ga_Max,ga_Avg,ga_L2, g_a_min, g_a_max)
-   
-    endif
-    
-    
+    !
+    !if( dynamicProblem) then 
+    !     call ConcGradient
+    !     call evolvingVariables(1,1)
+    !
+    ! !     output result in tecplot format
+    !        write(x2name, '(A,A)') dataOutputPath,'/energy.dat'
+    !        open (1, file = x2name)
+    !        write(1,*) 'variables = time, KE, PE, TE, u_max , delcAvg, delCMax, delCL2'        
+    !        write(1,1002) 0.D0, KE(1), PE(1), TE(1), max_vel(1), delcAvg(1), delCMax(1), delCL2(1)
+    !        close(1)   
+    !        
+    !    deallocate(delC,KE,PE,TE,max_vel, delcAvg, delCMax, delCL2, ga_Max,ga_Avg,ga_L2, g_a_min, g_a_max)
+    !
+    !endif
+    !
+    !
     
 
 !     output result in tecplot format

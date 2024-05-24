@@ -88,7 +88,6 @@
 		<File RelativePath="..\..\SPH_general\inputCADtoEdgeData.f90"/>
 		<File RelativePath="..\..\SPH_general\inputCADtoParticleData.f90"/>
 		<File RelativePath="..\InputExtNew.f90"/>
-		<File RelativePath="..\..\InputFiles(toBeRemoved-Deprecated)\inputParticePacking.f90"/>
 		<File RelativePath="..\..\SPH_general\inputSPHConfig.f90"/></Filter>
 		<Filter Name="MatrixInversion">
 		<File RelativePath="..\..\LinearEqnSolver\inv2d.f90"/>
@@ -173,13 +172,11 @@
 		<File RelativePath="..\..\SPH_general\centroidBdrySegment.f90"/>
 		<File RelativePath="..\..\SPH_general\ConfigParameter.f90"/>
 		<File RelativePath="..\..\SPH_general\EulerSchemeSPHOperations.f90"/>
-		<File RelativePath="..\..\SPH_general\evolvingVariables.f90"/>
 		<File RelativePath="..\..\SPH_general\kernel.f90"/>
 		<File RelativePath="..\..\SPH_general\LeapFrogKDKSchemeSPHOperations.f90"/>
 		<File RelativePath="..\..\SPH_general\marker_point_value.f90"/>
 		<File RelativePath="..\..\SPH_general\maxTimeStep.f90"/>
 		<File RelativePath="..\..\SPH_general\particle_data.f90"/>
-		<File RelativePath="..\..\SPH_general\ParticlePackingScheme.f90"/>
 		<File RelativePath="..\..\SPH_general\particlePackingTimeIntegration.f90"/>
 		<File RelativePath="..\..\SPH_general\ParticleShiftingTechnique.f90"/>
 		<File RelativePath="..\..\SPH_general\PositionDependentFactors.f90"/>

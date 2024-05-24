@@ -66,8 +66,7 @@ integer(4):: itimestep
     
     
     public packed_x,packed_itype, packed_vol, delC,delCMax,delCAvg, &
-        & delCL2,ga_Max,ga_Avg,ga_L2, xStart, g_a_min, g_a_max, packableParticle, &
-        & FirstCutoffStep,SecondCutoffStep, PP_variable, PP_Variable_prev
+        & delCL2,ga_Max,ga_Avg,ga_L2, xStart, g_a_min, g_a_max
     real(8),DIMENSION(:,:),ALLOCATABLE :: packed_x
     integer(2),DIMENSION(:),ALLOCATABLE::packed_itype
     real(8),DIMENSION(:),ALLOCATABLE:: packed_vol
@@ -81,11 +80,6 @@ integer(4):: itimestep
     real(8),DIMENSION(:),ALLOCATABLE :: g_a_min
     real(8),DIMENSION(:),ALLOCATABLE :: g_a_max
     real(8),DIMENSION(:,:),ALLOCATABLE :: xStart
-    logical, DIMENSION(:),ALLOCATABLE :: packableParticle
-    logical ::FirstCutoffStep =.false.
-    logical ::SecondCutoffStep =.false.
-    real(8) :: PP_variable =0.D0
-    real(8) :: PP_variable_prev =0.D0
     
 ![Input]            edge:   stores vertices of solid wall boudnary (edge in 2d and plane in 3d)    
 ![Output]           nedge_rel_edge:   Edge related to a boudnary particle (or reference point) on edge 

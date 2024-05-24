@@ -8,39 +8,51 @@
 !   Last Modified:  07/11/2023        by  PARIKSHIT BOREGOWDA 
 !****************************************************************************
 
-subroutine particlePackingTimeIntegration(packagingIterations)
+subroutine particlePackingTimeIntegration(quick_converge_step2C)
 
-use config_parameter, only: SPH_dim, pi, &
-    & print_step, save_step, hsml_const, dx_r    
+use config_parameter, only: SPH_dim, pi, DataConfigPath, &
+    & print_step, save_step, hsml_const, dx_r, itype_real_min, itype_real_max    
 use particle_data, only: nreal, w_aa, w, dwdx, &
         & gamma_discrt, gamma_cont, del_gamma_as, del_gamma, &
         & xi1_mat, beta_mat,gamma_mat,xi_cont_mat, &
         & gamma_mat_inv,xi1_mat_inv,xi_cont_mat_inv, &
-        & epair_a,epair_s,  pair_i, pair_j, &
-        & b_MLS, ntotal, packableParticle, &
-        & FirstCutoffStep,SecondCutoffStep, &
-        & xstart, vx, x
+        & epair_a,epair_s, eniac, pair_i, pair_j, niac, nedge_rel_edge,  &
+        & ntotal, xstart, x, mass, rho, itype, delC, xstart, &
+        & edge,etype, hsml, vol, surf_norm
 
 implicit none
 
-integer(4) i, a
-logical logicalcounter, packingInProgress
-real(8) dt, xEdgeTemp(2,2), xrefPoint(2), xEdge_surfNorm(2),gamma_cutoff
-integer(4), intent(in):: packagingIterations
 
-logicalcounter= .true. 
-packingInProgress =.true.
+logical, intent(in) :: quick_converge_step2C
+real(8) dt, xEdgeTemp(2,2), xrefPoint(2), xEdge_surfNorm(2),gamma_cutoff, scale_k, &
+    &   dCF, TPD, delC_avg
+real(8) PP_Variable_prev, PP_Variable, grad_b_term, maxShift, w_dxr, delr(SPH_dim), &
+    & extra_vec(SPH_dim), dstress(SPH_dim), dx_as, w_dxas, ps_pa, PSTShift
+integer(4) iterstep, a, b, k,s,d, cutoff_step
+logical packing_in_progress
+logical, DIMENSION(:),ALLOCATABLE :: packableParticle
+real(8),DIMENSION(:,:),ALLOCATABLE :: bdry_push
+character (40) :: x2name
 
 
+call sml_mult_factor(scale_k)
 
+Allocate(xStart(SPH_dim,ntotal))
+xStart=x   
 
 !intialize the start of the loop
-i=0
+iterstep=0
 
+!intialize cutoff_step as zero
+cutoff_step=0
 
-do while (packingInProgress)
-    i=i+1
-    if (i .eq. 1) then 
+!initialize packing_in_progress to true 
+packing_in_progress = .true.
+
+! start the particle packing loop
+do while (packing_in_progress)
+    iterstep= iterstep+1
+    if (iterstep .eq. 1) then 
         write(*,*)'______________________________________________'
         write(*,*)'  Starting the Packaging Alorithm'
         write(*,*)'______________________________________________'
@@ -78,23 +90,27 @@ do while (packingInProgress)
     call gamma_discrete1_factor
     
     ! We define particles that can be packed initially, following Algorithm of Boregowda et. al 2024
-    if (i .eq. 1) then
+    if (iterstep .eq. 1) then
         ALLOCATE(packableParticle(ntotal))
         packableParticle(:) = .true.
+        
         ! We only want to pack particles next to boundary initially
         do a = 1, ntotal
             if(gamma_cont(a) .eq. 1.D0) packableParticle(a) = .false.                
         enddo
         
+        !Initialize the previous particle packing variable to be zero
+        PP_Variable_prev=0.D0
+
     endif
     
-    if( FirstCutoffStep .and. logicalCounter) then
+    if( cutoff_step .eq. 1 ) then
         
         xEdgeTemp(:,:)= 0.D0
         xrefPoint(:)=0.D0
         xEdge_surfNorm(:)=0.D0
-        xEdgeTemp(1,1)= -2.D0*hsml_const !2 only for wendland kernel
-        xEdgeTemp(1,2)= 2.D0*hsml_const !2 only for wendland kernel
+        xEdgeTemp(1,1)= -scale_k*hsml_const 
+        xEdgeTemp(1,2)= scale_k*hsml_const 
         xrefPoint(2) = -3.D0*dx_r/5.D0
         xEdge_surfNorm(2)= -1.D0
         
@@ -111,30 +127,138 @@ do while (packingInProgress)
             endif            
         enddo
         
-        logicalCounter =.false.
+        cutoff_step = 2
     endif
     
     
 !Call the packaging algorithm
-    call ParticlePackingScheme(i)
+    ! Define the coeffecient of particle shifting technique used for packing particles
+    grad_b_term= 0.5D0*hsml_const**2.D0!
+    
+    maxShift=0.5D0*dx_r !0.2D0* hsml_const !0.25D0*dx_r!0.25*dx_r
+
+    Allocate( bdry_push(SPH_dim, ntotal),delC(SPH_dim,ntotal))
+    bdry_push=0.D0
+    delC=0.D0
+
+    call kernel(dx_r,delr,hsml_const,w_dxr,extra_vec)
+
+    do k = 1,niac
+        a=pair_i(k)
+        b=pair_j(k)
+
+        dCF= 1.D0
+    
+        call CorrectedScaGradPtoP(delC(:,a),delC(:,b),dCF,dCF,dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
+                    & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                    & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
+                    & SPH_dim, 1, 1) ! SPH_dim, correctionFactorID, grad_type
+    enddo
+
+
+    do k= 1, eniac
+        a=epair_a(k)
+        s=epair_s(k)
+        b = nedge_rel_edge(s)
+    
+        dx_as=norm2(x(:,a)-x(:,b))
+        call kernel(dx_as,delr,hsml_const,w_dxas,extra_vec)  
+        
+        dCF= 1.D0
+    
+        call CorrectedScaGradPtoB(delC(:,a),1.D0,dCF,del_gamma_as(:,k),  &
+                            & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                            & SPH_dim, 1, 1)
+        
+        ! Add boundary force function below
+        ! A step function twice the force is used here for particles
+        ! too close to the boundary
+        if ((dx_as .le. dx_r/2.D0) ) then 
+            ! use compressive bdry force only if the bdry is less than the particle radius 
+            ! but since bdry particles
+            !if (dot_product(x(:,a)-x(:,b),surf_norm(:,s)) .le. dx_r/2.D0) ps_pa = 2.D0
+            ps_pa = 2.D0
+        else
+            ps_pa = 1.D0
+        endif
+        
+        dCF=0.5D0*(ps_pa -1.D0)
+    
+        call CorrectedScaGradPtoB(bdry_push(:,a),1.D0,dCF,del_gamma_as(:,k),  &
+                            & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                            & SPH_dim, 1, 1)
+    enddo  
+
+    !------------------------Particle shift calcualtion from force terms -----------------------------!
+    do a=1,ntotal    
+        delr=0.D0
+        if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min) .and.  packableParticle(a)) then 
+            
+            dstress(:) = -grad_b_term*(delC(:,a)+bdry_push(:,a))
+            PSTShift = min(norm2(dstress(:)), maxShift)
+            if(PSTShift .gt. 1D-10*grad_b_term) then
+                delr=PSTshift*(dstress(:)/norm2(dstress(:)))
+            endif
+            x(:,a) = x(:,a)+ delr
+        endif  
+    enddo
+
+    deallocate(bdry_push)
     
     
-    if( SecondCutoffStep) then
-        write(*,*) "packing ends at i = ", i
-        packingInProgress = .false.
-    elseif(i .eq. packagingIterations) then
-        write(*,*) "packing ends at i = ", i
-        packingInProgress = .false.
+!------------------------Calculate parameters useful to simulation -----------------------------!  
+ 
+    !Initialize total particle displacement to zero and average concgradient to zero
+    TPD=0.D0
+    delC_avg = 0.D0
+    do a=1,ntotal        
+        if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min)) then
+            TPD = TPD + norm2(xStart(:,a)-x(:,a))/nreal
+            delC_avg= delC_avg + norm2(delC(:,a))/nreal
+        endif
+    enddo
+    
+    call outputPacking(iterstep,100,TPD,delC_avg) !input: iterStep, saveStep, TPD
+  
+    ! Now we check if for every 1000 steps if the particle packing variable
+    ! is unchanged compared to its previous value
+    if(mod(iterstep,1000) .eq. 0) then
+        ! Select the particle packing variable (like TPD)
+        PP_variable =TPD
+        
+        if((abs(PP_Variable - PP_Variable_prev)) .lt. 1.D-2*PP_Variable) then
+            cutoff_step = cutoff_step + 1
+        elseif((cutoff_step .eq. 2) .and. quick_converge_step2C) then
+            cutoff_step = cutoff_step + 1
+        endif
+        
+        PP_variable_prev = PP_variable
     endif
+    
+    deALLOCATE(delC)
+    
+
         
     deallocate(gamma_cont,del_gamma_as, del_gamma, epair_a, epair_s, pair_i, pair_j, w,dwdx, w_aa, gamma_discrt)
   
+    if( cutoff_step .eq. 3) then
+        write(*,*) "packing ends at iterstep = ", iterstep
+        packing_in_progress = .False.
+    endif
+        
 enddo
 
+deallocate(xstart)
+    
+    write(x2name, '(A,A)') DataConfigPath,'/input_PP.dat'
+    open (1, file = x2name)
+    
 
-if (allocated(xstart)) deallocate(xstart)
-
-if (allocated(vx)) deallocate(vx)
-
+    ! write particle data to the file input_PP.dat
+    do a=1,nreal
+        write(1,'(I10,4(e22.10,2x))') itype(a), (x(d, a), d=1,SPH_dim), vol(a)
+    enddo
+    
+    close(1)
 
 end

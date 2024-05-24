@@ -49,31 +49,30 @@
     enddo
     close(1)
     
-    maxedge=nEdomainBdry*2
-    maxnv=10*maxedge 
+    
     additionalParticles= 100 ! This is necessary only if expect to use periodic particles, or unflow, outflow particles
-    if (packagingIterations .eq. 0) then
+    if (packagingIterations) then
+        maxedge=int(nEbulkBdry)*2
+        maxnv=10*maxedge 
         maxn= max(nreal_mesh, nrealCartesian)+ maxedge +additionalParticles
     else
-        maxn= nreal+ maxedge + additionalParticles
+        maxedge=int(nEdomainBdry)*2
+        maxnv=10*maxedge 
+        maxn= max(nreal_mesh, nrealCartesian)+ maxedge + additionalParticles
     endif
     
     
-    !vaiuables required to define geometry are particle propoerties are allocated
-    ALLOCATE(x(SPH_dim,maxn),vx(SPH_dim,maxn))
-    ALLOCATE(mass(maxn), rho(maxn), vol(maxn), p(maxn), hsml(maxn), itype(maxn), mu(maxn), temp(maxn))
+    !variables required to define geometry are particle propoerties are allocated
+    ALLOCATE(x(SPH_dim,maxn))
+    ALLOCATE(mass(maxn), rho(maxn), vol(maxn), hsml(maxn), itype(maxn))
     
     ! The allocatable variables are now initialized
     x=0.D0
-    vx=0.D0
     mass=0.D0
     rho=0.D0
-    p=0.D0
+    vol=0.D0
     hsml=0.D0
     itype=0
-    mu=0
-    temp=0.D0
-    vol=0.D0
     
 
     ! initialize particle number to 0  
@@ -84,19 +83,21 @@
 
 
     nreal=k ! I can distinguish nreal and nedge here if needed
-    close(1)
     write(*,*)'      Total number of Real particles : ', nreal    	
     write(*,*)'**************************************************'
 
     ! initialize edges to 0
     s=0
     
-    input_file_name = '/input_domainBdryEdge.dat'
+    if (packagingIterations) then
+        input_file_name = '/input_bulkBdryEdge.dat'
+    else
+        input_file_name = '/input_domainBdryEdge.dat'
+    endif
     ! read bdry data file and store bdry information
     call inputCADtoEdgeData(s, maxedge, input_file_name, 10)
     
     etotal=s
-    close(1)
     write(*,*)'      Total number of boundary segments : ', etotal    	
     write(*,*)'**************************************************'      
 
@@ -160,14 +161,20 @@
     
     do k=1,ntotal
         !For changing density to hydrostatic
-        rho(k)=rho_init !*((7.D0*9.81D0*(hydroStaticHeight-x(2,k))/(c_sound**2)+1.D0)**(1.D0/7.D0))
-        p(k)=(rho_init*c_sound**2/7.D0)*((rho(k)/rho_init)**7.D0-1.D0) 
-        mass(k)= rho(k)*vol(k)
+        rho(k)=rho_init
+        mass(k)=rho(k)*vol(k)
         hsml(k)=hsml_const
-        mu(k)=mu_const
-        p(k)=0.D0
-        temp(k)=300
     enddo
     
+
+    ! Now perform the particle packing algorithm 
+    if(packagingIterations) then
+        call particlePackingTimeIntegration(.true.)
+    !input : quick_converge_step2C  ! use .true. to enable quickconverge    
+   
+        deallocate(simGridSize, x, vol, itype)
+    endif
+
+    DEALLOCATE(mass, rho, hsml)
     
     end
