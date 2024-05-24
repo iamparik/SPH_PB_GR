@@ -51,12 +51,12 @@
     
     
     additionalParticles= 100 ! This is necessary only if expect to use periodic particles, or unflow, outflow particles
-    if (packagingIterations .eq. 0) then
-        maxedge=int(nEdomainBdry)*2
+    if (packagingIterations) then
+        maxedge=int(nEbulkBdry)*2
         maxnv=10*maxedge 
         maxn= max(nreal_mesh, nrealCartesian)+ maxedge +additionalParticles
     else
-        maxedge=int(nEbulkBdry)*2
+        maxedge=int(nEdomainBdry)*2
         maxnv=10*maxedge 
         maxn= max(nreal_mesh, nrealCartesian)+ maxedge + additionalParticles
     endif
@@ -89,7 +89,11 @@
     ! initialize edges to 0
     s=0
     
-    input_file_name = '/input_bulkBdryEdge.dat'
+    if (packagingIterations) then
+        input_file_name = '/input_bulkBdryEdge.dat'
+    else
+        input_file_name = '/input_domainBdryEdge.dat'
+    endif
     ! read bdry data file and store bdry information
     call inputCADtoEdgeData(s, maxedge, input_file_name, 10)
     
@@ -168,7 +172,7 @@
         call particlePackingTimeIntegration(.true.)
     !input : quick_converge_step2C  ! use .true. to enable quickconverge    
    
-        deallocate(simGridSize)
+        deallocate(simGridSize, x, vol, itype)
     endif
 
     DEALLOCATE(mass, rho, hsml)

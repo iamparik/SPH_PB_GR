@@ -260,8 +260,5 @@ deallocate(xstart)
     enddo
     
     close(1)
-        
-    
-    deallocate(x, itype, vol,mass, rho, etype, surf_norm, nedge_rel_edge, edge, hsml)
 
 end
