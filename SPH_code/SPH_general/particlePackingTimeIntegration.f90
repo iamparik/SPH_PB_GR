@@ -10,14 +10,15 @@
 
 subroutine particlePackingTimeIntegration(quick_converge_step2C)
 
-use config_parameter, only: SPH_dim, pi, &
+use config_parameter, only: SPH_dim, pi, DataConfigPath, &
     & print_step, save_step, hsml_const, dx_r, itype_real_min, itype_real_max    
 use particle_data, only: nreal, w_aa, w, dwdx, &
         & gamma_discrt, gamma_cont, del_gamma_as, del_gamma, &
         & xi1_mat, beta_mat,gamma_mat,xi_cont_mat, &
         & gamma_mat_inv,xi1_mat_inv,xi_cont_mat_inv, &
         & epair_a,epair_s, eniac, pair_i, pair_j, niac, nedge_rel_edge,  &
-        & ntotal, xstart, x, mass, rho, itype, delC
+        & ntotal, xstart, x, mass, rho, itype, delC, xstart, &
+        & edge,etype, hsml, vol, surf_norm
 
 implicit none
 
@@ -27,13 +28,17 @@ real(8) dt, xEdgeTemp(2,2), xrefPoint(2), xEdge_surfNorm(2),gamma_cutoff, scale_
     &   dCF, TPD, delC_avg
 real(8) PP_Variable_prev, PP_Variable, grad_b_term, maxShift, w_dxr, delr(SPH_dim), &
     & extra_vec(SPH_dim), dstress(SPH_dim), dx_as, w_dxas, ps_pa, PSTShift
-integer(4) iterstep, a, b, k,s, cutoff_step
+integer(4) iterstep, a, b, k,s,d, cutoff_step
 logical packing_in_progress
 logical, DIMENSION(:),ALLOCATABLE :: packableParticle
 real(8),DIMENSION(:,:),ALLOCATABLE :: bdry_push
+character (40) :: x2name
 
 
 call sml_mult_factor(scale_k)
+
+Allocate(xStart(SPH_dim,ntotal))
+xStart=x   
 
 !intialize the start of the loop
 iterstep=0
@@ -240,5 +245,21 @@ do while (packing_in_progress)
     endif
         
 enddo
+
+deallocate(xstart)
+    
+    write(x2name, '(A,A)') DataConfigPath,'/input_PP.dat'
+    open (1, file = x2name)
+    
+
+    ! write particle data to the file input_PP.dat
+    do a=1,nreal
+        write(1,'(I10,4(e22.10,2x))') itype(a), (x(d, a), d=1,SPH_dim), vol(a)
+    enddo
+    
+    close(1)
+        
+    
+    deallocate(x, itype, vol,mass, rho, etype, surf_norm, nedge_rel_edge, edge, hsml)
 
 end

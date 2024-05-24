@@ -6,9 +6,10 @@
 !               for different boundary groups
 !
 !****************************************************************************
-subroutine BCinput(etype, tempType)
+subroutine BCinput(etype, tempType, packing)
     implicit none
     integer etype, tempType
+    logical packing
 
     if(tempType .eq. 1) etype = 200
         
@@ -17,6 +18,9 @@ subroutine BCinput(etype, tempType)
     if(tempType .eq. 3) etype = 2
         
     if(tempType .eq. 4) etype = 4  
+    
+    
+    if(packing) etype=2
 
 
 end subroutine

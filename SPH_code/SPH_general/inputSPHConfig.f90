@@ -20,8 +20,12 @@ subroutine inputSPHConfig
         !call input
     elseif(file_type.eq.1) then
         ! run packing algorithm according to user input
-        if(packagingIterations >0) call inputParticlePacking
-        call inputExt
+        if(packagingIterations) then
+            call inputParticlePacking
+        else 
+            call inputExt
+        endif
+        
     elseif(file_type.eq.2) then
         !call backupInput(itimestep)
     endif
