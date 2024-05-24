@@ -62,17 +62,17 @@
     endif
     
     
-    !vaiuables required to define geometry are particle propoerties are allocated
+    !variables required to define geometry are particle propoerties are allocated
     ALLOCATE(x(SPH_dim,maxn))
-    ALLOCATE(mass(maxn), rho(maxn), vol(maxn),hsml(maxn), itype(maxn))
+    ALLOCATE(mass(maxn), rho(maxn), vol(maxn), hsml(maxn), itype(maxn))
     
     ! The allocatable variables are now initialized
     x=0.D0
     mass=0.D0
     rho=0.D0
+    vol=0.D0
     hsml=0.D0
     itype=0
-    vol=0.D0
     
 
     ! initialize particle number to 0  
@@ -164,9 +164,11 @@
     
 
     ! Now perform the particle packing algorithm 
-    call particlePackingTimeIntegration(.true.)
-    !input : quick_converge_step2C
-    
-   deallocate(simGridSize)
+    if(packagingIterations) then
+        call particlePackingTimeIntegration(.true.)
+    !input : quick_converge_step2C  ! use .true. to enable quickconverge    
+   
+        deallocate(simGridSize)
+    endif
 
     end

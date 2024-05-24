@@ -12,7 +12,7 @@
 subroutine  outputPacking(iterStep, saveStep, TPD, delC_avg)
     use config_parameter, only:dataPackingPath, SPH_dim, itype_real_max, itype_real_min, &
             & etype_real_max, etype_real_min, etype_virtual, itype_virtual, itype_periodic
-    use particle_data ,   only: x, itype, etype, nedge_rel_edge, ntotal, etotal
+    use particle_data ,   only: x, itype, etype, nedge_rel_edge, ntotal, etotal 
     
     implicit none
 !----------------------------------------------------------------------           

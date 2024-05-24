@@ -2,7 +2,7 @@ subroutine inputSPHConfig
     use config_parameter
     implicit none
     
-    integer(4) file_type
+    integer(4) file_type, run_packed_simulation
     
     ! Read parameters to configure the SPH simulation from config_data.dat
     call read_config_file
@@ -20,11 +20,7 @@ subroutine inputSPHConfig
         !call input
     elseif(file_type.eq.1) then
         ! run packing algorithm according to user input
-        if(packagingIterations) then
-            call inputParticlePacking
-        else 
-            call inputExt
-        endif
+        call inputExt
         
     elseif(file_type.eq.2) then
         !call backupInput(itimestep)

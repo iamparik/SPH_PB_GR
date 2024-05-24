@@ -88,7 +88,6 @@
 		<File RelativePath="..\..\SPH_general\inputCADtoEdgeData.f90"/>
 		<File RelativePath="..\..\SPH_general\inputCADtoParticleData.f90"/>
 		<File RelativePath="..\InputExtNew.f90"/>
-		<File RelativePath="..\..\InputFiles(toBeRemoved-Deprecated)\inputParticePacking.f90"/>
 		<File RelativePath="..\..\SPH_general\inputSPHConfig.f90"/></Filter>
 		<Filter Name="MatrixInversion">
 		<File RelativePath="..\..\LinearEqnSolver\inv2d.f90"/>
