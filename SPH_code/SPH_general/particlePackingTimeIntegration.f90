@@ -192,7 +192,7 @@ do while (packing_in_progress)
     !------------------------Particle shift calcualtion from force terms -----------------------------!
     do a=1,ntotal    
         delr=0.D0
-        if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min)) then 
+        if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min) .and.  packableParticle(a)) then 
             
             dstress(:) = -grad_b_term*(delC(:,a)+bdry_push(:,a))
             PSTShift = min(norm2(dstress(:)), maxShift)
@@ -231,6 +231,8 @@ do while (packing_in_progress)
         elseif((cutoff_step .eq. 2) .and. quick_converge_step2C) then
             cutoff_step = cutoff_step + 1
         endif
+        
+        PP_variable_prev = PP_variable
     endif
     
     deALLOCATE(delC)
