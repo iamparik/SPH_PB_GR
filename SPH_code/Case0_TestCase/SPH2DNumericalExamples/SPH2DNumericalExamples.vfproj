@@ -84,10 +84,11 @@
 		<File RelativePath="..\..\FluidFlow\summationDensityOperator.f90"/>
 		<File RelativePath="..\..\FluidFlow\viscousStressOperator.f90"/></Filter>
 		<Filter Name="InputFiles">
-		<File RelativePath="..\BCinput_0.f90"/>
+		<File RelativePath="..\BoundaryConditions_0.f90"/>
+		<File RelativePath="..\InitialConditions.f90"/>
 		<File RelativePath="..\..\SPH_general\inputCADtoEdgeData.f90"/>
 		<File RelativePath="..\..\SPH_general\inputCADtoParticleData.f90"/>
-		<File RelativePath="..\InputExtNew.f90"/>
+		<File RelativePath="..\..\SPH_general\InputExt.f90"/>
 		<File RelativePath="..\..\SPH_general\inputSPHConfig.f90"/></Filter>
 		<Filter Name="MatrixInversion">
 		<File RelativePath="..\..\LinearEqnSolver\inv2d.f90"/>
