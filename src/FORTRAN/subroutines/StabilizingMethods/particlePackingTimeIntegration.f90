@@ -14,8 +14,8 @@ use config_parameter, only: SPH_dim, pi, DataConfigPath, &
     & print_step, save_step, hsml_const, dx_r, itype_real_min, itype_real_max    
 use particle_data, only: nreal, w_aa, w, dwdx, &
         & gamma_discrt, gamma_cont, del_gamma_as, del_gamma, &
-        & xi1_mat, beta_mat,gamma_mat, &
-        & gamma_mat_inv,xi1_mat_inv, &
+        & xi1_mat, beta_mat,gamma_mat,xi_cont_mat, &
+        & gamma_mat_inv,xi1_mat_inv,xi_cont_mat_inv, &
         & epair_a,epair_s, eniac, pair_i, pair_j, niac, nedge_rel_edge,  &
         & ntotal, xstart, x, mass, rho, itype, delC, xstart, &
         & edge,etype, hsml, vol, surf_norm
