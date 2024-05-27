@@ -50,13 +50,21 @@ correction_types=10
     
 ! Allocate variables important for physics simulation
     ALLOCATE(vx(SPH_dim,maxn), mass(maxn), rho(maxn), p(maxn), hsml(maxn), mu(maxn))
+    vx=0.D0
+    mass=0.D0
+    rho= rho_init
+    p=0.D0
+    hsml = hsml_const
+    mu =0.D0
+    
+    
 
 ! the size of the vector is the same as size of all variables assosciated 
 ! with particle position (including particle position)
     allocate(F_a(8)) 
     
 ! Initialize the variables
-    do a=1,ntotal
+    do a=1,nreal
         
         F_a(1:SPH_dim) = x(:,a)
         

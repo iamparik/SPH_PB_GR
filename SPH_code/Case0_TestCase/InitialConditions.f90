@@ -8,7 +8,7 @@
 !****************************************************************************
 subroutine ICinput(itype, tempType)
     implicit none
-    integer(4), intent(out) :: itype
+    integer(2), intent(out) :: itype
     integer(4), intent(in) :: tempType
 
     if(tempType .eq. 1) itype = 1
@@ -29,7 +29,7 @@ subroutine ICinputValue(initalVal_particle,num_var, itype)
     integer(4) :: d
     
     
-    !if(itype .eq. 3) then
+    if(itype .eq. 3) then
         
         initalVal_particle(3)= 0.D0 ! vx
         initalVal_particle(4)= 0.D0 ! vy
@@ -38,7 +38,7 @@ subroutine ICinputValue(initalVal_particle,num_var, itype)
         initalVal_particle(7)= hsml_const ! smoothing length
         initalVal_particle(8)= mu_const !viscosity mu
         
-    !endif
+    endif
     
     
 end subroutine
