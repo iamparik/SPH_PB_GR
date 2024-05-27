@@ -71,7 +71,7 @@ correction_types=10
         call ICinputValue(F_a,8, itype(a))      
         
         vx(:,a) = F_a(SPH_dim+1:SPH_dim*2)
-        rho(a) = F_a(SPH_dim*2+1)
+        rho(a) = F_a(5)
         p(a) = F_a(SPH_dim*2+2)
         hsml(a) = F_a(SPH_dim*2+3) 
         mu(a) = F_a(SPH_dim*2+4) 

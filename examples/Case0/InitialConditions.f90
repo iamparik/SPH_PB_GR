@@ -24,7 +24,8 @@ end subroutine
 subroutine ICinputValue(initalVal_particle,num_var, itype)
     use config_parameter , only : rho_init, c_sound, hsml_const, mu_const
     implicit none
-    integer(4), intent(in) :: itype, num_var
+    integer(2), intent(in) :: itype
+    integer(4), intent(in) ::  num_var
     real(8), dimension(num_var), intent(inout) :: initalVal_particle
     integer(4) :: d
     
