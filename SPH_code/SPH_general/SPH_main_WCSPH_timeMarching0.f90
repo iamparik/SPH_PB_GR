@@ -49,20 +49,39 @@ correction_types=10
     call inputSPHConfig
     
 ! Allocate variables important for physics simulation
-    ALLOCATE(vx(SPH_dim,maxn), mass(maxn), rho(maxn), p(maxn), hsml(maxn), mu(maxn), temp(maxn))
+    ALLOCATE(vx(SPH_dim,maxn), mass(maxn), rho(maxn), p(maxn), hsml(maxn), mu(maxn))
+    vx=0.D0
+    mass=0.D0
+    rho= rho_init
+    p=0.D0
+    hsml = hsml_const
+    mu =0.D0
+    
+    
 
+! the size of the vector is the same as size of all variables assosciated 
+! with particle position (including particle position)
+    allocate(F_a(8)) 
+    
 ! Initialize the variables
-    do k=1,ntotal
-        vx(:,k)=0.D0
-        !For changing density to hydrostatic
-        rho(k)=rho_init !*((7.D0*9.81D0*(hydroStaticHeight-x(2,k))/(c_sound**2)+1.D0)**(1.D0/7.D0))
-        p(k)=(rho_init*c_sound**2/7.D0)*((rho(k)/rho_init)**7.D0-1.D0) 
-        mass(k)= rho(k)*vol(k)
-        hsml(k)=hsml_const
-        mu(k)=mu_const
-        p(k)=0.D0
-        temp(k)=300
+    do a=1,nreal
+        
+        F_a(1:SPH_dim) = x(:,a)
+        
+        call ICinputValue(F_a,8, itype(a))      
+        
+        vx(:,a) = F_a(SPH_dim+1:SPH_dim*2)
+        rho(a) = F_a(SPH_dim*2+1)
+        p(a) = F_a(SPH_dim*2+2)
+        hsml(a) = F_a(SPH_dim*2+3) 
+        mu(a) = F_a(SPH_dim*2+4) 
+        
+        ! mass is calculated with volume from geoemtry file and density from initial condition file
+        mass(a)= rho(a)*vol(a)
     enddo
+    
+! deallocate F_a so it can be sued later again
+    deallocate(F_a)
     
 ! Allocate other variables used in time itnegration steps
     allocate(F_a(SPH_dim), F_b(SPH_dim), Cdwdx_a(SPH_dim), Cdwdx_b(SPH_dim), Cdgmas(SPH_dim), &

@@ -11,7 +11,7 @@
 subroutine xi_discrete1_factor
     use config_parameter, only: SPH_dim
     use particle_data, only: xi1_mat, niac, pair_i, pair_j, ntotal, &
-                & dwdx,mass, rho, x 
+                & dwdx,mass, rho, x , itype
     implicit none
 
     real(8) k,i,j, a, b

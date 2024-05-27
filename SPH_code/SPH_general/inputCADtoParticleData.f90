@@ -21,7 +21,7 @@ subroutine inputCADtoParticleData(k, nreal_mesh, totVol)
         do while (.not.eof(1))
             k=k+1
             read(1,*) tempType, (x(d, k), d=1,SPH_dim), vol(k)
-            itype(k) = NINT(tempType)        
+            call ICinput(itype(k), NINT(tempType))       
         enddo
     
     elseif(ExtInputMeshType .eq. 2) then 
@@ -36,7 +36,7 @@ subroutine inputCADtoParticleData(k, nreal_mesh, totVol)
             k=k+1
             read(1,*) tempType, (x(d, k), d=1,SPH_dim), vol(k)
             vol(k)=avgVol
-            itype(k) = NINT(tempType)        
+            call ICinput(itype(k), NINT(tempType))      
         enddo
             
     elseif ( ExtInputMeshType .eq. 4) then 
@@ -49,7 +49,7 @@ subroutine inputCADtoParticleData(k, nreal_mesh, totVol)
             k=k+1
             read(1,*) tempType, (x(d, k), d=1,SPH_dim), vol(k)
             vol(k) =avgVol
-            itype(k) = NINT(tempType)        
+            call ICinput(itype(k), NINT(tempType))  
         enddo
     elseif ( ExtInputMeshType .eq. 3) then 
         ! Use tri/quad mesh centroids with area from
@@ -59,7 +59,7 @@ subroutine inputCADtoParticleData(k, nreal_mesh, totVol)
         do while (.not.eof(1))
             k=k+1
             read(1,*) tempType, (x(d, k), d=1,SPH_dim), vol(k)
-            itype(k) = NINT(tempType)        
+            call ICinput(itype(k), NINT(tempType))  
         enddo
             
     elseif(ExtInputMeshType .eq. 5) then
@@ -69,8 +69,8 @@ subroutine inputCADtoParticleData(k, nreal_mesh, totVol)
 
         do while (.not.eof(1))
             k=k+1
-            read(1,*) tempType, (x(d, k), d=1,SPH_dim), vol(k)
-            itype(k) = NINT(tempType)        
+            read(1,*) tempType, (x(d, k), d=1,SPH_dim), vol(k) 
+            call ICinput(itype(k), NINT(tempType))
         enddo
     endif
 
