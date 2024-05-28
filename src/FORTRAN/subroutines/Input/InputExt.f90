@@ -135,7 +135,7 @@
         call centroidBdrySegment(x(:,k), x_ve_temp, SPH_dim)
 
        
-        itype(k)= itype_virtual+itype_real_min
+        itype(k)= itype_virtual
 
         nedge=nedge+1
     enddo
