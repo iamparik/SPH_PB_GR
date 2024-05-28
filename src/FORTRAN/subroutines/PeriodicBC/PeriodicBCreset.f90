@@ -35,8 +35,7 @@ subroutine PeriodicBCreset
         enddo        
         call centroidBdrySegment(x_PBC1, x_ve_temp, SPH_dim)
         
-       if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min)) then                                         
-           ! Find which edge is being called as the particle pair       
+       ! Find which edge is being called as the particle pair       
            do i= 1, size(pBC_edges,2)
                ! For the identified edge, identify its periodic edge pair,
                ! and the sense of the vector
@@ -70,8 +69,6 @@ subroutine PeriodicBCreset
                 x(:, a)= -ns_as*surf_norm(:,s_pBC2)+ ts_as*ts_pBC2(:) + x_PBC2(:)
            endif                                     
 
-       endif
-       
    enddo               
     
     

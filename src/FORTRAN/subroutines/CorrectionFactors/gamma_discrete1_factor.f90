@@ -26,23 +26,16 @@ subroutine gamma_discrete1_factor
         b=pair_j(k)
         
         ! The below can be accomodated better by changing the algorithm slighty while calculating gamma_discrt  
-        !if(rho(b).ne. 0.D0) gamma_discrt(a) = gamma_discrt(a) + mass(b)*w(k)/rho(b) 
-        !if(rho(a).ne. 0.D0) gamma_discrt(b) = gamma_discrt(b) + mass(a)*w(k)/rho(a) 
-        if((mod(itype(b),itype_virtual) .le. itype_real_max) .and. (mod(itype(b),itype_virtual) .ge. itype_real_min)) &
-                & gamma_discrt(a) = gamma_discrt(a) + mass(b)*w(k)/rho(b)
-        
-        if((mod(itype(a),itype_virtual) .le. itype_real_max) .and. (mod(itype(a),itype_virtual) .ge. itype_real_min)) &
-                & gamma_discrt(b) = gamma_discrt(b) + mass(a)*w(k)/rho(a)
+        gamma_discrt(a) = gamma_discrt(a) + mass(b)*w(k)/rho(b)
+        gamma_discrt(b) = gamma_discrt(b) + mass(a)*w(k)/rho(a)
         
     
     enddo
 
     do a= 1, ntotal
         ! The below can be accomodated better by changing the algorithm slighty while calculating gamma_discrt  
-        if(rho(a).ne. 0.D0) then
-            if((mod(itype(a),itype_virtual) .le. itype_real_max) .and. (mod(itype(a),itype_virtual) .ge. itype_real_min)) &
+        if((mod(itype(a),itype_virtual) .le. itype_real_max) .and. (mod(itype(a),itype_virtual) .ge. itype_real_min)) &
                 & gamma_discrt(a)= gamma_discrt(a)+ mass(a)*w_aa(a)/rho(a) 
-        endif
     enddo
 
 

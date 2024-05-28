@@ -63,8 +63,7 @@ use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, 
             x_ve_temp(:,d)=x_ve(:,edge(d,s_pBC1))
         enddo        
         call centroidBdrySegment(x_PBC1, x_ve_temp, SPH_dim)
-        
-       if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min)) then                                         
+                                              
            ! Find which edge is being called as the particle pair       
            do i= 1, size(pBC_edges,2)
                ! For the identified edge, identify its periodic edge pair,
@@ -112,8 +111,6 @@ use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, 
            kpBC=kpBC+1
            pBC_duplicate_pair(1,kpBC)=a
            pBC_duplicate_pair(2,kpBC)=kn
-           
-       endif
        
    enddo
    
