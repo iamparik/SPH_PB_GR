@@ -1,0 +1,29 @@
+
+	Points		= no mass associated
+	Particles 	= Mass associated (which occupies space)
+
+itype: particle type
+	itype = 0,100,200...  	---- Points
+	itype = 0	 	---- Ghost Virtual point
+	itype = 1 to 99		---- Real particles
+	itype = 1		---- Real point (no mass)
+	itype = 2	  	---- Water particle
+	itype = 100		---- Edge reference point
+	itype = 101 to 199	---- Edge reference particles	
+	itype = 200		---- Periodic edge reference point
+	itype = 201 to 299	---- Periodic domain virtual particles
+	itype = 101		---- Edge Real point (no mass)
+	itype = 102		---- Edge Water particle 
+	
+
+etype: edge type and boundary condition
+	etype = 0,100,200,300	---- Virtual edge boundary condition
+	etype= 1 to 99		---- Edge boundary condition
+	etype = 200		---- Periodic edge boundary condition
+	etype= 201 to 299	---- Edge boundary conditions of copied edges due to periodic boundaries
+	etype=2			---- Pressure at edge is neumann (like dp/dn=0), and zero velocity boundary condition is applied (etype_SolidWall1)
+	etype=3			---- Pressure at edge is dirichlet (like p=0), and velocity boundary condition is applied (etype_FreeSurface1)
+	etype=4			---- Pressure at edge is neumann (like dp/dn=0), and zero velocity boundary condition is applied (etype_SolidWall2)
+	etype=5			---- Far away wall boundary (etype_FarWall)
+	etype=51		---- Temperature boundary T=constant
+	etype=52		---- Temperature Neumann dT/dn
