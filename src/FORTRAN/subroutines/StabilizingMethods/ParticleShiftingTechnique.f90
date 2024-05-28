@@ -99,8 +99,8 @@ enddo
 if(PSTtype .ge. 1) then
     do a=1,ntotal    
         delr=0.D0
-        if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min) &
-            & .and. ( FreeSurfaceVar(a) .gt. FScutoff) ) then 
+        if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min)) then ! &
+           ! & .and. ( FreeSurfaceVar(a) .gt. FScutoff) ) then 
             
             dstress(:) = -grad_b_term*delC(:,a)
             PSTShift = min(norm2(dstress(:)), maxShift)
