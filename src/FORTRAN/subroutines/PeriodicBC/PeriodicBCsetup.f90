@@ -200,7 +200,7 @@ use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, 
                 !determine location of the copied edge reference point
                 x(:,kn)=-ns_as*surf_norm(:,s_pBC2)+ ts_as*ts_pBC2(:) &
                         & +x_PBC2(:)
-                itype(kn)= mod(itype(nedge_rel_edge(s)),itype_virtual)+ itype_periodic 
+                itype(kn)= mod(itype(nedge_rel_edge(s)),itype_virtual)!+ itype_periodic 
                 hsml(kn)=hsml(nedge_rel_edge(s))
                 mass(kn)=mass(nedge_rel_edge(s))
                 rho(kn)=rho(nedge_rel_edge(s))
@@ -261,7 +261,7 @@ use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, 
                 !determine location of the edge reference point
                 x(:,kn)=-ns_as*surf_norm(:,s_pBC1)+ ts_as*ts_pBC1(:) &
                         & + x_PBC1(:)   
-                itype(kn)=mod(itype(nedge_rel_edge(s)),itype_virtual)+ itype_periodic
+                itype(kn)=mod(itype(nedge_rel_edge(s)),itype_virtual)!+ itype_periodic
                 hsml(kn)=hsml(nedge_rel_edge(s))
                 mass(kn)=mass(nedge_rel_edge(s))
                 rho(kn)=rho(nedge_rel_edge(s))
