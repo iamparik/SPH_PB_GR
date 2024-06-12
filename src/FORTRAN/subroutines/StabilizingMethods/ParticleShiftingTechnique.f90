@@ -10,7 +10,7 @@ subroutine ParticleShiftingTechnique(PSTtype,PSTcoeff)
 use config_parameter, only:SPH_dim, itype_real_max, itype_real_min, &
         & hsml_const, dx_r, FScutoff
 use particle_data, only: niac,pair_i, pair_j,eniac,epair_a, epair_s, &
-    & w, dwdx, delC, surf_norm, del_gamma_as, nedge_rel_edge, ntotal, etotal, &
+    & w, dwdx, delC, surf_norm, del_gamma_as, ntotal, etotal, &
     & mass, rho, x, vx, itype,FreeSurfaceVar, bdryVal_seg, &
     & gamma_cont, gamma_discrt, gamma_mat, gamma_mat_inv,xi1_mat_inv
 
@@ -68,15 +68,13 @@ enddo
 do k= 1, eniac
     a=epair_a(k)
     s=epair_s(k)
-    b = nedge_rel_edge(s)
-    
-    dx_as=norm2(x(:,a)-x(:,b))
-    call kernel(dx_as,delr,hsml_const,w_dxas,extra_vec)
-    
+
     ! For different PSTtype we change dCF as follows 
     if (PSTtype .eq. 1) then
         dCF= 1.D0
     elseif (PSTtype .eq. 2) then
+        dx_as=dot_product(x(:,a), surf_norm(:,s)) 
+        call kernel(dx_as,delr,hsml_const,w_dxas,extra_vec)
         dCF= 1.D0 + 0.2D0*(w_dxas/w_dxr)**4.D0
     else
         dCF= 1.D0

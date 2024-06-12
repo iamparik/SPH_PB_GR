@@ -13,7 +13,7 @@
 subroutine beta_discrete_factor
     use config_parameter, only: SPH_dim
     use particle_data, only: beta_mat, eniac, epair_a, epair_s, ntotal, &
-                & del_gamma_as,edge,nedge_rel_edge,x 
+                & del_gamma_as,edge,x, mid_pt_for_edge
     implicit none
     
     real(8) k,i,j, a, s
@@ -30,7 +30,7 @@ subroutine beta_discrete_factor
             do j=1,SPH_dim
                 !the below definition is only true for one particle per edge, ingeneral this needs to be changed to include some
                 ! numerical itnegration schemes
-                beta_mat(i,j,a) = beta_mat(i,j,a) + (x(i,nedge_rel_edge(s))-x(i,a))*(-del_gamma_as(j,k)) 
+                beta_mat(i,j,a) = beta_mat(i,j,a) + (mid_pt_for_edge(i,s)-x(i,a))*(-del_gamma_as(j,k)) 
                 
             enddo
         enddo

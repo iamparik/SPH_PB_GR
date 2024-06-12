@@ -81,15 +81,23 @@ integer(4):: itimestep
     real(8),DIMENSION(:),ALLOCATABLE :: g_a_max
     real(8),DIMENSION(:,:),ALLOCATABLE :: xStart
     
-![Input]            edge:   stores vertices of solid wall boudnary (edge in 2d and plane in 3d)    
-![Output]           nedge_rel_edge:   Edge related to a boudnary particle (or reference point) on edge 
-![Output]           surf_norm:     surface normals for wall edges
-![input/output]     x_ve:      coordinate of vertices  
-    public edge,nedge_rel_edge,surf_norm, x_ve
+![Input]            edge:               stores vertices of solid wall boudnary (edge in 2d and plane in 3d)    
+![Output]           integ_pts_for_edge: first index returns the starting index of integration points for a given edge 
+!                                       and second index returns the number of itnegration pts for the edge
+![Output]           val_integ_pts:      first set of index determines the coordinates of the integration pt and 
+!                                       the last index returns the weight of the numerical integration assosciated with the pt
+![Output]           mid_pt_for_edge:    coordinate values of edge mid point.
+![Output]           surf_norm:          surface normals for wall edges
+![input/output]     x_ve:               coordinate of vertices  
+![input/output]     vx_ve:              velocity veoctor of vertices 
+    public edge,integ_pts_for_edge, val_integ_pts, surf_norm, x_ve
     integer(4), DIMENSION(:,:), ALLOCATABLE:: edge
-    integer(4), DIMENSION(:), ALLOCATABLE:: nedge_rel_edge
+    integer(4), DIMENSION(:,:), ALLOCATABLE:: integ_pts_for_edge
+    real(8), DIMENSION(:,:), ALLOCATABLE:: val_integ_pts
+    real(8), DIMENSION(:,:), ALLOCATABLE:: mid_pt_for_edge
     real(8),DIMENSION(:,:),ALLOCATABLE:: surf_norm  
     real(8),DIMENSION(:,:),ALLOCATABLE :: x_ve
+    real(8),DIMENSION(:,:),ALLOCATABLE :: vx_ve
 
 
 ![input/output]     nreal:  total number of real particles

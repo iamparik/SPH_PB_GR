@@ -35,7 +35,7 @@ integer(4) :: correction_types, CF_density, ID_density, CF_pressure, ID_pressure
 real(8) :: scalar_factor, Sca_Bdry_val, current_time
 real(8), DIMENSION(:), allocatable  :: F_a, F_b,DF_a, DF_b, Cdwdx_a, Cdwdx_b, Cdgmas
 real(8), DIMENSION(:,:,:), allocatable :: grad_vel
-real(8), DIMENSION(:,:), allocatable :: matrix_factor, stress, x_ve_temp, vx_ve,bdryVal_ve, grad_rho
+real(8), DIMENSION(:,:), allocatable :: matrix_factor, stress, x_ve_temp,bdryVal_ve, grad_rho ,grad_vel_s_temp
 real(8), DIMENSION(:), allocatable :: div_vel, delx_ab, dens_diffusion
 
 
@@ -117,7 +117,7 @@ correction_types=10
     !dimilarly define number of boudnary variables consdiered at vertices
     num_bdry_var_ve = (SPH_dim)*2 + 1
 
-    allocate(bdryVal_seg(num_bdry_var_seg,maxedge), bdryVal_ve(num_bdry_var_ve, SPH_dim), vx_ve(SPH_dim,ve_total))
+    allocate(bdryVal_seg(num_bdry_var_seg,maxedge), bdryVal_ve(num_bdry_var_ve, SPH_dim), vx_ve(SPH_dim,maxnv))
     
     do itimestep = current_ts+1, max_timesteps
         
@@ -132,7 +132,8 @@ correction_types=10
             enddo
             
             call BCinputValue(bdryVal_seg(:,s),num_bdry_var_seg,bdryVal_ve,num_bdry_var_ve,etype(s),SPH_dim,current_time)
-            
+
+            vx_ve=0.D0
             do d=1,SPH_dim
                 a= edge(d,s)
                 vx_ve(:,a)=bdryVal_ve(SPH_dim+1:SPH_dim*2,d)
@@ -159,7 +160,7 @@ correction_types=10
         !drho=0.D0
         
         allocate(div_vel(ntotal), stress(SPH_dim, ntotal),grad_rho(SPH_dim, ntotal) ,grad_vel(SPH_dim, SPH_dim, ntotal),  &
-            &  x_ve_temp(SPH_dim,SPH_dim), dens_diffusion(ntotal)) ! this can be reduced by accoutnign for nreal and nedge correctly
+            &  x_ve_temp(SPH_dim,SPH_dim), dens_diffusion(ntotal), grad_vel_s_temp(SPH_dim,SPH_dim)) ! this can be reduced by accoutnign for nreal and nedge correctly
         div_vel=0.D0
         grad_vel =0.D0
         grad_rho=0.D0
@@ -371,16 +372,21 @@ correction_types=10
         do k= 1,eniac
             a= epair_a(k)
             s= epair_s(k)
-            b= nedge_rel_edge(s)
             
-            delx_ab(:)= x(:,a)- x(:,b)
+            ! The below lines find distance between particle to edge mid point            
+            delx_ab(:)= x(:,a)- mid_pt_for_edge(:,s) ! this is form is important mostly for Macia formulation
+            ! otherwise dot_product(x(:,a), surf_norm(:,s)) is enough mostly
+            
             !------ Find viscous stress term (to be used in momentum equation) -------------!           
             F_b(:) = bdryVal_seg(1:SPH_dim,s)
+            grad_vel_s_temp(:,:)=0.D0
+            
             DF_a=0.D0          
+            
             do d= 1,SPH_dim
                 
-                call BILViscousBdry(F_a,Sca_Bdry_val, dirich0Neum1, grad_vel(d,:,a), grad_vel(d,:,b), vx(d,a), F_b, &
-                    & delx_ab, dx_r, surf_norm(:,s), d, SPH_dim, ID_BIL_visc)
+                call BILViscousBdry(F_a,Sca_Bdry_val, dirich0Neum1, grad_vel(d,:,a), grad_vel_s_temp(d,:), vx(d,a), F_b, &
+                    & delx_ab, dx_r, surf_norm(:,s), d, SPH_dim, ID_BIL_visc) ! for BIL type using ∇v_s input, v_s needs to be first defined
                 
                 call CorrectedBILapPtoB(DF_a(d), F_a, Sca_Bdry_val, del_gamma_as(:,k), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
@@ -424,19 +430,11 @@ correction_types=10
                     x_ve(:,a) = x_ve(:,a) + dt* vx_ve(:,a)
                 enddo
                 
-                ! now update the midpoint of edge, or poitns,
-                ! which are used in numerical integrations
-                k=nedge_rel_edge(s)        
-                do d =1,SPH_dim
-                    x_ve_temp(:,d)=x_ve(:,edge(d,s))
-                enddo        
-                call centroidBdrySegment(x(:,k), x_ve_temp, SPH_dim)
 
-            
             endif
         enddo
         
-         deallocate(grad_vel, stress, x_ve_temp)
+         deallocate(grad_vel, stress, x_ve_temp, grad_vel_s_temp)
         
         
         !---------------------- free surface detection and PST algorithm -------------------------------------!
@@ -475,7 +473,7 @@ write (*,*)'        Elapsed time = ', (ic2-ic1)/real(crate1), 'sec'
 if (Allocated(pBC_edges)) deallocate(pBC_epair_a, pBC_epair_s)
 
 DEALLOCATE(x,vx,mass, rho, p, hsml, itype, mu, xStart) 
-Deallocate(surf_norm, edge,nedge_rel_edge, etype )
+Deallocate(surf_norm, edge, etype )
 
 if(Allocated(dgrho_prev)) DEALLOCATE(dgrho_prev)
 if(Allocated(drho)) DEALLOCATE(drho)
