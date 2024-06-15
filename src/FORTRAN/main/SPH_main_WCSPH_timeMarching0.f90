@@ -142,6 +142,7 @@ correction_types=10
         
         call printTimeStep(itimestep,print_step)
         
+        ! Calculate all variables and correction factors taht depend on particle position
         call PositionDependentFactors
         
         !if (itimestep .eq. 1) call output_initial_config
