@@ -416,6 +416,7 @@ correction_types=10
                 x(:,a) = x(:,a) + dt* vx(:,a)
                 
             
+                vol(a) = mass(a)/rho(a)
             endif
         enddo
         
