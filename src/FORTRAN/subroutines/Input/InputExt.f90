@@ -158,7 +158,8 @@
     
     nedge = k_int_pt
     
-    ntotal=nreal+nedge
+    ! Add any other particles/ points that would be used in particle particle interatcionts
+    ntotal=nreal ! + nvirtual_points
     
     ! Maximum interactions for particle-particle and edge_temp-particle is defined
     max_interaction= 10*maxn*(ceiling((hsml_const/dx_r)*scale_k*2))**SPH_dim
