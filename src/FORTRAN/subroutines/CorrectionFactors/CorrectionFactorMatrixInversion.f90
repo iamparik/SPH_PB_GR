@@ -10,7 +10,7 @@
 !****************************************************************************
 
 subroutine CorrectionFactorMatrixInversion
-    use config_parameter, only: SPH_dim,itype_real_max,itype_real_min, itype_virtual
+    use config_parameter, only: SPH_dim
     use particle_data, only: xi1_mat,xi1_mat_inv,gamma_mat, gamma_mat_inv, ntotal, itype
 
     implicit none        
@@ -24,11 +24,8 @@ subroutine CorrectionFactorMatrixInversion
     
     if(SPH_dim .eq. 2) then
         do a=1,ntotal
-            !if((mod(itype(a),itype_virtual) .le. itype_real_max) .and. (mod(itype(a),itype_virtual) .ge. itype_real_min)) then
-            if((itype(a) .le. itype_real_max) .and. (itype(a) .ge. itype_real_min)) then
-                 call inv2d(xi1_mat_inv(:,:,a),xi1_mat(:,:,a))
-                 call inv2d(gamma_mat_inv(:,:,a), gamma_mat(:,:,a))
-             endif
+            call inv2d(xi1_mat_inv(:,:,a),xi1_mat(:,:,a))
+            call inv2d(gamma_mat_inv(:,:,a), gamma_mat(:,:,a))
         enddo
     else
         write(*,*) ' inversion only defined for 2 X 2 matrix'

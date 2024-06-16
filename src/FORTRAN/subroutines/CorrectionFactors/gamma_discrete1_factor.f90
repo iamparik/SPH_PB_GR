@@ -10,9 +10,8 @@
 !****************************************************************************
 
 subroutine gamma_discrete1_factor
-    use config_parameter, only: itype_real_max, itype_real_min, itype_virtual
     use particle_data, only: gamma_discrt, niac, pair_i, pair_j, ntotal, &
-                & w,itype,mass, rho, w_aa,x, maxn
+                & w,itype,vol, rho, w_aa,x, maxn
     implicit none
 
     integer(4) k, a, b
@@ -26,16 +25,15 @@ subroutine gamma_discrete1_factor
         b=pair_j(k)
         
         ! The below can be accomodated better by changing the algorithm slighty while calculating gamma_discrt  
-        gamma_discrt(a) = gamma_discrt(a) + mass(b)*w(k)/rho(b)
-        gamma_discrt(b) = gamma_discrt(b) + mass(a)*w(k)/rho(a)
+        gamma_discrt(a) = gamma_discrt(a) + vol(b)*w(k)
+        gamma_discrt(b) = gamma_discrt(b) + vol(a)*w(k)
         
     
     enddo
 
     do a= 1, ntotal
         ! The below can be accomodated better by changing the algorithm slighty while calculating gamma_discrt  
-        if((mod(itype(a),itype_virtual) .le. itype_real_max) .and. (mod(itype(a),itype_virtual) .ge. itype_real_min)) &
-                & gamma_discrt(a)= gamma_discrt(a)+ mass(a)*w_aa(a)/rho(a) 
+        gamma_discrt(a)= gamma_discrt(a)+ vol(a)*w_aa(a)
     enddo
 
 

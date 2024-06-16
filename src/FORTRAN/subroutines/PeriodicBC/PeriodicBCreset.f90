@@ -10,7 +10,7 @@
 !   Last Modified:  08/12/2022       by  PARIKSHIT BOREGOWDA 
 !****************************************************************************
 subroutine PeriodicBCreset
-    use config_parameter, only:SPH_dim, itype_real_max, itype_real_min
+    use config_parameter, only:SPH_dim
     use particle_data, only:ntotal, etotal, ntotal_prev,etotal_prev, &
         & pBC_duplicate_pair,surf_norm, &
         & pBC_edges, pBC_epair_a, pBC_epair_s, pBC_eniac, tangent_pBC, &

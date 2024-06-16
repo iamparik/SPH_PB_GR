@@ -10,7 +10,7 @@
 !****************************************************************************
 
 subroutine smoothing_w0
-    use config_parameter, only:SPH_dim, itype_virtual, itype_real_max, itype_real_min
+    use config_parameter, only:SPH_dim
     use particle_data ,   only: ntotal,itype,hsml,w_aa
     implicit none
     
@@ -22,10 +22,8 @@ subroutine smoothing_w0
     
     
     do a=1,ntotal
-        if((mod(itype(a),itype_virtual) .le. itype_real_max) .and. (mod(itype(a),itype_virtual) .ge. itype_real_min)) then
-            mhsml=hsml(a)
-            call kernel(0.D0,dx_dw_0,mhsml,w_aa(a),dx_dw_0)
-        endif
+        mhsml=hsml(a)
+        call kernel(0.D0,dx_dw_0,mhsml,w_aa(a),dx_dw_0)
     enddo
     
 end

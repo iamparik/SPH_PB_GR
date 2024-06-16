@@ -237,26 +237,26 @@ correction_types=10
         deallocate(grad_rho)
         
         ! Update variables for the next time step
-        do a =1, ntotal
-            if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min)) then
-                
-                ! Calcualate density as (𝐷𝜌_𝑎)/𝐷𝑡=− 𝜌_𝑎  ∇∙𝑣_𝑎
-                rho(a) = rho(a) - dt* rho(a) * div_vel(a) + dt*dens_diffusion(a)
-                ! Use Hughes density correction if necessary
-                if ((HG_density_correction) .and. (rho(a) .le. rho_init)) rho(a)=rho_init
+        do a =1, nreal
+            ! Calcualate density as (𝐷𝜌_𝑎)/𝐷𝑡=− 𝜌_𝑎  ∇∙𝑣_𝑎
+            rho(a) = rho(a) - dt* rho(a) * div_vel(a) + dt*dens_diffusion(a)
+            ! Use Hughes density correction if necessary
+            if ((HG_density_correction) .and. (rho(a) .le. rho_init)) rho(a)=rho_init
             
-                ! Update Pressure as it depends on density for WCSPH
-                call ParticlePressureEOS(p(a), rho(a), itype(a), itype_virtual)               
-                
+            ! Update Pressure as it depends on density for WCSPH
+            call ParticlePressureEOS(p(a), rho(a), itype(a), itype_virtual)    
             
-            endif
+            !Update Volume, since density is updated
+            vol(a) = mass(a)/rho(a)
         enddo
+        
         deallocate(dens_diffusion, div_vel)
         
         ! The varioables need to be updated for periodic particles
         if (Allocated(pBC_edges)) then
             call PeriodicParameter(rho)
             call PeriodicParameter(p)
+            call PeriodicParameter(vol)
         endif
         
         
@@ -403,22 +403,21 @@ correction_types=10
         enddo
         
         
-        ! Update variables for the next time step
-        do a =1, ntotal
-            if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min)) then
-                
-
-                !Update Velocity
-                vx(:,a) = vx(:,a) + dt* (-stress(:,a)/rho(a) + F_ext(:))
+        ! Update real particle position and velocity for the next time step
+        do a =1, nreal
+            !Update Velocity
+            vx(:,a) = vx(:,a) + dt* (-stress(:,a)/rho(a) + F_ext(:))
             
-
-                !Update position
-                x(:,a) = x(:,a) + dt* vx(:,a)
+            !Update Position
+            x(:,a) = x(:,a) + dt* vx(:,a)
                 
             
-                vol(a) = mass(a)/rho(a)
-            endif
         enddo
+        
+        if (Allocated(pBC_edges)) then
+            call PeriodicParameter(vx(1,:))
+            call PeriodicParameter(vx(2,:))
+        endif
         
         
         ! Update edges for next step

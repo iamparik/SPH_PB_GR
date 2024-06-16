@@ -24,7 +24,7 @@ summationDensity 0
 artViscType 1
 MLS_density_bound 0
 MLS_step 1
-densDiffType 25
+densDiffType 0
 delta_SPH 0.1D0
 prsrBdryType 11
 HG_density_correction 0

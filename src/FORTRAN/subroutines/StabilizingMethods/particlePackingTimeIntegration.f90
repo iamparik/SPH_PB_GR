@@ -11,7 +11,7 @@
 subroutine particlePackingTimeIntegration(quick_converge_step2C)
 
 use config_parameter, only: SPH_dim, pi, DataConfigPath, &
-    & print_step, save_step, hsml_const, dx_r, itype_real_min, itype_real_max    
+    & print_step, save_step, hsml_const, dx_r
 use particle_data, only: nreal, w_aa, w, dwdx, &
         & gamma_discrt, gamma_cont, del_gamma_as, del_gamma, &
         & xi1_mat, beta_mat,gamma_mat,xi_cont_mat, &
@@ -197,7 +197,7 @@ do while (packing_in_progress)
     !------------------------Particle shift calcualtion from force terms -----------------------------!
     do a=1,ntotal    
         delr=0.D0
-        if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min) .and.  packableParticle(a)) then 
+        if(packableParticle(a)) then 
             
             dstress(:) = -grad_b_term*(delC(:,a)+bdry_push(:,a))
             PSTShift = min(norm2(dstress(:)), maxShift)
@@ -216,11 +216,9 @@ do while (packing_in_progress)
     !Initialize total particle displacement to zero and average concgradient to zero
     TPD=0.D0
     delC_avg = 0.D0
-    do a=1,ntotal        
-        if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min)) then
-            TPD = TPD + norm2(xStart(:,a)-x(:,a))/nreal
-            delC_avg= delC_avg + norm2(delC(:,a))/nreal
-        endif
+    do a=1,nreal        
+        TPD = TPD + norm2(xStart(:,a)-x(:,a))/nreal
+        delC_avg= delC_avg + norm2(delC(:,a))/nreal
     enddo
     
     call outputPacking(iterstep,100,TPD,delC_avg) !input: iterStep, saveStep, TPD
