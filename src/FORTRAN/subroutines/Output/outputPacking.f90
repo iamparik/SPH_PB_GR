@@ -12,7 +12,7 @@
 subroutine  outputPacking(iterStep, saveStep, TPD, delC_avg)
     use config_parameter, only:dataPackingPath, SPH_dim, itype_real_max, itype_real_min, &
             & etype_real_max, etype_real_min, etype_virtual, itype_virtual, itype_periodic
-    use particle_data ,   only: x, itype, etype, nedge_rel_edge, ntotal, etotal 
+    use particle_data ,   only: x, itype, etype, ntotal, etotal, mid_pt_for_edge
     
     implicit none
 !----------------------------------------------------------------------           
@@ -89,8 +89,7 @@ subroutine  outputPacking(iterStep, saveStep, TPD, delC_avg)
     
         do s=1,etotal 
             if(text_print) write(1,'(A)')'ZONE T="Edge Particles",F=Point,C=Red'
-	        a=nedge_rel_edge(s)  ! this needs to be changed for edges with mroe than one poitn representation. This will then be itereated 
-            write(1,*) (x(d, a), d=1,SPH_dim)
+            write(1,*) (mid_pt_for_edge(d,s), d=1,SPH_dim)
             text_print=.false.                                     
         enddo
 

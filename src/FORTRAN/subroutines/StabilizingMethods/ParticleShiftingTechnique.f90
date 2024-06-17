@@ -7,10 +7,9 @@
 
 subroutine ParticleShiftingTechnique(PSTtype,PSTcoeff)
 
-use config_parameter, only:SPH_dim, itype_real_max, itype_real_min, &
-        & hsml_const, dx_r, FScutoff
+use config_parameter, only:SPH_dim, hsml_const, dx_r, FScutoff
 use particle_data, only: niac,pair_i, pair_j,eniac,epair_a, epair_s, &
-    & w, dwdx, delC, surf_norm, del_gamma_as, nedge_rel_edge, ntotal, etotal, &
+    & w, dwdx, delC, surf_norm, del_gamma_as, ntotal, nreal, etotal, &
     & mass, rho, x, vx, itype,FreeSurfaceVar, bdryVal_seg, &
     & gamma_cont, gamma_discrt, gamma_mat, gamma_mat_inv,xi1_mat_inv
 
@@ -62,21 +61,21 @@ do k = 1,niac
                 & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
                 & SPH_dim, 3, 2) ! SPH_dim, correctionFactorID, grad_type
     enddo
+
+    
 enddo
 
 
 do k= 1, eniac
     a=epair_a(k)
     s=epair_s(k)
-    b = nedge_rel_edge(s)
-    
-    dx_as=norm2(x(:,a)-x(:,b))
-    call kernel(dx_as,delr,hsml_const,w_dxas,extra_vec)
-    
+
     ! For different PSTtype we change dCF as follows 
     if (PSTtype .eq. 1) then
         dCF= 1.D0
     elseif (PSTtype .eq. 2) then
+        dx_as=dot_product(x(:,a), surf_norm(:,s)) 
+        call kernel(dx_as,delr,hsml_const,w_dxas,extra_vec)
         dCF= 1.D0 + 0.2D0*(w_dxas/w_dxr)**4.D0
     else
         dCF= 1.D0
@@ -97,21 +96,18 @@ enddo
 
 ! Now perform particle shifting
 if(PSTtype .ge. 1) then
-    do a=1,ntotal    
+    do a=1,nreal    
         delr=0.D0
-        if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min)) then ! &
-           ! & .and. ( FreeSurfaceVar(a) .gt. FScutoff) ) then 
-            
-            dstress(:) = -grad_b_term*delC(:,a)
-            PSTShift = min(norm2(dstress(:)), maxShift)
-            if(PSTShift .gt. 1D-10*grad_b_term) then
-                delr=PSTshift*(dstress(:)/norm2(dstress(:)))
-            endif
-            x(:,a) = x(:,a)+ delr
-            do d=1,SPH_dim
-                vx(d,a)= vx(d,a) + dot_product(grad_vel(d,:,a),delr)
-            enddo  
-        endif  
+
+        dstress(:) = -grad_b_term*delC(:,a)
+        PSTShift = min(norm2(dstress(:)), maxShift)
+        if(PSTShift .gt. 1D-10*grad_b_term) then
+            delr=PSTshift*(dstress(:)/norm2(dstress(:)))
+        endif
+        x(:,a) = x(:,a)+ delr
+        do d=1,SPH_dim
+            vx(d,a)= vx(d,a) + dot_product(grad_vel(d,:,a),delr)
+        enddo  
 
     enddo
 endif

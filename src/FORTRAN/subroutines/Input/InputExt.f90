@@ -17,16 +17,16 @@
         &  g_const, c_sound, F_ext, ExtInputMeshType, packagingIterations
     use particle_data ,   only: maxn, max_interaction, max_e_interaction, maxnv,  &
         & x,vx,mass,rho, vol,p,itype,hsml,mu, temp, nreal, nedge, nflow, nghost, ntotal, edge, &
-        & surf_norm, nedge_rel_edge, etype, etotal, maxedge, &
+        & surf_norm, etype, etotal, maxedge, &
         & pBC_edges,tangent_pBC, &
         &  f0max, dynamicProblem,avgVol, &
         & packed_x,packed_itype, packed_vol, simGridSize, &
-        & x_ve
+        & x_ve, integ_pts_for_edge,val_integ_pts, mid_pt_for_edge
     !use ifport, only:random
     
     implicit none
     real(8) tempType
-    integer(4) k,d,s,ke,periodicPairs,i , additionalParticles
+    integer(4) k,d,s,ke,k_int_pt, periodicPairs,i , additionalParticles
     real(8) tempX(SPH_dim,SPH_dim), tempBdry(5), mn, scale_k
     integer(4) nreal_mesh, nrealCartesian, nEbulkBdry, nEdomainBdry
     real(8) totVol, x_ve_temp(SPH_dim,SPH_dim)
@@ -119,28 +119,47 @@
         tangent_pBC(:,2,1)=tangent_pBC(:,2,1)/mn
     endif
 
-    !Now create particle per edge (this needs to be deleted when nedge_rel_Edge is decommisioned)
-    ALLOCATE(nedge_rel_edge(maxedge))
+    !val_integ_pts initialized using maximum pts per edge times the number of edges
+    ! here we use one itnegration pt per edge, hence 1*maxedge
+    ! integ_pts_for_edge initialized using the maximum number of edges
+    ALLOCATE(integ_pts_for_edge(2,maxedge), val_integ_pts(SPH_dim+1,1*maxedge), mid_pt_for_edge(SPH_dim,maxedge))
+    
     ! Now we will find the center of edges, which in Method 1 of Parikshit et. al will work as virtual points
-    ! In method 2 it will be used as a real boundary particle 
-    ! The below needs to be modified slightly to include more than one edge_temp particle per edge_temp (and to include different dx_v
     nedge=0
+    
+    !initialize kth integration pt to zero
+    k_int_pt=0
     do s=1,etotal
-        k= k+1
-        nedge_rel_edge(s)=k ! Here nedge_rel_edge(i)=i  is a simple case of one edge_temp particle per edge_temp
-        
+               
         do d =1,SPH_dim
             x_ve_temp(:,d)=x_ve(:,edge(d,s))
-        enddo        
-        call centroidBdrySegment(x(:,k), x_ve_temp, SPH_dim)
-
+        enddo      
+        
+    ! Now define number of integration pts per edge for the below lines. 
+    ! This would need to be in some loop for more than one integration pt per edge    
+        
+        k_int_pt= k_int_pt+1 !update the kth integration point globally numbered
+        
+        integ_pts_for_edge(1,s)= k_int_pt ! Starting integration pt for a given edge
+        
+        integ_pts_for_edge(2,s) = 1 ! Total number of integration pts for a given edge
+        
+        ! Determine the location of integration point
+        call centroidBdrySegment(val_integ_pts(1:SPH_dim, k_int_pt), x_ve_temp, SPH_dim)
+        
+        ! Determine the integration weight assosciated with the integration point
+        val_integ_pts(SPH_dim+1, k_int_pt)= norm2(x_ve(:,edge(1,s))-x_ve(:,edge(2,s))) ! in this 2D case, it simply length of 1D bdry edge
        
-        itype(k)= itype_virtual+itype_real_min
+        
+    ! Determine the location of edge mid point
+        call centroidBdrySegment(mid_pt_for_edge(:, s), x_ve_temp, SPH_dim)
 
-        nedge=nedge+1
     enddo
     
-    ntotal=nreal+nedge
+    nedge = k_int_pt
+    
+    ! Add any other particles/ points that would be used in particle particle interatcionts
+    ntotal=nreal ! + nvirtual_points
     
     ! Maximum interactions for particle-particle and edge_temp-particle is defined
     max_interaction= 10*maxn*(ceiling((hsml_const/dx_r)*scale_k*2))**SPH_dim

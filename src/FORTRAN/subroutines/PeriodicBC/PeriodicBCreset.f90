@@ -10,9 +10,9 @@
 !   Last Modified:  08/12/2022       by  PARIKSHIT BOREGOWDA 
 !****************************************************************************
 subroutine PeriodicBCreset
-    use config_parameter, only:SPH_dim, itype_real_max, itype_real_min
+    use config_parameter, only:SPH_dim
     use particle_data, only:ntotal, etotal, ntotal_prev,etotal_prev, &
-        & pBC_duplicate_pair,surf_norm, nedge_rel_edge, &
+        & pBC_duplicate_pair,surf_norm, &
         & pBC_edges, pBC_epair_a, pBC_epair_s, pBC_eniac, tangent_pBC, &
         & x, itype, x_ve, ve_total_prev, ve_total, edge
     
@@ -35,8 +35,7 @@ subroutine PeriodicBCreset
         enddo        
         call centroidBdrySegment(x_PBC1, x_ve_temp, SPH_dim)
         
-       if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min)) then                                         
-           ! Find which edge is being called as the particle pair       
+       ! Find which edge is being called as the particle pair       
            do i= 1, size(pBC_edges,2)
                ! For the identified edge, identify its periodic edge pair,
                ! and the sense of the vector
@@ -70,8 +69,6 @@ subroutine PeriodicBCreset
                 x(:, a)= -ns_as*surf_norm(:,s_pBC2)+ ts_as*ts_pBC2(:) + x_PBC2(:)
            endif                                     
 
-       endif
-       
    enddo               
     
     

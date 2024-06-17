@@ -11,14 +11,14 @@
 subroutine particlePackingTimeIntegration(quick_converge_step2C)
 
 use config_parameter, only: SPH_dim, pi, DataConfigPath, &
-    & print_step, save_step, hsml_const, dx_r, itype_real_min, itype_real_max    
+    & print_step, save_step, hsml_const, dx_r
 use particle_data, only: nreal, w_aa, w, dwdx, &
         & gamma_discrt, gamma_cont, del_gamma_as, del_gamma, &
         & xi1_mat, beta_mat,gamma_mat,xi_cont_mat, &
         & gamma_mat_inv,xi1_mat_inv,xi_cont_mat_inv, &
-        & epair_a,epair_s, eniac, pair_i, pair_j, niac, nedge_rel_edge,  &
+        & epair_a,epair_s, eniac, pair_i, pair_j, niac,  &
         & ntotal, xstart, x, mass, rho, itype, delC, xstart, &
-        & edge,etype, hsml, vol, surf_norm
+        & edge,etype, hsml, vol, surf_norm, edge, mid_pt_for_edge
 
 implicit none
 
@@ -149,6 +149,7 @@ do while (packing_in_progress)
 
         dCF= 1.D0
     
+        ! Calculate particle-particle term for concentration gradient
         call CorrectedScaGradPtoP(delC(:,a),delC(:,b),dCF,dCF,dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
@@ -159,13 +160,17 @@ do while (packing_in_progress)
     do k= 1, eniac
         a=epair_a(k)
         s=epair_s(k)
-        b = nedge_rel_edge(s)
-    
-        dx_as=norm2(x(:,a)-x(:,b))
+
+        
+        ! The below lines find distance between particle to edge mid point 
+        ! and the corresponding smoothing function value for that distance 
+        dx_as=norm2(x(:,a)-mid_pt_for_edge(:,s)) ! 
         call kernel(dx_as,delr,hsml_const,w_dxas,extra_vec)  
         
+        ! Reinitialize dCF as 1 
         dCF= 1.D0
     
+        ! Calculate boundary term for cincentration gradient
         call CorrectedScaGradPtoB(delC(:,a),1.D0,dCF,del_gamma_as(:,k),  &
                             & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                             & SPH_dim, 1, 1)
@@ -173,10 +178,10 @@ do while (packing_in_progress)
         ! Add boundary force function below
         ! A step function twice the force is used here for particles
         ! too close to the boundary
-        if ((dx_as .le. dx_r/2.D0) ) then 
+        if ((dx_as .le. dx_r/2.D0) ) then ! this can be improved
             ! use compressive bdry force only if the bdry is less than the particle radius 
             ! but since bdry particles
-            !if (dot_product(x(:,a)-x(:,b),surf_norm(:,s)) .le. dx_r/2.D0) ps_pa = 2.D0
+            !if (dot_product(x(:,a)-mid_pt_for_edge(:,s),surf_norm(:,s)) .le. dx_r/2.D0) ps_pa = 2.D0
             ps_pa = 2.D0
         else
             ps_pa = 1.D0
@@ -192,7 +197,7 @@ do while (packing_in_progress)
     !------------------------Particle shift calcualtion from force terms -----------------------------!
     do a=1,ntotal    
         delr=0.D0
-        if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min) .and.  packableParticle(a)) then 
+        if(packableParticle(a)) then 
             
             dstress(:) = -grad_b_term*(delC(:,a)+bdry_push(:,a))
             PSTShift = min(norm2(dstress(:)), maxShift)
@@ -211,11 +216,9 @@ do while (packing_in_progress)
     !Initialize total particle displacement to zero and average concgradient to zero
     TPD=0.D0
     delC_avg = 0.D0
-    do a=1,ntotal        
-        if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min)) then
-            TPD = TPD + norm2(xStart(:,a)-x(:,a))/nreal
-            delC_avg= delC_avg + norm2(delC(:,a))/nreal
-        endif
+    do a=1,nreal        
+        TPD = TPD + norm2(xStart(:,a)-x(:,a))/nreal
+        delC_avg= delC_avg + norm2(delC(:,a))/nreal
     enddo
     
     call outputPacking(iterstep,100,TPD,delC_avg) !input: iterStep, saveStep, TPD

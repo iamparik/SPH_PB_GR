@@ -11,9 +11,9 @@ subroutine  output_flow_simplified(itimestep,dt)
     use config_parameter, only:dataOutputPath, SPH_dim, itype_real_max, itype_real_min, &
         & etype_real_max, etype_real_min, etype_virtual, itype_virtual, itype_periodic, &
         & save_step, g_const, hydroStaticHeight
-    use particle_data ,   only: x, mass, rho, p, vx, nedge_rel_edge, &
+    use particle_data ,   only: x, mass, rho, p, vx, &
         & ntotal,etotal, itype, etype, gamma_cont, gamma_discrt,del_gamma, delC, &
-        & FreeSurfaceVar, gamma_density_cont, ve_total, x_ve
+        & FreeSurfaceVar, gamma_density_cont, ve_total, x_ve, vx_ve, mid_pt_for_edge
     
     implicit none
 !----------------------------------------------------------------------           
@@ -88,21 +88,18 @@ text_print=.true.
 ! called edge particles
     
     do s=1,etotal 
-        if((etype(s) .le. etype_real_max) .and. (etype(s) .ge. etype_real_min)) then
-            if(text_print) write(1,'(A)')'ZONE T="Edge Particles",F=Point,C=Red'
-	        i=nedge_rel_edge(s)  ! this needs to be changed for edges with mroe than one poitn representation. This will then be itereated 
-            write(1,1001) (x(d, i), d=1,SPH_dim), mass(i),rho(i), (vx(d, i), d = 1, SPH_dim), p(i), gamma_cont(i), gamma_discrt(i), (del_gamma(d, i), d = 1, SPH_dim), (0, d = 1, SPH_dim) 
-            text_print=.false.
-        endif                                       
+        if(text_print) write(1,'(A)')'ZONE T="Edge Mid-Points",F=Point,C=Red'
+        write(1,1001) (mid_pt_for_edge(d,s), d=1,SPH_dim), 0.D0 ,0.D0, (0.D0, d = 1, SPH_dim), 0.D0, 0.D0, 0.D0, (0.D0, d = 1, SPH_dim), (0.D0, d = 1, SPH_dim) 
+        text_print=.false.                           
     enddo
 
     text_print=.true.       
     
-! Export all Ghost particles/ponts.
+! Export all vertices of edges.
     
     do i=1, ve_total
         if(text_print)  write(1,'(A)')'ZONE T="Edge vertices",F=Point,C=Black'
-        write(1,1001) (x_ve(d, i), d=1,SPH_dim),0,0, (0, d = 1, SPH_dim), 0, gamma_cont(i), gamma_discrt(i), (del_gamma(d, i), d = 1, SPH_dim), (0, d = 1, SPH_dim)    
+        write(1,1001) (x_ve(d, i), d=1,SPH_dim),0,0, (vx_ve(d, i), d = 1, SPH_dim), 0, 0, 0, (0.D0, d = 1, SPH_dim), (0, d = 1, SPH_dim)    
         text_print=.false.
     enddo
    
@@ -117,30 +114,6 @@ text_print=.true.
        endif
     enddo
 
-    text_print=.true.
-! Export data of all particles representative of boundary, which are used in interpolation,
-! called edge particles
-    
-    do s=1,etotal 
-        if( .not.((etype(s) .le. etype_real_max) .and. (etype(s) .ge. etype_real_min))) then
-            if(text_print)   write(1,'(A)')'ZONE T="Virtual Edge Particles",F=Point,C=Red'
-	        i=nedge_rel_edge(s)  ! this needs to be changed for edges with more than one point representation. This will then be iterated 
-            write(1,1001) (x(d, i), d=1,SPH_dim), mass(i),rho(i), (vx(d, i), d = 1, SPH_dim), p(i), gamma_cont(i), gamma_discrt(i), (del_gamma(d, i), d = 1, SPH_dim), (0, d = 1, SPH_dim)
-            text_print=.false.
-        endif
-    enddo
-
-    text_print=.true.
-! Export all Ghost particles/ponts.
-    
-    do i=1, ntotal
-        if((itype(i) .gt. itype_virtual) .and. (mod(itype(i),itype_virtual) .eq. 0) ) then
-            if(text_print)   write(1,'(A)')'ZONE T="Virtual reference points",F=Point,C=Black'
-            write(1,1001) (x(d, i), d=1,SPH_dim), 0,0,(0, d = 1, SPH_dim), p(i), gamma_cont(i), gamma_discrt(i), (del_gamma(d, i), d = 1, SPH_dim), (0, d = 1, SPH_dim)   
-            text_print=.false.
-        endif
-    enddo
-       
 
 !Here is a readable format in which the data is stored
 1001 format(14(e22.10,2x))    ! i am using Maximum, it was 9 before

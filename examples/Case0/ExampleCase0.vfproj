@@ -63,7 +63,7 @@
 		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\PositionDependentFactors.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\xi_discrete1_factor.f90"/></Filter>
 		<Filter Name="ExampleCase_BC_IC">
-		<File RelativePath=".\BoundaryConditions_0.f90"/>
+		<File RelativePath=".\BoundaryConditions_2.f90"/>
 		<File RelativePath=".\InitialConditions.f90"/></Filter>
 		<Filter Name="FluidSubroutine">
 		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\artificialViscosityOperator.f90"/>

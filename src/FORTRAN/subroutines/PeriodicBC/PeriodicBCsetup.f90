@@ -11,12 +11,12 @@
 
 !this subroutine needs to further generalized to be applied in other scenarios
 subroutine PeriodicBCsetup2D 
-use config_parameter, only:SPH_dim, itype_real_max, itype_real_min, &
-    & etype_periodic,etype_virtual, itype_periodic, itype_virtual, hsml_const
-use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, nedge_rel_edge, &
+use config_parameter, only:SPH_dim,etype_periodic,etype_virtual, itype_periodic, &
+            & itype_virtual, hsml_const
+use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, &
             & pBC_edges, pBC_epair_a, pBC_epair_s, pBC_eniac, tangent_pBC, edge_pBC_pairs, &
             & x,rho,mass, itype, hsml, edge, etype, pBC_duplicate_pair, nperiodic, simGridSize, &
-            & x_ve, ve_total, ve_total_prev
+            & x_ve, ve_total, ve_total_prev, mid_pt_for_edge
     
     implicit none
 
@@ -63,8 +63,7 @@ use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, 
             x_ve_temp(:,d)=x_ve(:,edge(d,s_pBC1))
         enddo        
         call centroidBdrySegment(x_PBC1, x_ve_temp, SPH_dim)
-        
-       if((itype(a) .le. itype_real_max) .and. (itype(a) .gt. itype_real_min)) then                                         
+                                              
            ! Find which edge is being called as the particle pair       
            do i= 1, size(pBC_edges,2)
                ! For the identified edge, identify its periodic edge pair,
@@ -112,8 +111,6 @@ use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, 
            kpBC=kpBC+1
            pBC_duplicate_pair(1,kpBC)=a
            pBC_duplicate_pair(2,kpBC)=kn
-           
-       endif
        
    enddo
    
@@ -136,6 +133,7 @@ use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, 
             x_ve_temp(:,d)=x_ve(:,edge(d,s))
         enddo        
         call centroidBdrySegment(x_s, x_ve_temp, SPH_dim)
+        ! x_s(:) = mid_pt_for_edge(:,s)
     
         ! Find if either of the vertices are in the reach of eithe periodic edge
         ! if they are then copy the associated edge of those vertices to the other
@@ -145,16 +143,8 @@ use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, 
             s_pBC1 = pBC_edges(1,i)
             s_pBC2 = pBC_edges(2,i)
             
-            do d =1,SPH_dim
-                x_ve_temp(:,d)=x_ve(:,edge(d,s_pBC1))
-            enddo        
-            call centroidBdrySegment(x_PBC1, x_ve_temp, SPH_dim)
-            
-            do d =1,SPH_dim
-                x_ve_temp(:,d)=x_ve(:,edge(d,s_pBC2))
-            enddo        
-            call centroidBdrySegment(x_PBC2, x_ve_temp, SPH_dim)
-            
+            x_PBC1(:) = mid_pt_for_edge(:,s_pBC1)
+            x_PBC2(:) = mid_pt_for_edge(:,s_pBC2)
             
             !Find the distance vector from first periodic edge mid point to edge points 
             dxr_v1(:)= x_ve(:,v1) - x_PBC1(:)
@@ -166,56 +156,53 @@ use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, 
                 & .or. (dot_product(surf_norm(:,s_pBC1),dxr_v2(:)) .le. khsml) ) then 
             
                 ke=ke+1
-                ts_pBC1(:)=tangent_pBC(:,1,i)
-                ts_pBC2(:)=tangent_pBC(:,2,i)
                 
-                ns_as= dot_product(surf_norm(:,s_pBC1),dxr_v1(:))
-                ts_as= dot_product(ts_pBC1(:),dxr_v1(:))
-                num_ver=num_ver+1
-                !determine location of the copied vertice
-                x_ve(:,num_ver)=-ns_as*surf_norm(:,s_pBC2)+ ts_as*ts_pBC2(:) &
-                        & +x_PBC2(:)
-                edge(1,ke)=num_ver
-                
-                
-                ! The copied particle/point and the copy are paired for future reference
-                !kpBC=kpBC+1
-                !pBC_duplicate_pair(1,kpBC)=v1
-                !pBC_duplicate_pair(2,kpBC)=num_ver
-
-                ns_as= dot_product(surf_norm(:,s_pBC1),dxr_v2(:))
-                ts_as= dot_product(ts_pBC1(:),dxr_v2(:))
-                num_ver=num_ver+1
-                !determine location of the copied vertice
-                x_ve(:,num_ver)=-ns_as*surf_norm(:,s_pBC2)+ ts_as*ts_pBC2(:) &
-                        & +x_PBC2(:)              
-                edge(2,ke)=num_ver
-
-                
-                ! The copied particle/point and the copy are paired for future reference
-                !kpBC=kpBC+1
-                !pBC_duplicate_pair(1,kpBC)=v2
-                !pBC_duplicate_pair(2,kpBC)=num_ver
-                
-                ns_as= dot_product(surf_norm(:,s_pBC1),dxr_as(:))
-                ts_as= dot_product(ts_pBC1(:),dxr_as(:))
-                kn=kn+1
-                !determine location of the copied edge reference point
-                x(:,kn)=-ns_as*surf_norm(:,s_pBC2)+ ts_as*ts_pBC2(:) &
-                        & +x_PBC2(:)
-                itype(kn)= mod(itype(nedge_rel_edge(s)),itype_virtual)+ itype_periodic 
-                hsml(kn)=hsml(nedge_rel_edge(s))
-                mass(kn)=mass(nedge_rel_edge(s))
-                rho(kn)=rho(nedge_rel_edge(s))
-                
-                kpBC=kpBC+1
-                pBC_duplicate_pair(1,kpBC)=nedge_rel_edge(s)
-                pBC_duplicate_pair(2,kpBC)=kn
-                
-                nedge_rel_edge(ke)=kn
-                
+                ! Copy the surface normal to the new edge created
                 surf_norm(:,ke)=surf_norm(:,s)
+                
+                ! Copy the etype but mark it as copied when using periodic BC
                 etype(ke)= mod(etype(s),etype_virtual) + etype_periodic
+                
+                ! now we created vertices for the copied edge
+                    ts_pBC1(:)=tangent_pBC(:,1,i)
+                    ts_pBC2(:)=tangent_pBC(:,2,i)
+                
+                    ns_as= dot_product(surf_norm(:,s_pBC1),dxr_v1(:))
+                    ts_as= dot_product(ts_pBC1(:),dxr_v1(:))
+                    num_ver=num_ver+1
+                    !determine location of the copied vertice
+                    x_ve(:,num_ver)=-ns_as*surf_norm(:,s_pBC2)+ ts_as*ts_pBC2(:) &
+                            & +x_PBC2(:)
+                    edge(1,ke)=num_ver
+                
+                
+                    ! The copied particle/point and the copy are paired for future reference
+                    !kpBC=kpBC+1
+                    !pBC_duplicate_pair(1,kpBC)=v1
+                    !pBC_duplicate_pair(2,kpBC)=num_ver
+
+                    ns_as= dot_product(surf_norm(:,s_pBC1),dxr_v2(:))
+                    ts_as= dot_product(ts_pBC1(:),dxr_v2(:))
+                    num_ver=num_ver+1
+                    !determine location of the copied vertice
+                    x_ve(:,num_ver)=-ns_as*surf_norm(:,s_pBC2)+ ts_as*ts_pBC2(:) &
+                            & +x_PBC2(:)              
+                    edge(2,ke)=num_ver
+
+                
+                    ! The copied particle/point and the copy are paired for future reference
+                    !kpBC=kpBC+1
+                    !pBC_duplicate_pair(1,kpBC)=v2
+                    !pBC_duplicate_pair(2,kpBC)=num_ver
+                
+                
+                ! Now create a midpoint edge which can be used in simulation
+                do d =1,SPH_dim
+                    x_ve_temp(:,d)=x_ve(:,edge(d,ke))
+                enddo 
+                ! Determine the location of edge mid point
+                call centroidBdrySegment(mid_pt_for_edge(:, ke), x_ve_temp, SPH_dim)
+
                 
             endif
             
@@ -229,55 +216,50 @@ use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, 
                 & .or. (dot_product(surf_norm(:,s_pBC2),dxr_v2(:)) .le. khsml) ) then 
             
                 ke=ke+1
-                ts_pBC2(:)=tangent_pBC(:,2,i)
-                ts_pBC1(:)=tangent_pBC(:,1,i)
                 
-                ns_as= dot_product(surf_norm(:,s_pBC2),dxr_v1(:))
-                ts_as= dot_product(ts_pBC2(:),dxr_v1(:))
-                num_ver=num_ver+1
-                !determine location of the copied vertice
-                x_ve(:,num_ver)=-ns_as*surf_norm(:,s_pBC1)+ ts_as*ts_pBC1(:) &
-                        & + x_PBC1(:)              
-                edge(1,ke)=num_ver
-                
-                ! The copied particle/point and the copy are paired for future reference
-                !kpBC=kpBC+1
-                !pBC_duplicate_pair(1,kpBC)=v1
-                !pBC_duplicate_pair(2,kpBC)=num_ver
-                
-                ns_as= dot_product(surf_norm(:,s_pBC2),dxr_v2(:))
-                ts_as= dot_product(ts_pBC2(:),dxr_v2(:))
-                num_ver=num_ver+1
-                !determine location of the copied vertice
-                x_ve(:,num_ver)=-ns_as*surf_norm(:,s_pBC1)+ ts_as*ts_pBC1(:) &
-                        & + x_PBC1(:)                
-                edge(2,ke)=num_ver
-
-                ! The copied particle/point and the copy are paired for future reference
-                !kpBC=kpBC+1
-                !pBC_duplicate_pair(1,kpBC)=v2
-                !pBC_duplicate_pair(2,kpBC)=num_ver
-                
-                ns_as= dot_product(surf_norm(:,s_pBC2),dxr_as(:))
-                ts_as= dot_product(ts_pBC2(:),dxr_as(:))
-                kn=kn+1
-                !determine location of the edge reference point
-                x(:,kn)=-ns_as*surf_norm(:,s_pBC1)+ ts_as*ts_pBC1(:) &
-                        & + x_PBC1(:)   
-                itype(kn)=mod(itype(nedge_rel_edge(s)),itype_virtual)+ itype_periodic
-                hsml(kn)=hsml(nedge_rel_edge(s))
-                mass(kn)=mass(nedge_rel_edge(s))
-                rho(kn)=rho(nedge_rel_edge(s))
-                
-                ! The copied particle/point and the copy are paired for future reference
-                kpBC=kpBC+1
-                pBC_duplicate_pair(1,kpBC)=nedge_rel_edge(s)
-                pBC_duplicate_pair(2,kpBC)=kn
-                
-                nedge_rel_edge(ke)=kn
-                
+                ! Copy the surface normal to the new edge created
                 surf_norm(:,ke)=surf_norm(:,s)
-                etype(ke)=mod(etype(s),etype_virtual) + etype_periodic
+                
+                ! Copy the etype but mark it as copied when using periodic BC
+                etype(ke)= mod(etype(s),etype_virtual) + etype_periodic
+                
+                ! now we created vertices for the copied edge
+                
+                    ts_pBC2(:)=tangent_pBC(:,2,i)
+                    ts_pBC1(:)=tangent_pBC(:,1,i)
+                
+                    ns_as= dot_product(surf_norm(:,s_pBC2),dxr_v1(:))
+                    ts_as= dot_product(ts_pBC2(:),dxr_v1(:))
+                    num_ver=num_ver+1
+                    !determine location of the copied vertice
+                    x_ve(:,num_ver)=-ns_as*surf_norm(:,s_pBC1)+ ts_as*ts_pBC1(:) &
+                            & + x_PBC1(:)              
+                    edge(1,ke)=num_ver
+                
+                    ! The copied particle/point and the copy are paired for future reference
+                    !kpBC=kpBC+1
+                    !pBC_duplicate_pair(1,kpBC)=v1
+                    !pBC_duplicate_pair(2,kpBC)=num_ver
+                
+                    ns_as= dot_product(surf_norm(:,s_pBC2),dxr_v2(:))
+                    ts_as= dot_product(ts_pBC2(:),dxr_v2(:))
+                    num_ver=num_ver+1
+                    !determine location of the copied vertice
+                    x_ve(:,num_ver)=-ns_as*surf_norm(:,s_pBC1)+ ts_as*ts_pBC1(:) &
+                            & + x_PBC1(:)                
+                    edge(2,ke)=num_ver
+
+                    ! The copied particle/point and the copy are paired for future reference
+                    !kpBC=kpBC+1
+                    !pBC_duplicate_pair(1,kpBC)=v2
+                    !pBC_duplicate_pair(2,kpBC)=num_ver
+                
+                ! Now create a midpoint edge which can be used in simulation
+                do d =1,SPH_dim
+                    x_ve_temp(:,d)=x_ve(:,edge(d,ke))
+                enddo 
+                ! Determine the location of edge mid point
+                call centroidBdrySegment(mid_pt_for_edge(:, ke), x_ve_temp, SPH_dim)
             endif
             
             
