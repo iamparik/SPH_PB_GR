@@ -99,7 +99,7 @@ text_print=.true.
     
     do i=1, ve_total
         if(text_print)  write(1,'(A)')'ZONE T="Edge vertices",F=Point,C=Black'
-        write(1,1001) (x_ve(d, i), d=1,SPH_dim),0,0, (vx_ve(d, i), d = 1, SPH_dim), 0, gamma_cont(i), gamma_discrt(i), (del_gamma(d, i), d = 1, SPH_dim), (0, d = 1, SPH_dim)    
+        write(1,1001) (x_ve(d, i), d=1,SPH_dim),0,0, (vx_ve(d, i), d = 1, SPH_dim), 0, 0, 0, (0.D0, d = 1, SPH_dim), (0, d = 1, SPH_dim)    
         text_print=.false.
     enddo
    

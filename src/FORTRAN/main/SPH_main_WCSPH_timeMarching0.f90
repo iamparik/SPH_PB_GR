@@ -35,7 +35,7 @@ integer(4) :: correction_types, CF_density, ID_density, CF_pressure, ID_pressure
 real(8) :: scalar_factor, Sca_Bdry_val, current_time
 real(8), DIMENSION(:), allocatable  :: F_a, F_b,DF_a, DF_b, Cdwdx_a, Cdwdx_b, Cdgmas
 real(8), DIMENSION(:,:,:), allocatable :: grad_vel
-real(8), DIMENSION(:,:), allocatable :: matrix_factor, stress, x_ve_temp,bdryVal_ve, grad_rho ,grad_vel_s_temp
+real(8), DIMENSION(:,:), allocatable :: matrix_factor, stress,bdryVal_ve, grad_rho ,grad_vel_s_temp, x_ve_temp
 real(8), DIMENSION(:), allocatable :: div_vel, delx_ab, dens_diffusion
 
 
@@ -121,6 +121,9 @@ correction_types=10
     
     do itimestep = current_ts+1, max_timesteps
         
+        !initialize velocity to 0
+        vx_ve=0.D0
+        
         current_time=dble(itimestep)*dt
         
         ! Add time dependent boundary conditions to the boundary:
@@ -133,11 +136,13 @@ correction_types=10
             
             call BCinputValue(bdryVal_seg(:,s),num_bdry_var_seg,bdryVal_ve,num_bdry_var_ve,etype(s),SPH_dim,current_time)
 
-            vx_ve=0.D0
+            
             do d=1,SPH_dim
                 a= edge(d,s)
                 vx_ve(:,a)=bdryVal_ve(SPH_dim+1:SPH_dim*2,d)
             enddo
+            
+            !if(etype(s) .eq. 4) pause
         enddo
         
         call printTimeStep(itimestep,print_step)
@@ -161,12 +166,11 @@ correction_types=10
         !drho=0.D0
         
         allocate(div_vel(ntotal), stress(SPH_dim, ntotal),grad_rho(SPH_dim, ntotal) ,grad_vel(SPH_dim, SPH_dim, ntotal),  &
-            &  x_ve_temp(SPH_dim,SPH_dim), dens_diffusion(ntotal), grad_vel_s_temp(SPH_dim,SPH_dim)) ! this can be reduced by accoutnign for nreal and nedge correctly
+            &  dens_diffusion(ntotal), grad_vel_s_temp(SPH_dim,SPH_dim)) ! this can be reduced by accoutnign for nreal and nedge correctly
         div_vel=0.D0
         grad_vel =0.D0
         grad_rho=0.D0
         stress =0.D0
-        x_ve_temp=0.D0
         dens_diffusion=0.D0
         
         CF_density=mod( ConDivtype, correction_types)
@@ -419,7 +423,7 @@ correction_types=10
             call PeriodicParameter(vx(2,:))
         endif
         
-        
+        allocate(x_ve_temp(SPH_dim,SPH_dim))
         ! Update edges for next step
         do s = 1,etotal
             if((etype(s) .le. etype_real_max) .and. (etype(s) .gt. etype_real_min)) then
@@ -429,13 +433,22 @@ correction_types=10
                     a= edge(d,s)
                     !Update position
                     x_ve(:,a) = x_ve(:,a) + dt* vx_ve(:,a)
+                    x_ve_temp(:,d)= x_ve(:,a)
                 enddo
                 
-
+                
+                ! now update the integration points and midpoints, that will be used again in the simulation
+        
+                ! Determine the location of edge mid point
+                call centroidBdrySegment(mid_pt_for_edge(:, s), x_ve_temp, SPH_dim)
+                ! currently integration poitns are not updated, as those are tnot used in the code for any boundary itnegration,
+                ! if it is used,that needs to be updated here.
+                
             endif
         enddo
+        deallocate(x_ve_temp)
         
-         deallocate(grad_vel, stress, x_ve_temp, grad_vel_s_temp)
+        deallocate(grad_vel, stress, grad_vel_s_temp)
         
         
         !---------------------- free surface detection and PST algorithm -------------------------------------!
