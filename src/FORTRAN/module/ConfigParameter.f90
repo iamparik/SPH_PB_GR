@@ -173,6 +173,8 @@ module config_parameter
     
     real(8) :: FScutoff
     
+    integer(4) :: edge_to_dx_ratio
+    
     contains
 
     
@@ -236,6 +238,7 @@ module config_parameter
         write(*, *) 'nnps = ', nnps
         write(*, *) 'nnes = ', nnes 
         write(*,*) 'FScutoff = ' , FScutoff
+        write(*,*) 'edge_to_dx_ratio = ' , edge_to_dx_ratio
         
     end subroutine read_config_file
     
@@ -350,6 +353,8 @@ module config_parameter
                 nnes = param_value
             case ('FScutoff')
                 FScutoff = param_value
+            case ('edge_to_dx_ratio')
+                edge_to_dx_ratio =param_value
             case default
                 ! Handle unknown parameter name
                 write(*, *) 'Unknown parameter: ', trim(param_name)

@@ -14,7 +14,7 @@
         & etype_FreeSurface1, etype_thermal_neumann, etype_thermal_dirichlet, etype_FarWall, &
         & DataConfigPath, itype_virtual, itype_real_min, &
         & dx_r, hsml_const,hydrostaticHeight, rho_init, mu_const, &
-        &  g_const, c_sound, F_ext, ExtInputMeshType, packagingIterations
+        &  g_const, c_sound, F_ext, ExtInputMeshType, packagingIterations, edge_to_dx_ratio
     use particle_data ,   only: maxn, max_interaction, max_e_interaction, maxnv,  &
         & x,vx,mass,rho, vol,p,itype,hsml,mu, temp, nreal, nedge, nflow, nghost, ntotal, edge, &
         & surf_norm, etype, etotal, maxedge, &
@@ -52,11 +52,11 @@
     
     additionalParticles= 100 ! This is necessary only if expect to use periodic particles, or unflow, outflow particles
     if (packagingIterations) then
-        maxedge=int(len_bulkBdry/dx_r)*20
+        maxedge=int((len_bulkBdry/dx_r)*(dble(edge_to_dx_ratio)*2.D0+1.D0)) ! *2.D0 is used to account for the 2X vertices of issue #48
         maxnv=10*maxedge 
         maxn= max(nreal_mesh, nrealCartesian)+ maxedge +additionalParticles
     else
-        maxedge=int(len_domainBdry/dx_r)*20
+        maxedge=int((len_domainBdry/dx_r)*(dble(edge_to_dx_ratio)*2.D0+1.D0))
         maxnv=10*maxedge 
         maxn= max(nreal_mesh, nrealCartesian)+ maxedge + additionalParticles
     endif
@@ -95,7 +95,7 @@
         input_file_name = '/input_domainBdryEdge.dat'
     endif
     ! read bdry data file and store bdry information
-    call inputCADtoEdgeData(s, maxedge, input_file_name, 2)
+    call inputCADtoEdgeData(s, maxedge, input_file_name, edge_to_dx_ratio)
     
     etotal=s
     write(*,*)'      Total number of boundary segments : ', etotal    	

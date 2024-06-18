@@ -432,7 +432,7 @@ def fillDomainWParticle2D(x_min, x_max, dx,bdryPolygon, output_file_path, bdry_t
 #Define the main function
 def main():
     root_directory="../../../"
-    ref_directory="src/Python/NXtoParticle/"  #"examples/Case2/" #"src/Python/NXtoParticle/" 
+    ref_directory="examples/Case1/"  #"examples/Case2/" #"src/Python/NXtoParticle/" 
     print("current ref_directory is in: ", ref_directory)        
 
     input_directory="inputCAD/"
@@ -487,7 +487,7 @@ def main():
 
 
     with open(output_file_path_simSize, 'w') as output_file:
-        output_file.write(f"{totalNum2DElements:<10} {totalNum2DElements_Cartesian:<10} {totalLen1DElements_Bulkbdry:<20.30f} {totalLen1DElements_domainbdry:<20.30f} {total2DArea/(unit_conversion**2):<20.30f}\n")
+        output_file.write(f"{totalNum2DElements:<10} {totalNum2DElements_Cartesian:<10} {totalLen1DElements_Bulkbdry/unit_conversion:<20.30f} {totalLen1DElements_domainbdry/unit_conversion:<20.30f} {total2DArea/(unit_conversion**2):<20.30f}\n")
 
     a=input("---------------press return to exit-----------------")
 
