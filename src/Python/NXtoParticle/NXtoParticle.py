@@ -15,10 +15,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from concurrent.futures import ThreadPoolExecutor
 
-# ---- General variables defined for all functions ---
-
-
-
 
 # --- First define all functions to be used ----
 # Function to calculate centroid of a TriaElement
@@ -34,7 +30,7 @@ def calculate_Tri_area(vertices):
     QArea = 0.5 * abs(xA * (yB - yC) + xB * (yC - yA) + xC * (yA - yB))
     return QArea
 
-#Function to calcualte area of Quadrilateral Element
+#Function to calculate area of Quadrilateral Element
 def calculate_Quad_area(vertices):
     (_, xA, _, yA), (_, xB, _, yB), (_, xC, _, yC), (_, xD, _, yD)=vertices
     QArea = 0.5 * abs(xA * yB + xB * yC + xC * yD + xD * yA - (yA * xB + yB * xC + yC * xD + yD * xA))
@@ -106,7 +102,7 @@ def check_points_serial(points,polygon, bdry_tolerance):
 
     return inside_points, outside_points
 
-#Extract values from text lines to tuple containg coordinates of grid points,
+#Extract values from text lines to tuple containing coordinates of grid points,
 # and elements formed by those grid points
 def extractValues(line, group_element, text_pattern, elementType):
 
