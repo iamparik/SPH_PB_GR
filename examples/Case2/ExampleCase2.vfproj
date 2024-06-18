@@ -93,6 +93,7 @@
 		<File RelativePath="..\..\src\FORTRAN\subroutines\Output\createOutputFolder.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\Output\output_flow_simplified.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\Output\outputPacking.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\Output\OutputSetup.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\Output\printTimeStep.f90"/></Filter>
 		<Filter Name="PeriodicBCRoutines">
 		<File RelativePath="..\..\src\FORTRAN\subroutines\PeriodicBC\PeriodicBCcorrectionFactors.f90"/>

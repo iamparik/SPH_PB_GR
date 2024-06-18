@@ -28,8 +28,8 @@
     real(8) tempType
     integer(4) k,d,s,ke,k_int_pt, periodicPairs,i , additionalParticles
     real(8) tempX(SPH_dim,SPH_dim), tempBdry(5), mn, scale_k
-    integer(4) nreal_mesh, nrealCartesian, nEbulkBdry, nEdomainBdry
-    real(8) totVol, x_ve_temp(SPH_dim,SPH_dim)
+    integer(4) nreal_mesh, nrealCartesian
+    real(8) totVol, x_ve_temp(SPH_dim,SPH_dim), len_bulkBdry, len_domainBdry
     character(40) :: input_file_name
    
     
@@ -45,18 +45,18 @@
     open(1,file= DataConfigPath // '/input_param_SimSize.dat',status='old')
     do while (.not.eof(1))
         ! I might have to modify below to strictly read as integers
-          read(1,*) nreal_mesh, nrealCartesian, nEbulkBdry, nEdomainBdry, totVol
+          read(1,*) nreal_mesh, nrealCartesian, len_bulkBdry, len_domainBdry, totVol
     enddo
     close(1)
     
     
     additionalParticles= 100 ! This is necessary only if expect to use periodic particles, or unflow, outflow particles
     if (packagingIterations) then
-        maxedge=int(nEbulkBdry)*2
+        maxedge=int(len_bulkBdry/dx_r)*20
         maxnv=10*maxedge 
         maxn= max(nreal_mesh, nrealCartesian)+ maxedge +additionalParticles
     else
-        maxedge=int(nEdomainBdry)*2
+        maxedge=int(len_domainBdry/dx_r)*20
         maxnv=10*maxedge 
         maxn= max(nreal_mesh, nrealCartesian)+ maxedge + additionalParticles
     endif
@@ -95,7 +95,7 @@
         input_file_name = '/input_domainBdryEdge.dat'
     endif
     ! read bdry data file and store bdry information
-    call inputCADtoEdgeData(s, maxedge, input_file_name, 10)
+    call inputCADtoEdgeData(s, maxedge, input_file_name, 2)
     
     etotal=s
     write(*,*)'      Total number of boundary segments : ', etotal    	
@@ -185,6 +185,7 @@
         hsml(k)=hsml_const
     enddo
     
+    call OutputSetup
 
     ! Now perform the particle packing algorithm 
     if(packagingIterations) then

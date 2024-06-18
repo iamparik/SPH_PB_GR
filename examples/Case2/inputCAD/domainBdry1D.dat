@@ -46,7 +46,7 @@ $* ELEMENT CARDS
 $*
 $*  Mesh Collector: Plotel Collector(1)
 $*  Mesh: 1d_mesh(1)
-PLOTEL,1,2,1
-PLOTEL,2,3,2
-PLOTEL,3,4,3
+PLOTEL,1,1,2
+PLOTEL,2,2,3
+PLOTEL,3,3,4
 ENDDATA

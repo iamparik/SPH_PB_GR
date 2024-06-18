@@ -201,7 +201,7 @@ def bulkCase2D(input_file_directory, output_file_directory,unit_conversion):
 
     
 
-    return totalNum2DElements, total2DArea
+    return total2DArea, totalNum2DElements
 
 #Takes NX sim file bulkBdry.dat to obtain bdry elements and particles at cartesian grid coordinates
 def bulkBdryCase2D(input_file_directory,output_file_directory, dx, bdry_tolerance,unit_conversion, parallelBool):
@@ -241,7 +241,6 @@ def bulkBdryCase2D(input_file_directory,output_file_directory, dx, bdry_toleranc
         # Calculate centroids of QuadElements and store in a list
         midPoints_Bulkbdry = []
         oneDlens_Bulkbdry=[]
-        verticesEdge_Bulkbdry=[]
 
         # initialize and define the xmin and y min values
         x_min=[meshNodes_oneD_Bulkbdry[0][1], meshNodes_oneD_Bulkbdry[0][3]]
@@ -273,7 +272,7 @@ def bulkBdryCase2D(input_file_directory,output_file_directory, dx, bdry_toleranc
 
         print("Total Length of All elements : ", sum(oneDlens_Bulkbdry))
 
-        total1DLength_Bulkbdry=sum(oneDlens_Bulkbdry)
+        total1DLength_Bulkbdry=float(sum(oneDlens_Bulkbdry))
         totalNum1DElements_Bulkbdry=len(oneDElements_Bulkbdry)
         print("Total length Occupied by _Bulkbdry",totalNum1DElements_Bulkbdry," (all) elements : ", total1DLength_Bulkbdry)
         print("Extraction and writing of Surface Area for _Bulkbdry Elements completed.")
@@ -284,10 +283,11 @@ def bulkBdryCase2D(input_file_directory,output_file_directory, dx, bdry_toleranc
         totalNum2DElements_Cartesian = fillDomainWParticle2D(x_min, x_max, dx, bdryPolygon, output_cartesianfile_path, bdry_tolerance,unit_conversion, parallelBool)
 
     else:
+        total1DLength_Bulkbdry=0
         totalNum1DElements_Bulkbdry = 0
         totalNum2DElements_Cartesian = 0
     
-    return totalNum1DElements_Bulkbdry, totalNum2DElements_Cartesian
+    return total1DLength_Bulkbdry, totalNum2DElements_Cartesian
 
 #Takes NX sim file domainBdry.dat to obtain bdry elements and particles at cartesian grid coordinates
 def domainBdryCase2D(input_file_directory, output_file_directory, dx, unit_conversion):
@@ -380,18 +380,19 @@ def domainBdryCase2D(input_file_directory, output_file_directory, dx, unit_conve
 
         print("Total Length of All elements : ", sum(oneDlens))
 
-        total1DLength=sum(oneDlens)
+        total1DLength=float(sum(oneDlens))
         totalNum1DElements=len(oneDElements)
         print("Total length Occupied by",totalNum1DElements," (all) elements : ", total1DLength)
         print("Extraction and writing of Surface Area Elements completed.")
         #------------------------------------------------------------------------------------------
     else:
+        total1DLength=0
         totalNum1DElements = 0
 
 
     
 
-    return totalNum1DElements
+    return total1DLength
 
 # Create cartesian particles for a given boudary information
 def fillDomainWParticle2D(x_min, x_max, dx,bdryPolygon, output_file_path, bdry_tolerance,unit_conversion,  parallelBool):
@@ -458,7 +459,7 @@ def main():
     input_file_path_SA = root_directory+ref_directory+input_directory
     output_file_path_SA = root_directory+ref_directory+output_directory
 
-    totalNum2DElements,total2DArea= bulkCase2D(input_file_path_SA,output_file_path_SA,unit_conversion)
+    total2DArea, totalNum2DElements= bulkCase2D(input_file_path_SA,output_file_path_SA,unit_conversion)
     #------------------------------------------------------------------------------------------
 
     #------------------------------------------------------------------------------------------
@@ -467,7 +468,7 @@ def main():
     input_file_path_Bulkbdry = root_directory+ref_directory+input_directory
     output_file_path_Bulkbdry = root_directory+ref_directory+output_directory
     prlBool = True
-    totalNum1DElements_Bulkbdry, totalNum2DElements_Cartesian = bulkBdryCase2D(input_file_path_Bulkbdry,output_file_path_Bulkbdry, dx_r, bdry_tol,unit_conversion, prlBool)
+    totalLen1DElements_Bulkbdry, totalNum2DElements_Cartesian = bulkBdryCase2D(input_file_path_Bulkbdry,output_file_path_Bulkbdry, dx_r, bdry_tol,unit_conversion, prlBool)
 
         #------------------------------------------------------------------------------------------
 
@@ -477,7 +478,7 @@ def main():
     input_file_path_bdry = root_directory+ref_directory+input_directory
     output_file_path_bdry = root_directory+ref_directory+output_directory
 
-    totalNum1DElements=domainBdryCase2D(input_file_path_bdry,output_file_path_bdry,dx_r, unit_conversion)
+    totalLen1DElements_domainbdry=domainBdryCase2D(input_file_path_bdry,output_file_path_bdry,dx_r, unit_conversion)
 
     #------------------------------------------------------------------------------------------
     ######### Create Sim File ############################################################################################################
@@ -486,7 +487,7 @@ def main():
 
 
     with open(output_file_path_simSize, 'w') as output_file:
-        output_file.write(f"{totalNum2DElements:<10} {totalNum2DElements_Cartesian:<10} {totalNum1DElements_Bulkbdry:<10} {totalNum1DElements:<10} {total2DArea/(unit_conversion**2):<20.30f}\n")
+        output_file.write(f"{totalNum2DElements:<10} {totalNum2DElements_Cartesian:<10} {totalLen1DElements_Bulkbdry:<20.30f} {totalLen1DElements_domainbdry:<20.30f} {total2DArea/(unit_conversion**2):<20.30f}\n")
 
     a=input("---------------press return to exit-----------------")
 
