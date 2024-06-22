@@ -50,7 +50,10 @@ do k=1,eniac
     
     gamma_cont(a)= gamma_cont(a) - gamma_as(k)
     
-    if(isNAN(gamma_cont(a))) pause
+    if(isNAN(gamma_cont(a))) then
+        write(*,*) "gamma_cont(",a,") is NAN"
+        pause
+    endif
     
 enddo
 

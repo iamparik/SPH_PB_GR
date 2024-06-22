@@ -31,7 +31,11 @@ subroutine xi_discrete1_factor
             enddo          
         
         enddo
-        if(isNAN(xi1_mat(1,1,a))) pause
+        if(isNAN(xi1_mat(i,j,a))) then
+            write(*,*) " xi1_mat(",i,",",j,",",a,") is NAN"   
+            pause
+        endif
+        
 
     enddo
 

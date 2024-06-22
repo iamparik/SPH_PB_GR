@@ -196,7 +196,18 @@ correction_types=10
                     & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
                     & SPH_dim, CF_densDiff, ID_densDiff) ! SPH_dim, correctionFactorID, grad_type
             !-------------------------------------------------------------------------------------------------------------!
-            
+            do d=1,SPH_dim
+                if(isNAN(grad_rho(d,a))) then
+                    write(*,*) "error calculating in PtoP grad_rho(",d,",",a,")=", grad_rho(d,a)
+                    write(*,*) " ++ gamma_mat_inv(:,:,",a,")=", gamma_mat_inv(:,:,a)
+                    write(*,*) " ++ gamma_mat(:,:,",a,")=", gamma_mat(:,:,a)
+                    write(*,*) " ++ xi1_mat_inv(:,:,",a,")=", xi1_mat_inv(:,:,a)
+                    write(*,*) " ++ xi1_mat(:,:,",a,")=", xi1_mat(:,:,a)
+                    write(*,*) " ++ dwdx(:,",k,")=", dwdx(:,k)
+                
+                    pause    
+                endif
+            enddo
             
         enddo
         
@@ -222,6 +233,19 @@ correction_types=10
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & SPH_dim, CF_densDiff, ID_densDiff) ! SPH_dim, correctionFactorID, grad_type
             ! -----------------------------------------------------------------------!
+            do d=1,SPH_dim
+                if(isNAN(grad_rho(d,a))) then
+                    write(*,*) "error calculating in PtoB grad_rho(",d,",",a,")=", grad_rho(d,a)
+                    write(*,*) " ++ gamma_mat_inv(:,:,",a,")=", gamma_mat_inv(:,:,a)
+                    write(*,*) " ++ gamma_mat(:,:,",a,")=", gamma_mat(:,:,a)
+                    write(*,*) " ++ xi1_mat_inv(:,:,",a,")=", xi1_mat_inv(:,:,a)
+                    write(*,*) " ++ xi1_mat(:,:,",a,")=", xi1_mat(:,:,a)
+                    write(*,*) " ++ del_gamma_as(:,",k,")=", del_gamma_as(:,k)
+                
+                
+                    pause    
+                endif
+            enddo
         enddo
         
         
@@ -234,7 +258,7 @@ correction_types=10
             
             call densDiffOperatorPtoP(dens_diffusion(a),dens_diffusion(b), &
                 & grad_rho(:,a),grad_rho(:,b),dwdx(:,k),mass(a), mass(b), rho(a), rho(b), &
-                & SPH_dim, hsml_const, c_sound, delx_ab, delta_SPH, ID_densDiff )  
+                & SPH_dim, hsml_const, c_sound, delx_ab, delta_SPH, ID_densDiff, a,b )  
             
         enddo
 
@@ -307,7 +331,11 @@ correction_types=10
             !------ Find Pressure Gradient term (to be used in momentum equation) -------------!
             DF_a=0.D0
             
-            Sca_Bdry_val = P(a) -rho(a)*c_sound*dot_product(vx(:,a)-bdryVal_seg(1:SPH_dim,s), surf_norm(:,s))
+            Sca_Bdry_val = P(a) - rho(a)*c_sound*dot_product(vx(:,a)-bdryVal_seg(1:SPH_dim,s), surf_norm(:,s))  &
+                            !& - rho(a)*dot_product(F_ext, x(:,a)- mid_pt_for_edge(:,s)) &
+                            !& + rho(a)*c_sound*norm2(vx(:,a)-bdryVal_seg(1:SPH_dim,s))*max(0.6D0-gamma_cont(a), 0.D0) &
+                            & + rho(a)*c_sound*norm2(vx(:,a)-bdryVal_seg(1:SPH_dim,s))*max(0.6D0-gamma_cont(a), 0.D0) &
+                            & + 0.D0
             
             call CorrectedScaGradPtoB(DF_a,P(a),Sca_Bdry_val,del_gamma_as(:,k),  &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
@@ -494,5 +522,6 @@ if(Allocated(drho)) DEALLOCATE(drho)
 if(Allocated(rho_prev)) DEALLOCATE(rho_prev)
 
 !Pause is used so that the terminal is closed only after hitting enter/return on keyboard
+write(*,*) 'The code has finished executing, press return to exit'
 pause 
 end program
