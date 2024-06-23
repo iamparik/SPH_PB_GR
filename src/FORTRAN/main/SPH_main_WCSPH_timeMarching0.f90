@@ -36,7 +36,7 @@ real(8) :: scalar_factor, Sca_Bdry_val, current_time, prsr_wall_compress,gamma_w
 real(8), DIMENSION(:), allocatable  :: F_a, F_b,DF_a, DF_b, Cdwdx_a, Cdwdx_b, Cdgmas
 real(8), DIMENSION(:,:,:), allocatable :: grad_vel
 real(8), DIMENSION(:,:), allocatable :: matrix_factor, stress,bdryVal_ve, grad_rho ,grad_vel_s_temp, x_ve_temp
-real(8), DIMENSION(:), allocatable :: div_vel, delx_ab, dens_diffusion, fs_temp
+real(8), DIMENSION(:), allocatable :: div_vel, delx_ab, dens_diffusion
 
 
 correction_types=10
@@ -166,14 +166,14 @@ correction_types=10
         !drho=0.D0
         
         allocate(div_vel(ntotal), stress(SPH_dim, ntotal),grad_rho(SPH_dim, ntotal) ,grad_vel(SPH_dim, SPH_dim, ntotal),  &
-            &  dens_diffusion(ntotal), grad_vel_s_temp(SPH_dim,SPH_dim), free_surf_val(ntotal), fs_temp(ntotal)) ! this can be reduced by accoutnign for nreal and nedge correctly
+            &  dens_diffusion(ntotal), grad_vel_s_temp(SPH_dim,SPH_dim), free_surf_particle(ntotal), free_surf_val(ntotal)) ! this can be reduced by accoutnign for nreal and nedge correctly
         div_vel=0.D0
         grad_vel =0.D0
         grad_rho=0.D0
         stress =0.D0
         dens_diffusion=0.D0
-        free_surf_val=0
-        fs_temp=0.D0
+        free_surf_particle=0
+        free_surf_val=0.D0
         
         CF_density=mod( ConDivtype, correction_types)
         ID_density=int( ConDivtype/correction_types)
@@ -185,8 +185,8 @@ correction_types=10
             a= pair_i(k)
             b= pair_j(k)  
             
-            !------------------- Find divergence of position (to determine free_surf_val) -------------------------!
-            call CorrectedVecDivPtoP(fs_temp(a),fs_temp(b),x(:,a),x(:,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
+            !------------------- Find divergence of position (to determine free_surf_particle) -------------------------!
+            call CorrectedVecDivPtoP(free_surf_val(a),free_surf_val(b),x(:,a),x(:,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
                     & SPH_dim, 1, 2) ! SPH_dim, correctionFactorID, divType
@@ -229,7 +229,7 @@ correction_types=10
             F_a(:) = x(:,a)
             F_b(:) = mid_pt_for_edge(:,s)
 
-             call CorrectedVecDivPtoB(fs_temp(a),F_a,F_b,del_gamma_as(:,k),  &
+             call CorrectedVecDivPtoB(free_surf_val(a),F_a,F_b,del_gamma_as(:,k),  &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & SPH_dim, 1, 2) ! SPH_dim, correctionFactorID, divType
             ! -----------------------------------------------------------------------!
@@ -283,7 +283,7 @@ correction_types=10
         
         ! Update freesurface values, as 1 - and the non free surface values are 0
         do a= 1,nreal
-            if(fs_temp(a) .lt. FScutoff) free_surf_val(a) = 1
+            if(free_surf_val(a) .lt. FScutoff) free_surf_particle(a) = 1
         enddo
         
         ! Update variables for the next time step
@@ -295,7 +295,7 @@ correction_types=10
             if ((HG_density_correction) .and. (rho(a) .le. rho_init)) rho(a)=rho_init
             
             ! for free surface impose 𝜌_𝑎= rho_free_surface
-            rho(a)=dble(1-free_surf_val(a))*rho(a)+dble(free_surf_val(a))*rho_init
+            rho(a)=dble(1-free_surf_particle(a))*rho(a)+dble(free_surf_particle(a))*rho_init
             
             ! Update Pressure as it depends on density for WCSPH
             call ParticlePressureEOS(p(a), rho(a), itype(a), itype_virtual)    
@@ -518,7 +518,7 @@ correction_types=10
         
         if ((mod(itimestep,save_step).eq.0) .or. (itimestep.eq.1)) call output_flow_simplified(itimestep,dt)   
         deallocate(delC)
-        !deallocate(free_surf_val)
+        !deallocate(free_surf_particle)
         
        !call EulerIntegration_fluid(itimestep,dt)
         
@@ -526,7 +526,7 @@ correction_types=10
         
         ! the below needs to be deallocated here because periodic bc can sometimes increase the total number of particles in next loop
         deallocate(w_aa, gamma_discrt,del_gamma_as, del_gamma, xi1_mat, beta_mat,gamma_mat, &
-                   & gamma_mat_inv,xi1_mat_inv , free_surf_val,fs_temp)
+                   & gamma_mat_inv,xi1_mat_inv , free_surf_particle,free_surf_val)
         
         
         ! if (mod(itimestep,backup_step).eq.0)  call backupOutput(itimestep)
