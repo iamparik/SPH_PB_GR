@@ -33,69 +33,69 @@ extra_vec=0.D0
 Allocate( grad_vel(SPH_dim, SPH_dim, ntotal),delC(SPH_dim,ntotal))
 grad_vel=0.D0
 delC=0.D0
+if(PST .ge. 1) then 
+    call kernel(dx_r,delr,hsml_const,w_dxr,extra_vec)
 
-call kernel(dx_r,delr,hsml_const,w_dxr,extra_vec)
+    do k = 1,niac
+        a=pair_i(k)
+        b=pair_j(k)
 
-do k = 1,niac
-    a=pair_i(k)
-    b=pair_j(k)
-
-    ! For different PSTtype we change dCF as 
-    if (PSTtype .eq. 1) then
-        dCF= 1.D0
-    elseif (PSTtype .eq. 2) then
-        dCF=1.D0 + 0.2D0*(w(k)/w_dxr)**4.D0
-    else
-        dCF= 1.D0
-    endif
+        ! For different PSTtype we change dCF as 
+        if (PSTtype .eq. 1) then
+            dCF= 1.D0
+        elseif (PSTtype .eq. 2) then
+            dCF=1.D0 + 0.2D0*(w(k)/w_dxr)**4.D0
+        else
+            dCF= 1.D0
+        endif
     
-    call CorrectedScaGradPtoP(delC(:,a),delC(:,b),dCF,dCF,dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
-                & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
-                & SPH_dim, 1, 1) ! SPH_dim, correctionFactorID, grad_type
+        call CorrectedScaGradPtoP(delC(:,a),delC(:,b),dCF,dCF,dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
+                    & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                    & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
+                    & SPH_dim, 1, 1) ! SPH_dim, correctionFactorID, grad_type
     
-    do d=1,SPH_dim 
-        ! add an if condition with PCBI for inside and WCBI near bdry if needed
-        call CorrectedScaGradPtoP(grad_vel(d,:,a),grad_vel(d,:,b),vx(d,a),vx(d,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
-                & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
-                & SPH_dim, 3, 2) ! SPH_dim, correctionFactorID, grad_type
+        do d=1,SPH_dim 
+            ! add an if condition with PCBI for inside and WCBI near bdry if needed
+            call CorrectedScaGradPtoP(grad_vel(d,:,a),grad_vel(d,:,b),vx(d,a),vx(d,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
+                    & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                    & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
+                    & SPH_dim, 3, 2) ! SPH_dim, correctionFactorID, grad_type
+        enddo
+
+    
     enddo
 
-    
-enddo
 
+    do k= 1, eniac
+        a=epair_a(k)
+        s=epair_s(k)
 
-do k= 1, eniac
-    a=epair_a(k)
-    s=epair_s(k)
-
-    ! For different PSTtype we change dCF as follows 
-    if (PSTtype .eq. 1) then
-        dCF= 1.D0
-    elseif (PSTtype .eq. 2) then
-        dx_as=dot_product(x(:,a), surf_norm(:,s)) 
-        call kernel(dx_as,delr,hsml_const,w_dxas,extra_vec)
-        dCF= 1.D0 + 0.2D0*(w_dxas/w_dxr)**4.D0
-    else
-        dCF= 1.D0
-    endif
+        ! For different PSTtype we change dCF as follows 
+        if (PSTtype .eq. 1) then
+            dCF= 1.D0
+        elseif (PSTtype .eq. 2) then
+            dx_as=dot_product(x(:,a), surf_norm(:,s)) 
+            call kernel(dx_as,delr,hsml_const,w_dxas,extra_vec)
+            dCF= 1.D0 + 0.2D0*(w_dxas/w_dxr)**4.D0
+        else
+            dCF= 1.D0
+        endif
     
-    call CorrectedScaGradPtoB(delC(:,a),1.D0,dCF,del_gamma_as(:,k),  &
-                        & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                        & SPH_dim, 1, 1)
+        call CorrectedScaGradPtoB(delC(:,a),1.D0,dCF,del_gamma_as(:,k),  &
+                            & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                            & SPH_dim, 1, 1)
     
-    do d=1,SPH_dim
+        do d=1,SPH_dim
         
-        F_b(:) = bdryVal_seg(1:SPH_dim,s)
-        call CorrectedScaGradPtoB(grad_vel(d,:,a),vx(d,a),F_b(d),del_gamma_as(:,k),  &
-                        & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                        & SPH_dim, 3, 2) ! SPH_dim, correctionFactorID, grad_type
-    enddo    
-enddo  
+            F_b(:) = bdryVal_seg(1:SPH_dim,s)
+            call CorrectedScaGradPtoB(grad_vel(d,:,a),vx(d,a),F_b(d),del_gamma_as(:,k),  &
+                            & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                            & SPH_dim, 3, 2) ! SPH_dim, correctionFactorID, grad_type
+        enddo    
+    enddo  
 
-! Now perform particle shifting
-if(PSTtype .ge. 1) then
+    ! Now perform particle shifting
+    
     do a=1,nreal    
         delr=0.D0
 
