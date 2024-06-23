@@ -13,7 +13,7 @@ subroutine  output_flow_simplified(itimestep,dt)
         & save_step, g_const, hydroStaticHeight
     use particle_data ,   only: x, mass, rho, p, vx, &
         & ntotal,etotal, itype, etype, gamma_cont, gamma_discrt,del_gamma, delC, &
-        & FreeSurfaceVar, gamma_density_cont, ve_total, x_ve, vx_ve, mid_pt_for_edge
+        & gamma_density_cont, ve_total, x_ve, vx_ve, mid_pt_for_edge
     
     implicit none
 !----------------------------------------------------------------------           

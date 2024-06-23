@@ -39,7 +39,7 @@ integer(4):: itimestep
 ![Input]            itype:     type of particle (real, edge, ghost etc)
 ![Input]            etype:     type of edge (real, periodic, etc)
 
-    public x,vx,mass,rho,vol,p,hsml,mu,temp, itype,etype, avgVol, KE, PE, TE, max_vel, KE_prev,FreeSurfaceVar
+    public x,vx,mass,rho,vol,p,hsml,mu,temp, itype,etype, avgVol, KE, PE, TE, max_vel, KE_prev,free_surf_val
     real(8),DIMENSION(:,:),ALLOCATABLE :: x
     real(8),DIMENSION(:,:),ALLOCATABLE :: x_prev
     real(8),DIMENSION(:,:),ALLOCATABLE :: vx
@@ -58,7 +58,7 @@ integer(4):: itimestep
     real(8),DIMENSION(:),ALLOCATABLE :: TE
     real(8),DIMENSION(:),ALLOCATABLE :: max_vel
     real(8):: KE_prev
-    real(8),DIMENSION(:),ALLOCATABLE :: FreeSurfaceVar 
+    integer(2),DIMENSION(:),ALLOCATABLE :: free_surf_val 
     
 
     

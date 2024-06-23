@@ -10,7 +10,7 @@ subroutine ParticleShiftingTechnique(PSTtype,PSTcoeff)
 use config_parameter, only:SPH_dim, hsml_const, dx_r, FScutoff
 use particle_data, only: niac,pair_i, pair_j,eniac,epair_a, epair_s, &
     & w, dwdx, delC, surf_norm, del_gamma_as, ntotal, nreal, etotal, &
-    & mass, rho, x, vx, itype,FreeSurfaceVar, bdryVal_seg, &
+    & mass, rho, x, vx, itype,free_surf_val, bdryVal_seg, &
     & gamma_cont, gamma_discrt, gamma_mat, gamma_mat_inv,xi1_mat_inv
 
 
@@ -104,6 +104,10 @@ if(PSTtype .ge. 1) then
         if(PSTShift .gt. 1D-10*grad_b_term) then
             delr=PSTshift*(dstress(:)/norm2(dstress(:)))
         endif
+        
+        ! account for free surface
+        delr=dble(1-free_surf_val(a))*delr
+        
         x(:,a) = x(:,a)+ delr
         do d=1,SPH_dim
             vx(d,a)= vx(d,a) + dot_product(grad_vel(d,:,a),delr)
