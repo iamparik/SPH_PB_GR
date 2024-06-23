@@ -33,7 +33,7 @@ extra_vec=0.D0
 Allocate( grad_vel(SPH_dim, SPH_dim, ntotal),delC(SPH_dim,ntotal))
 grad_vel=0.D0
 delC=0.D0
-if(PST .ge. 1) then 
+if(PSTtype .ge. 1) then 
     call kernel(dx_r,delr,hsml_const,w_dxr,extra_vec)
 
     do k = 1,niac
