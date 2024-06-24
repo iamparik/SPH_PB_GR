@@ -360,7 +360,7 @@ correction_types=10
             gamma_wall_cutoff=0.6D0
             
             !rho_wall_compress=max(rho(a),rho(a)*(gamma_cont(a) + 0.5D0 - 2.D0*gamma_wall_cutoff)/(0.5D0-gamma_wall_cutoff))
-            rho_wall_compress=max(rho(a),(2.D0*rho(a)/dx_r)*(dx_r-norm2(x(:,a)-mid_pt_for_edge(:,s))))
+            rho_wall_compress=max(rho(a),(rho(a)/(dx_r/4.D0))*(2.D0*(dx_r/4.D0)-norm2(x(:,a)-mid_pt_for_edge(:,s))))
             !might have to change dx_r to individual particle radius using its vol(a)
             call ParticlePressureEOS(prsr_wall_compress, rho_wall_compress, itype(a), itype_virtual)    
             
