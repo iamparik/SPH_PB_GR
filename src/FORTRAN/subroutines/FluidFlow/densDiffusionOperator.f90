@@ -17,7 +17,7 @@ subroutine densDiffOperatorPtoP(dF_a,dF_b,F_a,F_b,dwdx, mass_a, mass_b, rho_a, r
         if((mass_a .gt. 0.D0) .and. (mass_b .gt. 0.D0)) then
             eta=0.1*hsml
         
-            diff_term=2.D0*(rho_a-rho_b)*(x_ab)/(norm2(x_ab)**2)- (F_a+F_b)
+            diff_term=2.D0*(rho_a-rho_b)*(x_ab)/(norm2(x_ab)**2+eta**2)- (F_a+F_b)
             dF_a= dF_a + delta_SPH*hsml*c_sound*dot_product(diff_term,Cdwdx_a)*mass_b/rho_b
             dF_b= dF_b + delta_SPH*hsml*c_sound*dot_product(diff_term,Cdwdx_b)*mass_a/rho_a
             
