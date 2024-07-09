@@ -31,7 +31,8 @@ subroutine xi_discrete1_factor
             enddo          
         
         enddo
-        if(isNAN(xi1_mat(1,1,a))) pause
+        
+        
 
     enddo
 

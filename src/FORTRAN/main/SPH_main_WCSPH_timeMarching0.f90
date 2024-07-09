@@ -32,7 +32,7 @@ integer(4) :: k, a, b , d, s, i, j, Scalar0Matrix1
 integer(4) :: correction_types, CF_density, ID_density, CF_pressure, ID_pressure, &
     & CF_BIL_visc, ID_BIL_visc,dirich0Neum1, num_bdry_var_seg, num_bdry_var_ve, &
     & CF_densDiff, ID_densDiff
-real(8) :: scalar_factor, Sca_Bdry_val, current_time
+real(8) :: scalar_factor, Sca_Bdry_val, current_time, prsr_wall_compress,gamma_wall_cutoff, rho_wall_compress
 real(8), DIMENSION(:), allocatable  :: F_a, F_b,DF_a, DF_b, Cdwdx_a, Cdwdx_b, Cdgmas
 real(8), DIMENSION(:,:,:), allocatable :: grad_vel
 real(8), DIMENSION(:,:), allocatable :: matrix_factor, stress,bdryVal_ve, grad_rho ,grad_vel_s_temp, x_ve_temp
@@ -166,12 +166,14 @@ correction_types=10
         !drho=0.D0
         
         allocate(div_vel(ntotal), stress(SPH_dim, ntotal),grad_rho(SPH_dim, ntotal) ,grad_vel(SPH_dim, SPH_dim, ntotal),  &
-            &  dens_diffusion(ntotal), grad_vel_s_temp(SPH_dim,SPH_dim)) ! this can be reduced by accoutnign for nreal and nedge correctly
+            &  dens_diffusion(ntotal), grad_vel_s_temp(SPH_dim,SPH_dim), free_surf_particle(ntotal), free_surf_val(ntotal)) ! this can be reduced by accoutnign for nreal and nedge correctly
         div_vel=0.D0
         grad_vel =0.D0
         grad_rho=0.D0
         stress =0.D0
         dens_diffusion=0.D0
+        free_surf_particle=0
+        free_surf_val=0.D0
         
         CF_density=mod( ConDivtype, correction_types)
         ID_density=int( ConDivtype/correction_types)
@@ -182,6 +184,13 @@ correction_types=10
         do k= 1,niac
             a= pair_i(k)
             b= pair_j(k)  
+            
+            !------------------- Find divergence of position (to determine free_surf_particle) -------------------------!
+            call CorrectedVecDivPtoP(free_surf_val(a),free_surf_val(b),x(:,a),x(:,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
+                    & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                    & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
+                    & SPH_dim, 1, 2) ! SPH_dim, correctionFactorID, divType
+            ! -------------------------------------------------------------------------------------------------------------!
 
             !------------------- Find divergence of velocity (to be used in continuity equation) -------------------------!
             call CorrectedVecDivPtoP(div_vel(a),div_vel(b),vx(:,a),vx(:,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
@@ -196,7 +205,18 @@ correction_types=10
                     & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
                     & SPH_dim, CF_densDiff, ID_densDiff) ! SPH_dim, correctionFactorID, grad_type
             !-------------------------------------------------------------------------------------------------------------!
-            
+            do d=1,SPH_dim
+                if(isNAN(grad_rho(d,a))) then
+                    write(*,*) "error calculating in PtoP grad_rho(",d,",",a,")=", grad_rho(d,a)
+                    write(*,*) " ++ gamma_mat_inv(:,:,",a,")=", gamma_mat_inv(:,:,a)
+                    write(*,*) " ++ gamma_mat(:,:,",a,")=", gamma_mat(:,:,a)
+                    write(*,*) " ++ xi1_mat_inv(:,:,",a,")=", xi1_mat_inv(:,:,a)
+                    write(*,*) " ++ xi1_mat(:,:,",a,")=", xi1_mat(:,:,a)
+                    write(*,*) " ++ dwdx(:,",k,")=", dwdx(:,k)
+                
+                    pause    
+                endif
+            enddo
             
         enddo
         
@@ -205,6 +225,14 @@ correction_types=10
             a= epair_a(k)
             s= epair_s(k)
             
+            !------ Find divergence of velocity (to be used in continuity equation)-------------!
+            F_a(:) = x(:,a)
+            F_b(:) = mid_pt_for_edge(:,s)
+
+             call CorrectedVecDivPtoB(free_surf_val(a),F_a,F_b,del_gamma_as(:,k),  &
+                    & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                    & SPH_dim, 1, 2) ! SPH_dim, correctionFactorID, divType
+            ! -----------------------------------------------------------------------!
             
             !------ Find divergence of velocity (to be used in continuity equation)-------------!
             F_a(:) = vx(:,a)
@@ -222,6 +250,19 @@ correction_types=10
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & SPH_dim, CF_densDiff, ID_densDiff) ! SPH_dim, correctionFactorID, grad_type
             ! -----------------------------------------------------------------------!
+            do d=1,SPH_dim
+                if(isNAN(grad_rho(d,a))) then
+                    write(*,*) "error calculating in PtoB grad_rho(",d,",",a,")=", grad_rho(d,a)
+                    write(*,*) " ++ gamma_mat_inv(:,:,",a,")=", gamma_mat_inv(:,:,a)
+                    write(*,*) " ++ gamma_mat(:,:,",a,")=", gamma_mat(:,:,a)
+                    write(*,*) " ++ xi1_mat_inv(:,:,",a,")=", xi1_mat_inv(:,:,a)
+                    write(*,*) " ++ xi1_mat(:,:,",a,")=", xi1_mat(:,:,a)
+                    write(*,*) " ++ del_gamma_as(:,",k,")=", del_gamma_as(:,k)
+                
+                
+                    pause    
+                endif
+            enddo
         enddo
         
         
@@ -234,18 +275,27 @@ correction_types=10
             
             call densDiffOperatorPtoP(dens_diffusion(a),dens_diffusion(b), &
                 & grad_rho(:,a),grad_rho(:,b),dwdx(:,k),mass(a), mass(b), rho(a), rho(b), &
-                & SPH_dim, hsml_const, c_sound, delx_ab, delta_SPH, ID_densDiff )  
+                & SPH_dim, hsml_const, c_sound, delx_ab, delta_SPH, ID_densDiff, a,b )  
             
         enddo
 
         deallocate(grad_rho)
         
+        ! Update freesurface values, as 1 - and the non free surface values are 0
+        do a= 1,nreal
+            if(free_surf_val(a) .lt. FScutoff) free_surf_particle(a) = 1
+        enddo
+        
         ! Update variables for the next time step
         do a =1, nreal
             ! Calcualate density as (𝐷𝜌_𝑎)/𝐷𝑡=− 𝜌_𝑎  ∇∙𝑣_𝑎
             rho(a) = rho(a) - dt* rho(a) * div_vel(a) + dt*dens_diffusion(a)
+            
             ! Use Hughes density correction if necessary
             if ((HG_density_correction) .and. (rho(a) .le. rho_init)) rho(a)=rho_init
+            
+            ! for free surface impose 𝜌_𝑎= rho_free_surface
+            rho(a)=dble(1-free_surf_particle(a))*rho(a)+dble(free_surf_particle(a))*rho_init
             
             ! Update Pressure as it depends on density for WCSPH
             call ParticlePressureEOS(p(a), rho(a), itype(a), itype_virtual)    
@@ -299,6 +349,7 @@ correction_types=10
         enddo
         
         
+        
         ! Use all particle-edge interactions to find boundary terms
         do k= 1,eniac
             a= epair_a(k)
@@ -306,8 +357,17 @@ correction_types=10
             
             !------ Find Pressure Gradient term (to be used in momentum equation) -------------!
             DF_a=0.D0
+            gamma_wall_cutoff=0.6D0
             
-            Sca_Bdry_val = P(a) -rho(a)*c_sound*dot_product(vx(:,a)-bdryVal_seg(1:SPH_dim,s), surf_norm(:,s))
+            !rho_wall_compress=max(rho(a),rho(a)*(gamma_cont(a) + 0.5D0 - 2.D0*gamma_wall_cutoff)/(0.5D0-gamma_wall_cutoff))
+            rho_wall_compress=max(rho(a),(rho(a)/(dx_r/4.D0))*(2.D0*(dx_r/4.D0)-norm2(x(:,a)-mid_pt_for_edge(:,s))))
+            !might have to change dx_r to individual particle radius using its vol(a)
+            call ParticlePressureEOS(prsr_wall_compress, rho_wall_compress, itype(a), itype_virtual)    
+            
+            Sca_Bdry_val = prsr_wall_compress - rho(a)*c_sound*dot_product(vx(:,a)-bdryVal_seg(1:SPH_dim,s), surf_norm(:,s))  &
+                            !& - rho(a)*dot_product(F_ext, x(:,a)- mid_pt_for_edge(:,s)) &
+                            !& + rho(a)*c_sound*norm2(vx(:,a)-bdryVal_seg(1:SPH_dim,s))*max(0.6D0-gamma_cont(a), 0.D0) &
+                            & + 0.D0
             
             call CorrectedScaGradPtoB(DF_a,P(a),Sca_Bdry_val,del_gamma_as(:,k),  &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
@@ -458,7 +518,7 @@ correction_types=10
         
         if ((mod(itimestep,save_step).eq.0) .or. (itimestep.eq.1)) call output_flow_simplified(itimestep,dt)   
         deallocate(delC)
-        !deallocate(FreeSurfaceVar)
+        !deallocate(free_surf_particle)
         
        !call EulerIntegration_fluid(itimestep,dt)
         
@@ -466,7 +526,7 @@ correction_types=10
         
         ! the below needs to be deallocated here because periodic bc can sometimes increase the total number of particles in next loop
         deallocate(w_aa, gamma_discrt,del_gamma_as, del_gamma, xi1_mat, beta_mat,gamma_mat, &
-                   & gamma_mat_inv,xi1_mat_inv )
+                   & gamma_mat_inv,xi1_mat_inv , free_surf_particle,free_surf_val)
         
         
         ! if (mod(itimestep,backup_step).eq.0)  call backupOutput(itimestep)
@@ -494,5 +554,6 @@ if(Allocated(drho)) DEALLOCATE(drho)
 if(Allocated(rho_prev)) DEALLOCATE(rho_prev)
 
 !Pause is used so that the terminal is closed only after hitting enter/return on keyboard
+write(*,*) 'The code has finished executing, press return to exit'
 pause 
 end program

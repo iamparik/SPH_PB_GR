@@ -13,7 +13,7 @@ subroutine  output_flow_simplified(itimestep,dt)
         & save_step, g_const, hydroStaticHeight
     use particle_data ,   only: x, mass, rho, p, vx, &
         & ntotal,etotal, itype, etype, gamma_cont, gamma_discrt,del_gamma, delC, &
-        & FreeSurfaceVar, gamma_density_cont, ve_total, x_ve, vx_ve, mid_pt_for_edge
+        & gamma_density_cont, ve_total, x_ve, vx_ve, mid_pt_for_edge, free_surf_val
     
     implicit none
 !----------------------------------------------------------------------           
@@ -58,11 +58,11 @@ subroutine  output_flow_simplified(itimestep,dt)
 
 !   Specify variables that need to be read by tecplot to correspond to the data fed
 ! for 3D output 
-    if(SPH_dim.eq.3)    write(1,*) 'variables = x, y, z, mass, rho, vx, vy, vz, p, gamma, alpha, dgammax, dgammay, dgammaz, delcX, delCy, delCz '
+    if(SPH_dim.eq.3)    write(1,*) 'variables = x, y, z, mass, rho, vx, vy, vz, p, gamma, alpha, dgammax, dgammay, dgammaz, delcX, delCy, delCz,free_surf_val '
 ! for 2D output
-    if(SPH_dim.eq.2)    write(1,*) 'variables = x, y, mass, rho, vx, vy, p, gamma, alpha, dgammax, dgammay, delcX, delCy'
+    if(SPH_dim.eq.2)    write(1,*) 'variables = x, y, mass, rho, vx, vy, p, gamma, alpha, dgammax, dgammay, delcX, delCy,free_surf_val'
 ! for 1D output
-    if(SPH_dim.eq.1)    write(1,*) 'variables = x, mass, rho, temp, vx, p, gamma, alpha, dgammax, delcX'
+    if(SPH_dim.eq.1)    write(1,*) 'variables = x, mass, rho, temp, vx, p, gamma, alpha, dgammax, delcX,free_surf_val'
   
 text_print=.true.
 ! First export data of all real particles ( not on boundary)
@@ -70,7 +70,7 @@ text_print=.true.
     do i=1,ntotal
        if((itype(i) .le. itype_real_max) .and. (itype(i) .gt. itype_real_min))  then
            if(text_print) write(1,'(A)')'ZONE T="Real Particles",F=Point,C=Blue'
-           write(1,1001) (x(d, i), d=1,SPH_dim), mass(i),rho(i), (vx(d, i), d = 1, SPH_dim), p(i), gamma_cont(i), gamma_discrt(i), (del_gamma(d, i), d = 1, SPH_dim), (delC(d, i), d = 1, SPH_dim)
+           write(1,1001) (x(d, i), d=1,SPH_dim), mass(i),rho(i), (vx(d, i), d = 1, SPH_dim), p(i), gamma_cont(i), gamma_discrt(i), (del_gamma(d, i), d = 1, SPH_dim), (delC(d, i), d = 1, SPH_dim), free_surf_val(i)
            text_print=.false. 
        endif
        
@@ -89,7 +89,7 @@ text_print=.true.
     
     do s=1,etotal 
         if(text_print) write(1,'(A)')'ZONE T="Edge Mid-Points",F=Point,C=Red'
-        write(1,1001) (mid_pt_for_edge(d,s), d=1,SPH_dim), 0.D0 ,0.D0, (0.D0, d = 1, SPH_dim), 0.D0, 0.D0, 0.D0, (0.D0, d = 1, SPH_dim), (0.D0, d = 1, SPH_dim) 
+        write(1,1001) (mid_pt_for_edge(d,s), d=1,SPH_dim), 0.D0 ,0.D0, (0.D0, d = 1, SPH_dim), 0.D0, 0.D0, 0.D0, (0.D0, d = 1, SPH_dim), (0.D0, d = 1, SPH_dim), 0.D0
         text_print=.false.                           
     enddo
 
@@ -99,7 +99,7 @@ text_print=.true.
     
     do i=1, ve_total
         if(text_print)  write(1,'(A)')'ZONE T="Edge vertices",F=Point,C=Black'
-        write(1,1001) (x_ve(d, i), d=1,SPH_dim),0,0, (vx_ve(d, i), d = 1, SPH_dim), 0, 0, 0, (0.D0, d = 1, SPH_dim), (0, d = 1, SPH_dim)    
+        write(1,1001) (x_ve(d, i), d=1,SPH_dim),0,0, (vx_ve(d, i), d = 1, SPH_dim), 0, 0, 0, (0.D0, d = 1, SPH_dim), (0, d = 1, SPH_dim), 0.D0
         text_print=.false.
     enddo
    
@@ -109,7 +109,7 @@ text_print=.true.
     do i=1,ntotal
        if( ((itype(i)-itype_periodic) .le. itype_real_max) .and. ((itype(i)-itype_periodic) .ge. itype_real_min)  )  then
            if(text_print)  write(1,'(A)')'ZONE T="Periodic Real Particles",F=Point,C=Purple'
-           write(1,1001) (x(d, i), d=1,SPH_dim), mass(i),rho(i), (vx(d, i), d = 1, SPH_dim), p(i), gamma_cont(i), gamma_discrt(i), (del_gamma(d, i), d = 1, SPH_dim), (0, d = 1, SPH_dim) 
+           write(1,1001) (x(d, i), d=1,SPH_dim), mass(i),rho(i), (vx(d, i), d = 1, SPH_dim), p(i), gamma_cont(i), gamma_discrt(i), (del_gamma(d, i), d = 1, SPH_dim), (0, d = 1, SPH_dim), free_surf_val(i)
            text_print=.false.
        endif
     enddo

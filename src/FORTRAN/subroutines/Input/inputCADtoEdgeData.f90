@@ -29,7 +29,7 @@ subroutine inputCADtoEdgeData(s, max_edge, input_file_name, avgEdgeSize_ratio )
         
         read(1,*) tempType, (tempX(d,1), d=1,SPH_dim), (tempX(d,2), d=1,SPH_dim) !, (temp_surf_norm(d), d=1,SPH_dim) ! this can be generalized with x_temp(d1,d2)
         
-        !obtain the surface normal for the bodry type from the given order of vertices
+        !obtain the surface normal for the bdry type from the given order of vertices
         ! the below wouldnt be required if surf_norm is read directly from bdry file
         call surfaceNormalBdry(temp_surf_norm, tempX, SPH_dim)
         
@@ -39,7 +39,7 @@ subroutine inputCADtoEdgeData(s, max_edge, input_file_name, avgEdgeSize_ratio )
         
         if(temp_edgetype_int .eq. etype_periodic) then ! this is to treat general open type boundaries like periodic, inlet/outlet flow etc.
                 
-            ! each division above is a boudanry element
+            ! each division above is a boundary element
             s=s+1
             
             ! make sure the array size is big enough
@@ -47,6 +47,7 @@ subroutine inputCADtoEdgeData(s, max_edge, input_file_name, avgEdgeSize_ratio )
                 write(*,*) "Increase value of max edge and rerun simulation"
                 write(*,*) "current maxedge =", max_edge 
                 write(*,*) "current num_vertex_pts =", num_vertex_pts 
+                write(*,*) "Paused in the conditional statement if(temp_edgetype_int .eq. etype_periodic) in inputCADtoEdgeData"
                 pause
             endif
                 
@@ -117,6 +118,7 @@ subroutine inputCADtoEdgeData(s, max_edge, input_file_name, avgEdgeSize_ratio )
                     write(*,*) "Increase value of max edge and rerun simulation"
                     write(*,*) "current maxedge =", max_edge 
                     write(*,*) "current num_vertex_pts =", num_vertex_pts 
+                    write(*,*) "Paused in do i = 1, num_divisions loop inside inputCADtoEdgeData"
                     pause
                 endif
                 
@@ -196,7 +198,7 @@ subroutine divideBdryElement(divided_tempX,tempX, num_divisions, dim)
             divided_tempX(:,1,i) = divided_tempX(:,2,i-1)
             divided_tempX(:,2,i) = divided_tempX(:,2,i-1) + vector_dir_2D(:)
         enddo
-        divided_tempX(:,1,num_divisions) = divided_tempX(:,2,num_divisions)
+        divided_tempX(:,1,num_divisions) = divided_tempX(:,2,num_divisions-1)
         divided_tempX(:,2,num_divisions) = tempX(:,2)       
         
         
