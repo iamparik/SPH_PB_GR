@@ -359,15 +359,7 @@ correction_types=10
             DF_a=0.D0
             gamma_wall_cutoff=0.6D0
             
-            !rho_wall_compress=max(rho(a),rho(a)*(gamma_cont(a) + 0.5D0 - 2.D0*gamma_wall_cutoff)/(0.5D0-gamma_wall_cutoff))
-            rho_wall_compress=max(rho(a),(rho(a)/(dx_r/4.D0))*(2.D0*(dx_r/4.D0)-norm2(x(:,a)-mid_pt_for_edge(:,s))))
-            !might have to change dx_r to individual particle radius using its vol(a)
-            call ParticlePressureEOS(prsr_wall_compress, rho_wall_compress, itype(a), itype_virtual)    
-            
-            Sca_Bdry_val = prsr_wall_compress - rho(a)*c_sound*dot_product(vx(:,a)-bdryVal_seg(1:SPH_dim,s), surf_norm(:,s))  &
-                            !& - rho(a)*dot_product(F_ext, x(:,a)- mid_pt_for_edge(:,s)) &
-                            !& + rho(a)*c_sound*norm2(vx(:,a)-bdryVal_seg(1:SPH_dim,s))*max(0.6D0-gamma_cont(a), 0.D0) &
-                            & + 0.D0
+            call PressureBdryValue(Sca_Bdry_val,rho(a),x(:,a), vx(:,a), itype(a),bdryVal_seg(1:SPH_dim,s), num_bdry_var_seg, s, prsrBdryType)
             
             call CorrectedScaGradPtoB(DF_a,P(a),Sca_Bdry_val,del_gamma_as(:,k),  &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
