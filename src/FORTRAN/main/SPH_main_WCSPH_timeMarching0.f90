@@ -359,7 +359,7 @@ correction_types=10
             DF_a=0.D0
             gamma_wall_cutoff=0.6D0
             
-            call PressureBdryValue(Sca_Bdry_val,rho(a),x(:,a), vx(:,a), itype(a),bdryVal_seg(1:SPH_dim,s), num_bdry_var_seg, s, prsrBdryType)
+            call PressureBdryValue(Sca_Bdry_val,rho(a),x(:,a), vx(:,a), itype(a),bdryVal_seg(:,s), num_bdry_var_seg, s, prsrBdryType)
             
             call CorrectedScaGradPtoB(DF_a,P(a),Sca_Bdry_val,del_gamma_as(:,k),  &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
@@ -505,7 +505,7 @@ correction_types=10
         
         !---------------------- free surface detection and PST algorithm -------------------------------------!
         !call FreeSurfaceDetection
-        call ParticleShiftingTechnique(PSTtype,PSTcoeff)
+        if ((mod(itimestep,PST_step ).eq.0) call ParticleShiftingTechnique(PSTtype,PSTcoeff)
                
         
         if ((mod(itimestep,save_step).eq.0) .or. (itimestep.eq.1)) call output_flow_simplified(itimestep,dt)   

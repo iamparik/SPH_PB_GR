@@ -175,6 +175,14 @@ module config_parameter
     
     integer(4) :: edge_to_dx_ratio
     
+    integer(4) :: pack_step2a
+    
+    real(8) :: pack_step2b
+    
+    integer(4) :: pack_step2c
+    
+    integer(4) :: PST_step
+    
     contains
 
     
@@ -208,8 +216,11 @@ module config_parameter
         write(*, *) 'poisson eqn solver_type = ', solver_type
         write(*, *) 'time_step =  ', time_step
         write(*, *) 'dx_r = ', dx_r
-        write(*,*) 'ExtInputMeshType = ', ExtInputMeshType
+        write(*,*)  'ExtInputMeshType = ', ExtInputMeshType
         write(*, *) 'packagingIterations = ', packagingIterations
+        write(*, *) 'pack_step2a = ',  pack_step2a
+        write(*, *) 'pack_step2b = ',  pack_step2b
+        write(*, *) 'pack_step2c = ',  pack_step2c
         write(*, *) 'hsml_const = ', hsml_const
         write(*, *) 'rho_init = ', rho_init
         write(*, *) 'mu_const = ', mu_const
@@ -233,6 +244,7 @@ module config_parameter
         write(*, *) 'prsrBdryType = ', prsrBdryType
         write(*, *) 'HG_density_correction = ', HG_density_correction
         write(*, *) 'PSTtype = ',PSTtype
+        write(*, *) 'PST_step = ',PST_step
         write(*, *) 'PSTCoeff = ', PSTCoeff
         write(*, *) 'WallBoundaryLayer = ', WallBoundaryLayer
         write(*, *) 'nnps = ', nnps
@@ -276,6 +288,12 @@ module config_parameter
                 else
                     packagingIterations = .true.    
                 endif  
+            case ('pack_step2a')
+                pack_step2a =param_value
+            case ('pack_step2b')
+                pack_step2b =param_value
+            case ('pack_step2c')
+                pack_step2c =param_value
             case ('hsml_const')
                 hsml_const = param_value
             case ('rho_init')
@@ -336,6 +354,8 @@ module config_parameter
                 endif  
             case ('PSTtype') 
                 PSTtype = param_value
+            case('PST_step')
+                PST_step = param_value
             case('PSTCoeff')
                 PSTCoeff = param_value
             case('delC_Cap')

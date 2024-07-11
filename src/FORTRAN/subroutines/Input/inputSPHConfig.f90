@@ -22,6 +22,16 @@ subroutine inputSPHConfig
         ! run packing algorithm according to user input
         call inputExt
         
+        if(packagingIterations) then
+            write(*,*) "BIPI algorithm implemented, press enter to now use BIPI config as input"
+            !set external CAD input to type 5 
+            ExtInputMeshType = 5
+            packagingIterations = .false.
+            
+            call inputExt
+            
+        endif
+        
     elseif(file_type.eq.2) then
         !call backupInput(itimestep)
     endif

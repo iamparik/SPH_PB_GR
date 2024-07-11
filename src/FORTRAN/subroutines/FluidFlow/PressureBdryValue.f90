@@ -4,8 +4,9 @@ subroutine PressureBdryValue(prsr_,rho_, x_, vx_, itype_,bdryVal_seg_, num_seg, 
     
 implicit none
   
-integer(4), intent(in) :: ID, s, itype_, num_seg
-real(8), intent(in) :: bdryVal_seg_(num_seg), x_(SPH_dim), vx_(sPH_dim)
+integer(4), intent(in) :: ID, s, num_seg
+integer(2), intent(in) :: itype_
+real(8), intent(in) :: bdryVal_seg_(num_seg), x_(SPH_dim), vx_(SPH_dim)
 real(8), intent(inout) :: prsr_,rho_
 real(8) :: rho_comp 
 

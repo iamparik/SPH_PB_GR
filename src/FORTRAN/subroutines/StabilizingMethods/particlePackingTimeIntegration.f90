@@ -221,22 +221,31 @@ do while (packing_in_progress)
         delC_avg= delC_avg + norm2(delC(:,a))/nreal
     enddo
     
-    call outputPacking(iterstep,100,TPD,delC_avg) !input: iterStep, saveStep, TPD
-  
-    ! Now we check if for every 1000 steps if the particle packing variable
-    ! is unchanged compared to its previous value
-    if(mod(iterstep,1000) .eq. 0) then
-        ! Select the particle packing variable (like TPD)
-        PP_variable =TPD
-        
-        if((abs(PP_Variable - PP_Variable_prev)) .lt. 1.D-2*PP_Variable) then
-            cutoff_step = cutoff_step + 1
-        elseif((cutoff_step .eq. 2) .and. quick_converge_step2C) then
-            cutoff_step = cutoff_step + 1
-        endif
-        
-        PP_variable_prev = PP_variable
+    !call outputPacking(iterstep,100,TPD,delC_avg) !input: iterStep, saveStep, TPD
+    !! Now we check if for every 1000 steps if the particle packing variable
+    !! is unchanged compared to its previous value
+    !if(mod(iterstep,1000) .eq. 0) then
+    !    ! Select the particle packing variable (like TPD)
+    !    PP_variable =TPD
+    !    
+    !    if((abs(PP_Variable - PP_Variable_prev)) .lt. 1.D-2*PP_Variable) then
+    !        cutoff_step = cutoff_step + 1
+    !    elseif((cutoff_step .eq. 2) .and. quick_converge_step2C) then
+    !        cutoff_step = cutoff_step + 1
+    !    endif
+    !    
+    !    PP_variable_prev = PP_variable
+    !endif
+    
+    ! uncomment above lines to run previous code
+    call outputPacking(iterstep,1,TPD,delC_avg)
+    if((cutoff_step .eq. 0) .and. (mod(iterstep,100) .eq. 0)) then
+        cutoff_step = cutoff_step + 1
     endif
+    if((cutoff_step .eq. 2) .and. (mod(iterstep,100) .eq. 0)) then
+        cutoff_step = cutoff_step + 1
+    endif
+    
     
     deALLOCATE(delC)
     

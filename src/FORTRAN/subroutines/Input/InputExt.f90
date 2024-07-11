@@ -52,11 +52,11 @@
     
     additionalParticles= 100 ! This is necessary only if expect to use periodic particles, or unflow, outflow particles
     if (packagingIterations) then
-        maxedge=int((len_bulkBdry/dx_r)*(dble(edge_to_dx_ratio)*2.D0+1.D0)) ! *2.D0 is used to account for the 2X vertices of issue #48
+        maxedge=int((len_bulkBdry/dx_r)*(dble(edge_to_dx_ratio)*5.D0+1.D0)) ! *2.D0 is used to account for the 2X vertices of issue #48
         maxnv=10*maxedge 
         maxn= max(nreal_mesh, nrealCartesian)+ maxedge +additionalParticles
     else
-        maxedge=int((len_domainBdry/dx_r)*(dble(edge_to_dx_ratio)*2.D0+1.D0))
+        maxedge=int((len_domainBdry/dx_r)*(dble(edge_to_dx_ratio)*5.D0+1.D0))
         maxnv=10*maxedge 
         maxn= max(nreal_mesh, nrealCartesian)+ maxedge + additionalParticles
     endif
@@ -193,6 +193,8 @@
     !input : quick_converge_step2C  ! use .true. to enable quickconverge    
    
         deallocate(simGridSize, x, vol, itype)
+        deallocate(x_ve,etype, edge, surf_norm)
+        deallocate(integ_pts_for_edge, val_integ_pts, mid_pt_for_edge)
     endif
 
     DEALLOCATE(mass, rho, hsml)
