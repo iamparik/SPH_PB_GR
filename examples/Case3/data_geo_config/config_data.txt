@@ -5,10 +5,12 @@ backup_step 1000000
 dx_r 1.0D-2
 ExtInputMeshType 2
 packagingIterations 0
+pack_stap2a 20
+pack_step2b 1.D0
+pack_step2c 100
 hsml_const 2.D-2
 rho_init 1000.D0
 mu_const 1.D1
-hydroStaticHeight 1.D0
 g_const 0.D0
 ref_vel_max	3.D0
 c_sound	30.D0
@@ -29,6 +31,7 @@ delta_SPH 0.1D0
 prsrBdryType 3
 HG_density_correction 1
 PSTtype 1
+PST_step 2
 PSTCoeff 5.D-1
 delC_Cap 1.D-4
 WallBoundaryLayer 0

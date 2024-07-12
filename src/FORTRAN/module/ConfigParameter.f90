@@ -66,7 +66,7 @@ module config_parameter
 ! Below are variables that can be defiend at run time
     public  SPH_dim, skf, eos, solver_type, &
         & time_step,print_step,save_step,backup_step, dx_r, ExtInputMeshType, packagingIterations,  &
-        & hsml_const, rho_init, mu_const, hydroStaticHeight, g_const, ref_vel_max, c_sound, F_ext,  &
+        & hsml_const, rho_init, mu_const, ref_vel_max, c_sound, F_ext,  &
         & NumericalSimCase,  timeIntegrationScheme, SumDenstype, summationDensity, artViscType, MLS_density_bound,  &
         & MLS_step,BILtype, PrsrGradtype,PSTCoeff, ConDivtype, densDiffType, delta_SPH, prsrBdryType, HG_density_correction,PSTtype, &
         & nnps, nnes,WallBoundaryLayer, FScutoff
@@ -116,10 +116,6 @@ module config_parameter
     real(8) :: rho_init
     
     real(8) :: mu_const
-    
-    real(8) :: hydroStaticHeight
-    
-    real(8) :: g_const
     
     real(8) :: ref_vel_max
     
@@ -224,8 +220,6 @@ module config_parameter
         write(*, *) 'hsml_const = ', hsml_const
         write(*, *) 'rho_init = ', rho_init
         write(*, *) 'mu_const = ', mu_const
-        write(*, *) 'hydroStaticHeight = ', hydroStaticHeight
-        write(*, *) 'g_const = ', g_const
         write(*, *) 'ref_vel_max = ', ref_vel_max
         write(*, *) 'c_sound = ', c_sound
         write(*, *) 'F_ext = ', F_ext
@@ -300,10 +294,6 @@ module config_parameter
                 rho_init = param_value
             case ('mu_const')
                 mu_const = param_value
-            case ('hydroStaticHeight')
-                hydroStaticHeight = param_value
-            case ('g_const')
-                g_const = param_value
             case ('ref_vel_max')
                 ref_vel_max= param_value
             case ('c_sound')

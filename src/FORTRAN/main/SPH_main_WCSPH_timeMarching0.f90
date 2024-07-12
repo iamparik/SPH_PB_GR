@@ -295,13 +295,15 @@ correction_types=10
             if ((HG_density_correction) .and. (rho(a) .le. rho_init)) rho(a)=rho_init
             
             ! for free surface impose 𝜌_𝑎= rho_free_surface
-            rho(a)=dble(1-free_surf_particle(a))*rho(a)+dble(free_surf_particle(a))*rho_init
+            !rho(a)=dble(1-free_surf_particle(a))*rho(a)+dble(free_surf_particle(a))*rho_init
+            
+            !Update Volume, since density is updated
+            vol(a) = mass(a)/rho(a)
             
             ! Update Pressure as it depends on density for WCSPH
             call ParticlePressureEOS(p(a), rho(a), itype(a), itype_virtual)    
             
-            !Update Volume, since density is updated
-            vol(a) = mass(a)/rho(a)
+            
         enddo
         
         deallocate(dens_diffusion, div_vel)
@@ -505,7 +507,7 @@ correction_types=10
         
         !---------------------- free surface detection and PST algorithm -------------------------------------!
         !call FreeSurfaceDetection
-        if ((mod(itimestep,PST_step ).eq.0) call ParticleShiftingTechnique(PSTtype,PSTcoeff)
+        call ParticleShiftingTechnique(PSTtype,PSTcoeff, PST_Step, itimestep)
                
         
         if ((mod(itimestep,save_step).eq.0) .or. (itimestep.eq.1)) call output_flow_simplified(itimestep,dt)   
