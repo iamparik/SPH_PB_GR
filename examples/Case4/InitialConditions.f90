@@ -36,10 +36,10 @@ subroutine ICinputValue(initalVal_particle,num_var, itype)
         
         initalVal_particle(3)= 0.D0 ! vx
         initalVal_particle(4)= 0.D0 ! vy
-        !initalVal_particle(5)= rho_init*((7.D0*9.81D0*(hydroStaticHeight-initalVal_particle(2))/(c_sound**2)+1.D0)**(1.D0/7.D0)) ! density
-        !initalVal_particle(6)= (rho_init*c_sound**2/7.D0)*((initalVal_particle(5)/rho_init)**7.D0-1.D0) !pressure
-        initalVal_particle(5)= rho_init ! density
-        initalVal_particle(6)= rho_init*9.81D0*(hydroStaticHeight-initalVal_particle(2)) !pressure
+        initalVal_particle(5)= rho_init*((7.D0*9.81D0*(hydroStaticHeight-initalVal_particle(2))/(c_sound**2)+1.D0)**(1.D0/7.D0)) ! density
+        initalVal_particle(6)= (rho_init*c_sound**2/7.D0)*((initalVal_particle(5)/rho_init)**7.D0-1.D0) !pressure
+        !initalVal_particle(5)= rho_init ! density
+        !initalVal_particle(6)= rho_init*9.81D0*(hydroStaticHeight-initalVal_particle(2)) !pressure
         initalVal_particle(7)= hsml_const ! smoothing length
         initalVal_particle(8)= mu_const !viscosity mu
         

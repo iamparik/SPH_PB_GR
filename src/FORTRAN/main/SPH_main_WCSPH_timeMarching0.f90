@@ -121,6 +121,8 @@ correction_types=10
     
     do itimestep = current_ts+1, max_timesteps
         
+        
+        
         !initialize velocity to 0
         vx_ve=0.D0
         
@@ -508,9 +510,14 @@ correction_types=10
         !---------------------- free surface detection and PST algorithm -------------------------------------!
         !call FreeSurfaceDetection
         call ParticleShiftingTechnique(PSTtype,PSTcoeff, PST_Step, itimestep)
+        
+        !------------------------ export parameter values as output -----------------!
                
+        if(time_ev_par_op)call caseBasedOutput(itimestep)
         
         if ((mod(itimestep,save_step).eq.0) .or. (itimestep.eq.1)) call output_flow_simplified(itimestep,dt)   
+        
+        !-----------------------------------------------------------
         deallocate(delC)
         !deallocate(free_surf_particle)
         

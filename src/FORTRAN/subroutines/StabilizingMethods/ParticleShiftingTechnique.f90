@@ -42,7 +42,7 @@ else
 endif
 
 
-if(perform_shifting) then 
+
     call kernel(dx_r,delr,hsml_const,w_dxr,extra_vec)
 
     do k = 1,niac
@@ -103,6 +103,7 @@ if(perform_shifting) then
     enddo  
 
     ! Now perform particle shifting
+if(perform_shifting) then 
     
     do a=1,nreal    
         delr=0.D0

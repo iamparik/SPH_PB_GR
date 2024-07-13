@@ -91,6 +91,7 @@
 		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\nnps_algorithm.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\particlePair.f90"/></Filter>
 		<Filter Name="OutputRoutines">
+		<File RelativePath=".\caseBasedOutput.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\Output\createOutputFolder.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\Output\output_flow_simplified.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\Output\outputPacking.f90"/>

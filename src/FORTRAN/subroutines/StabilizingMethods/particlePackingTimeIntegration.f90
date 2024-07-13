@@ -17,7 +17,7 @@ use particle_data, only: nreal, w_aa, w, dwdx, &
         & xi1_mat, beta_mat,gamma_mat,xi_cont_mat, &
         & gamma_mat_inv,xi1_mat_inv,xi_cont_mat_inv, &
         & epair_a,epair_s, eniac, pair_i, pair_j, niac,  &
-        & ntotal, xstart, x, mass, rho, itype, delC, xstart, &
+        & ntotal, xstart, x, mass, rho, itype, delC, &
         & edge,etype, hsml, vol, surf_norm, edge, mid_pt_for_edge
 
 implicit none

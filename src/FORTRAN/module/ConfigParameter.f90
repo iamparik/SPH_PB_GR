@@ -179,6 +179,8 @@ module config_parameter
     
     integer(4) :: PST_step
     
+    logical :: time_ev_par_op =.false.
+    
     contains
 
     
@@ -245,6 +247,7 @@ module config_parameter
         write(*, *) 'nnes = ', nnes 
         write(*,*) 'FScutoff = ' , FScutoff
         write(*,*) 'edge_to_dx_ratio = ' , edge_to_dx_ratio
+        write(*,*) 'time_ev_par_op = ', time_ev_par_op
         
     end subroutine read_config_file
     
@@ -365,6 +368,12 @@ module config_parameter
                 FScutoff = param_value
             case ('edge_to_dx_ratio')
                 edge_to_dx_ratio =param_value
+            case('time_ev_par_op')            
+                if(param_value .eq. 1) then
+                    time_ev_par_op = .true.
+                else
+                    time_ev_par_op = .false.    
+                endif
             case default
                 ! Handle unknown parameter name
                 write(*, *) 'Unknown parameter: ', trim(param_name)
