@@ -151,6 +151,8 @@ module config_parameter
     
     logical :: HG_density_correction
     
+    logical :: FS_density_correction = .false.
+    
     integer(4) :: PSTtype
     
     real(8) :: PSTCoeff
@@ -239,6 +241,7 @@ module config_parameter
         write(*, *) 'delta_SPH = ', delta_SPH
         write(*, *) 'prsrBdryType = ', prsrBdryType
         write(*, *) 'HG_density_correction = ', HG_density_correction
+        write(*, *) 'FS_density_correction = ', FS_density_correction
         write(*, *) 'PSTtype = ',PSTtype
         write(*, *) 'PST_step = ',PST_step
         write(*, *) 'PSTCoeff = ', PSTCoeff
@@ -344,6 +347,12 @@ module config_parameter
                     HG_density_correction = .false.
                 else
                     HG_density_correction = .true.    
+                endif  
+            case ('FS_density_correction')
+                if(param_value .eq. 0) then
+                    FS_density_correction = .false.
+                else
+                    FS_density_correction = .true.    
                 endif  
             case ('PSTtype') 
                 PSTtype = param_value

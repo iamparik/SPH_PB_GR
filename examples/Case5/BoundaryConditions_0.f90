@@ -11,7 +11,11 @@ subroutine BCinput(etype, tempType, packing)
     integer etype, tempType
     logical packing
 
-    if(tempType .eq. 1) etype = 2    
+    if(tempType .eq. 1) then
+        etype = 2
+    else
+        etype =2
+    endif
     
     if(packing) etype=2
 

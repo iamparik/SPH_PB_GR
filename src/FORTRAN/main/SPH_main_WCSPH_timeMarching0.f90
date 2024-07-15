@@ -297,7 +297,7 @@ correction_types=10
             if ((HG_density_correction) .and. (rho(a) .le. rho_init)) rho(a)=rho_init
             
             ! for free surface impose 𝜌_𝑎= rho_free_surface
-            !rho(a)=dble(1-free_surf_particle(a))*rho(a)+dble(free_surf_particle(a))*rho_init
+            if(FS_density_correction) rho(a)=dble(1-free_surf_particle(a))*rho(a)+dble(free_surf_particle(a))*rho_init
             
             !Update Volume, since density is updated
             vol(a) = mass(a)/rho(a)
