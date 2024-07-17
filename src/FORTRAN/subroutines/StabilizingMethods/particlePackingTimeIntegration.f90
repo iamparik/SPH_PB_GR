@@ -153,7 +153,7 @@ do while (packing_in_progress)
         call CorrectedScaGradPtoP(delC(:,a),delC(:,b),dCF,dCF,dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
-                    & SPH_dim, 1, 1) ! SPH_dim, correctionFactorID, grad_type
+                    & 0,0,SPH_dim, 1, 1) ! SPH_dim, correctionFactorID, grad_type
     enddo
 
 
@@ -173,7 +173,7 @@ do while (packing_in_progress)
         ! Calculate boundary term for cincentration gradient
         call CorrectedScaGradPtoB(delC(:,a),1.D0,dCF,del_gamma_as(:,k),  &
                             & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                            & SPH_dim, 1, 1)
+                            & 0,SPH_dim, 1, 1)
         
         ! Add boundary force function below
         ! A step function twice the force is used here for particles
@@ -191,7 +191,7 @@ do while (packing_in_progress)
     
         call CorrectedScaGradPtoB(bdry_push(:,a),1.D0,dCF,del_gamma_as(:,k),  &
                             & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                            & SPH_dim, 1, 1)
+                            & 0,SPH_dim, 1, 1)
     enddo  
 
     !------------------------Particle shift calcualtion from force terms -----------------------------!

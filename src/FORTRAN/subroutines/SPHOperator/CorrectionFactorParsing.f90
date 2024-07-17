@@ -41,7 +41,22 @@ subroutine CorrectionFactorParsing(scalar_factor,matrix_factor,id,Scalar0Matrix1
         
     elseif( id .eq. 6 ) then
         !This uses L matrix inverse (essentially PCBI without bdry) as a factor
-        matrix_factor=xi_m_i
+        if( (FS .eq. 1) .and. (g_c .lt. 1.D0)) then
+            do d=1,dim
+                matrix_factor(d,d)= 1.D0/g_c
+            enddo
+        else
+            matrix_factor=g_m_i
+        endif            
+        Scalar0Matrix1 = 1
+    
+    elseif( id .eq. 7) then
+        !This uses L matrix inverse (essentially PCBI without bdry) as a factor
+        if( (FS .eq. 1) .and. (g_c .lt. 1.D0)) then
+            matrix_factor=xi_m_i
+        else
+            matrix_factor=g_m_i
+        endif            
         Scalar0Matrix1 = 1
         
     else
