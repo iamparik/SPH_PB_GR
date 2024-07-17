@@ -56,6 +56,7 @@
 		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\CorrectionFactorMatrixInversion.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\dgamma_analytical.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\dgamma_analytical_Ferrand_2D.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\FSWallCorrectionFactors.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\gamma_analytical_leroy_2D.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\gamma_continuous_leroy.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\gamma_discrete1_factor.f90"/>

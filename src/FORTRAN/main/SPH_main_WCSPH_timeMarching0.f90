@@ -182,7 +182,8 @@ correction_types=10
         CF_densDiff= mod(densDiffType,correction_types)
         ID_densDiff= int(densDiffType/correction_types)
         
-        ! Use all particle-particle interaction to find non boundary terms
+        !Find freeSurfaceValues
+        !Particle-particle itneraction for finding freeSurfaceValues
         do k= 1,niac
             a= pair_i(k)
             b= pair_j(k)  
@@ -191,21 +192,49 @@ correction_types=10
             call CorrectedVecDivPtoP(free_surf_val(a),free_surf_val(b),x(:,a),x(:,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
-                    & SPH_dim, 1, 2) ! SPH_dim, correctionFactorID, divType
+                    & 0,0, SPH_dim, 1, 2) ! SPH_dim, correctionFactorID, divType
             ! -------------------------------------------------------------------------------------------------------------!
+        enddo
+        
+        !Particle-boundary itneraction for finding freeSurfaceValues
+        do k= 1,eniac
+            a= epair_a(k)
+            s= epair_s(k)
+            
+            !------ Find divergence of velocity (to be used in continuity equation)-------------!
+            F_a(:) = x(:,a)
+            F_b(:) = mid_pt_for_edge(:,s)
+
+             call CorrectedVecDivPtoB(free_surf_val(a),F_a,F_b,del_gamma_as(:,k),  &
+                    & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                    & 1,SPH_dim, 1, 2) ! SPH_dim, correctionFactorID, divType
+            ! -----------------------------------------------------------------------!
+        enddo
+        
+        
+        ! Update freesurface values, as 1 - and the non free surface values are 0
+        do a= 1,nreal
+            if(free_surf_val(a) .lt. FScutoff) free_surf_particle(a) = 1
+        enddo
+        
+        
+        ! Use all particle-particle interaction to find non boundary terms
+        do k= 1,niac
+            a= pair_i(k)
+            b= pair_j(k)  
 
             !------------------- Find divergence of velocity (to be used in continuity equation) -------------------------!
             call CorrectedVecDivPtoP(div_vel(a),div_vel(b),vx(:,a),vx(:,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
-                    & SPH_dim, CF_density, ID_density) ! SPH_dim, correctionFactorID, divType
+                    & free_surf_particle(a),free_surf_particle(b),SPH_dim, CF_density, ID_density) ! SPH_dim, correctionFactorID, divType
             ! -------------------------------------------------------------------------------------------------------------!
             
             !-------------- Find density Gradient term (to be used in density diffusion equation) --------------!
             call CorrectedScaGradPtoP(grad_rho(:,a), grad_rho(:,b),rho(a),rho(b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
-                    & SPH_dim, CF_densDiff, ID_densDiff) ! SPH_dim, correctionFactorID, grad_type
+                    & free_surf_particle(a),free_surf_particle(b),SPH_dim, CF_densDiff, ID_densDiff) ! SPH_dim, correctionFactorID, grad_type
             !-------------------------------------------------------------------------------------------------------------!
             do d=1,SPH_dim
                 if(isNAN(grad_rho(d,a))) then
@@ -228,21 +257,12 @@ correction_types=10
             s= epair_s(k)
             
             !------ Find divergence of velocity (to be used in continuity equation)-------------!
-            F_a(:) = x(:,a)
-            F_b(:) = mid_pt_for_edge(:,s)
-
-             call CorrectedVecDivPtoB(free_surf_val(a),F_a,F_b,del_gamma_as(:,k),  &
-                    & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                    & SPH_dim, 1, 2) ! SPH_dim, correctionFactorID, divType
-            ! -----------------------------------------------------------------------!
-            
-            !------ Find divergence of velocity (to be used in continuity equation)-------------!
             F_a(:) = vx(:,a)
             F_b(:) = bdryVal_seg(1:SPH_dim,s)
 
              call CorrectedVecDivPtoB(div_vel(a),F_a,F_b,del_gamma_as(:,k),  &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                    & SPH_dim, CF_density, ID_density) ! SPH_dim, correctionFactorID, divType
+                    & free_surf_particle(a),SPH_dim, CF_density, ID_density) ! SPH_dim, correctionFactorID, divType
             ! -----------------------------------------------------------------------!
              
             !------ Find density Gradient term (to be used in density diffusion equation) -------------!         
@@ -250,7 +270,7 @@ correction_types=10
             
             call CorrectedScaGradPtoB(grad_rho(:,a),rho(a),Sca_Bdry_val,del_gamma_as(:,k),  &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                    & SPH_dim, CF_densDiff, ID_densDiff) ! SPH_dim, correctionFactorID, grad_type
+                    & free_surf_particle(a),SPH_dim, CF_densDiff, ID_densDiff) ! SPH_dim, correctionFactorID, grad_type
             ! -----------------------------------------------------------------------!
             do d=1,SPH_dim
                 if(isNAN(grad_rho(d,a))) then
@@ -283,10 +303,7 @@ correction_types=10
 
         deallocate(grad_rho)
         
-        ! Update freesurface values, as 1 - and the non free surface values are 0
-        do a= 1,nreal
-            if(free_surf_val(a) .lt. FScutoff) free_surf_particle(a) = 1
-        enddo
+        
         
         ! Update variables for the next time step
         do a =1, nreal
@@ -335,7 +352,7 @@ correction_types=10
             call CorrectedScaGradPtoP( DF_a, DF_b,P(a),P(b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
-                    & SPH_dim, CF_pressure, ID_pressure) ! SPH_dim, correctionFactorID, grad_type
+                    & free_surf_particle(a),free_surf_particle(b),SPH_dim, CF_pressure, ID_pressure) ! SPH_dim, correctionFactorID, grad_type
             stress(:,a) = stress(:,a)+ DF_a(:)
             stress(:,b) = stress(:,b)+ DF_b(:)
             !-------------------------------------------------------------------------------------------------------------!
@@ -345,7 +362,7 @@ correction_types=10
                 call CorrectedScaGradPtoP(grad_vel(d,:,a),grad_vel(d,:,b),vx(d,a),vx(d,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                         & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                         & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
-                        & SPH_dim, CF_BIL_visc, 2) ! SPH_dim, correctionFactorID, grad_type
+                        & free_surf_particle(a),free_surf_particle(b),SPH_dim, CF_BIL_visc, 2) ! SPH_dim, correctionFactorID, grad_type
             enddo
             !-------------------------------------------------------------------------------------------------------------!
 
@@ -367,7 +384,7 @@ correction_types=10
             
             call CorrectedScaGradPtoB(DF_a,P(a),Sca_Bdry_val,del_gamma_as(:,k),  &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                    & SPH_dim, CF_pressure, ID_pressure) ! SPH_dim, correctionFactorID, grad_type
+                    & free_surf_particle(a),SPH_dim, CF_pressure, ID_pressure) ! SPH_dim, correctionFactorID, grad_type
             
             stress(:,a) = stress(:,a)+ DF_a(:)
             ! -----------------------------------------------------------------------!
@@ -377,7 +394,7 @@ correction_types=10
             do d = 1, SPH_dim
                 call CorrectedScaGradPtoB(grad_vel(d,:,a),vx(d,a),F_b(d),del_gamma_as(:,k),  &
                         & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                        & SPH_dim, CF_BIL_visc, 2) ! SPH_dim, correctionFactorID, grad_type
+                        & free_surf_particle(a),SPH_dim, CF_BIL_visc, 2) ! SPH_dim, correctionFactorID, grad_type
             enddo
             ! -----------------------------------------------------------------------!
             
@@ -408,7 +425,7 @@ correction_types=10
                 call CorrectedBILapPtoP(DF_a(d),DF_b(d),vx(d,a),vx(d,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                         & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                         & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
-                        & SPH_dim, delx_ab(:),ID_BIL_visc)
+                        & free_surf_particle(a),free_surf_particle(b),SPH_dim, delx_ab(:),ID_BIL_visc)
             enddo
             
             stress(:,a) = stress(:,a)- mu(a)*DF_a(:)
@@ -451,7 +468,7 @@ correction_types=10
                 
                 call CorrectedBILapPtoB(DF_a(d), F_a, Sca_Bdry_val, del_gamma_as(:,k), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                    & SPH_dim, dirich0Neum1,1) ! SPH_dim, correctionFactorID, BIL_type(1 = BIL-PCg, Macia, 2=BIL-NTG), dirich0Neum1
+                    & free_surf_particle(a),SPH_dim, dirich0Neum1,1) ! SPH_dim, correctionFactorID, BIL_type(1 = BIL-PCg, Macia, 2=BIL-NTG), dirich0Neum1
             enddo
             
             stress(:,a) = stress(:,a)- mu(a)*DF_a(:)

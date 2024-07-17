@@ -1,10 +1,11 @@
-subroutine CorrectionFactorParsing(scalar_factor,matrix_factor,id,Scalar0Matrix1,g_c, g_d, g_m, g_m_i, xi_m_i, dim)
+subroutine CorrectionFactorParsing(scalar_factor,matrix_factor,id,Scalar0Matrix1,g_c, g_d, g_m, g_m_i, xi_m_i, FS, dim)
     !This subroutine helps identify the correction factor for a given id
     implicit None
     integer(4), intent(in) :: dim,id
     integer(4), intent(out) :: Scalar0Matrix1
     real(8), intent(out) :: scalar_factor, matrix_factor(dim,dim)
     real(8), intent(in) :: g_c, g_d, g_m(dim,dim),g_m_i(dim,dim), xi_m_i(dim,dim)
+    integer(2), intent(in) :: FS
     integer(4) :: d
 
     
@@ -34,6 +35,11 @@ subroutine CorrectionFactorParsing(scalar_factor,matrix_factor,id,Scalar0Matrix1
         Scalar0Matrix1 = 1
     
     elseif( id .eq. 5 ) then
+        !This uses L matrix inverse (essentially PCBI without bdry) as a factor
+        matrix_factor=xi_m_i
+        Scalar0Matrix1 = 1
+        
+    elseif( id .eq. 6 ) then
         !This uses L matrix inverse (essentially PCBI without bdry) as a factor
         matrix_factor=xi_m_i
         Scalar0Matrix1 = 1
