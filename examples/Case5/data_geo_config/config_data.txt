@@ -10,7 +10,7 @@ pack_step2b 1.D0
 pack_step2c 200
 hsml_const 8.D-2
 rho_init 1000.D0
-mu_const 1.D3
+mu_const 0.D0
 g_const 0.D0
 ref_vel_max	7.D0
 c_sound	10.D0
@@ -23,7 +23,7 @@ PrsrGradtype 31
 ConDivtype 26
 SumDenstype 3
 summationDensity 0
-artViscType 0
+artViscType 1
 MLS_density_bound 0
 MLS_step 1
 densDiffType 25

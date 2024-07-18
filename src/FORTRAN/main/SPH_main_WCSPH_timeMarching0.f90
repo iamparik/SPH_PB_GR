@@ -530,7 +530,7 @@ correction_types=10
         
         !------------------------ export parameter values as output -----------------!
                
-        if(time_ev_par_op)call caseBasedOutput(itimestep)
+        if(time_ev_par_op)call caseBasedOutput(itimestep,dt)
         
         if ((mod(itimestep,save_step).eq.0) .or. (itimestep.eq.1)) call output_flow_simplified(itimestep,dt)   
         
