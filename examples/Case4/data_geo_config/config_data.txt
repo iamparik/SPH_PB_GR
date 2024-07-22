@@ -7,7 +7,7 @@ ExtInputMeshType 2
 packagingIterations 1
 pack_step2a 100000
 pack_step2b 6.D-1
-pack_step2c 1000
+pack_step2c 100000
 hsml_const 8.D-2
 rho_init 1000.D0
 mu_const 1.D1

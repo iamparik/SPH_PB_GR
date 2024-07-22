@@ -237,8 +237,8 @@ do while (packing_in_progress)
     if((cutoff_step .eq. 0) .and. (mod(iterstep,pack_step2a) .eq. 0)) then
         cutoff_step = cutoff_step + 1
         write(*,*) "First Cut off step at iteration ", iterstep
-    elseif((cutoff_step .eq. 0) .and. (mod(iterstep,1000) .eq. 0) .and. &
-            & (abs(PP_Variable - PP_Variable_prev) .lt. 1.D-2*PP_Variable) ) then
+    elseif((cutoff_step .eq. 0) .and. (mod(iterstep,100) .eq. 0) .and. &
+            & (abs(PP_Variable - PP_Variable_prev) .lt. 1.D-1*PP_Variable) ) then
         cutoff_step = cutoff_step + 1
         write(*,*) "First Cut off step at iteration ", iterstep       
     endif
@@ -247,8 +247,8 @@ do while (packing_in_progress)
     if((cutoff_step .eq. 2) .and. (mod(iterstep,pack_step2c) .eq. 0)) then
         cutoff_step = cutoff_step + 1
         write(*,*) "Second Cut off step at iteration ", iterstep
-    elseif((cutoff_step .eq. 2) .and. (mod(iterstep,1000) .eq. 0) .and. &
-            & (abs(PP_Variable - PP_Variable_prev) .lt. 1.D-2*PP_Variable) ) then
+    elseif((cutoff_step .eq. 2) .and. (mod(iterstep,100) .eq. 0) .and. &
+            & (abs(PP_Variable - PP_Variable_prev) .lt. 1.D-1*PP_Variable) ) then
         cutoff_step = cutoff_step + 1
         write(*,*) "Second Cut off step at iteration ", iterstep
     endif
