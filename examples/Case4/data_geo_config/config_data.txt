@@ -3,8 +3,8 @@ print_step 100
 save_step 100
 backup_step 1000000
 dx_r 4.D-2
-ExtInputMeshType 2
-packagingIterations 1
+ExtInputMeshType 5
+packagingIterations 0
 pack_step2a 100000
 pack_step2b 6.D-1
 pack_step2c 100000

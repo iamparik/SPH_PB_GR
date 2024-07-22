@@ -27,7 +27,7 @@ real(8) dt, xEdgeTemp(2,2), xrefPoint(2), xEdge_surfNorm(2),gamma_cutoff, scale_
     &   dCF, TPD, delC_avg
 real(8) PP_Variable_prev, PP_Variable, grad_b_term, maxShift, w_dxr, delr(SPH_dim), &
     & extra_vec(SPH_dim), dstress(SPH_dim), dx_as, w_dxas, ps_pa, PSTShift
-integer(4) iterstep, a, b, k,s,d, cutoff_step
+integer(4) iterstep, a, b, k,s,d, cutoff_step, step2a_iter
 logical packing_in_progress
 logical, DIMENSION(:),ALLOCATABLE :: packableParticle
 real(8),DIMENSION(:,:),ALLOCATABLE :: bdry_push
@@ -219,38 +219,55 @@ do while (packing_in_progress)
         TPD = TPD + norm2(xStart(:,a)-x(:,a))/nreal
         delC_avg= delC_avg + norm2(delC(:,a))/nreal
     enddo
-    
-    ! uncomment above lines to run previous code
-    
-    
-    if(iterstep .eq. 1) then
-        PP_variable_prev = 1000.D0 !random highnumber
-        PP_variable = 0.D0
-    elseif(mod(iterstep,1000) .eq. 0) then
-        PP_variable_prev = PP_variable
-        PP_variable = TPD
-    endif
-    
+
+
     call outputPacking(iterstep,1,TPD,delC_avg)
     
+    !Use TPD for step2a convergence criteria
+    if(iterstep .eq. 1) PP_variable =TPD
+    
     ! check if step2a can be ended
-    if((cutoff_step .eq. 0) .and. (mod(iterstep,pack_step2a) .eq. 0)) then
-        cutoff_step = cutoff_step + 1
-        write(*,*) "First Cut off step at iteration ", iterstep
-    elseif((cutoff_step .eq. 0) .and. (mod(iterstep,100) .eq. 0) .and. &
-            & (abs(PP_Variable - PP_Variable_prev) .lt. 1.D-1*PP_Variable) ) then
-        cutoff_step = cutoff_step + 1
-        write(*,*) "First Cut off step at iteration ", iterstep       
+    if(cutoff_step .eq. 0) then
+        if(mod(iterstep,100) .eq. 0) then
+            PP_variable_prev = PP_variable
+            PP_variable = TPD
+            if(abs(PP_Variable - PP_Variable_prev) .lt. 1.D-2*PP_Variable) then
+                cutoff_step = cutoff_step + 1
+                write(*,*) "First Cut off step at iteration ", iterstep
+                PP_variable = delC_avg
+                step2a_iter = 0
+            elseif(mod(iterstep,pack_step2a) .eq. 0) then
+                cutoff_step = cutoff_step + 1
+                write(*,*) "First Cut off step at iteration ", iterstep
+                PP_variable = delC_avg
+                step2a_iter = 0
+            endif
+        elseif(mod(iterstep,pack_step2a) .eq. 0) then
+            cutoff_step = cutoff_step + 1
+            write(*,*) "First Cut off step at iteration ", iterstep
+            PP_variable = delC_avg
+            step2a_iter = iterstep
+        endif
+        
     endif
     
     ! check if step2c can be ended
-    if((cutoff_step .eq. 2) .and. (mod(iterstep,pack_step2c) .eq. 0)) then
-        cutoff_step = cutoff_step + 1
-        write(*,*) "Second Cut off step at iteration ", iterstep
-    elseif((cutoff_step .eq. 2) .and. (mod(iterstep,100) .eq. 0) .and. &
-            & (abs(PP_Variable - PP_Variable_prev) .lt. 1.D-1*PP_Variable) ) then
-        cutoff_step = cutoff_step + 1
-        write(*,*) "Second Cut off step at iteration ", iterstep
+    if(cutoff_step .eq. 2) then
+        if(mod(iterstep,100) .eq. step2a_iter) then
+            PP_variable_prev = PP_variable
+            PP_variable = delC_avg
+            if(abs(PP_Variable - PP_Variable_prev) .lt. 1.D-2*PP_Variable) then
+                cutoff_step = cutoff_step + 1
+                write(*,*) "Second Cut off step at iteration ", iterstep
+            elseif(mod(iterstep,pack_step2c) .eq. 0) then
+                cutoff_step = cutoff_step + 1
+                write(*,*) "Second Cut off step at iteration ", iterstep
+            endif
+        elseif(mod(iterstep,pack_step2c) .eq. 0) then
+            cutoff_step = cutoff_step + 1
+            write(*,*) "Second Cut off step at iteration ", iterstep
+        endif
+        
     endif
     
     
