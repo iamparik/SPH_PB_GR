@@ -189,8 +189,7 @@
 
     ! Now perform the particle packing algorithm 
     if(packagingIterations) then
-        call particlePackingTimeIntegration(.true.)
-    !input : quick_converge_step2C  ! use .true. to enable quickconverge    
+        call particlePackingTimeIntegration  
    
         deallocate(simGridSize, x, vol, itype)
         deallocate(x_ve,etype, edge, surf_norm)

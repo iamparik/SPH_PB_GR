@@ -8,10 +8,11 @@
 !   Last Modified:  07/11/2023        by  PARIKSHIT BOREGOWDA 
 !****************************************************************************
 
-subroutine particlePackingTimeIntegration(quick_converge_step2C)
+subroutine particlePackingTimeIntegration
 
 use config_parameter, only: SPH_dim, pi, DataConfigPath, &
-    & print_step, save_step, hsml_const, dx_r
+    & print_step, save_step, hsml_const, dx_r, &
+    & pack_step2a, pack_step2b, pack_step2c
 use particle_data, only: nreal, w_aa, w, dwdx, &
         & gamma_discrt, gamma_cont, del_gamma_as, del_gamma, &
         & xi1_mat, beta_mat,gamma_mat,xi_cont_mat, &
@@ -22,8 +23,6 @@ use particle_data, only: nreal, w_aa, w, dwdx, &
 
 implicit none
 
-
-logical, intent(in) :: quick_converge_step2C
 real(8) dt, xEdgeTemp(2,2), xrefPoint(2), xEdge_surfNorm(2),gamma_cutoff, scale_k, &
     &   dCF, TPD, delC_avg
 real(8) PP_Variable_prev, PP_Variable, grad_b_term, maxShift, w_dxr, delr(SPH_dim), &
@@ -111,7 +110,7 @@ do while (packing_in_progress)
         xEdge_surfNorm(:)=0.D0
         xEdgeTemp(1,1)= -scale_k*hsml_const 
         xEdgeTemp(1,2)= scale_k*hsml_const 
-        xrefPoint(2) = -3.D0*dx_r/5.D0
+        xrefPoint(2) = -pack_step2b*dx_r
         xEdge_surfNorm(2)= -1.D0
         
         call gamma_analytical_leroy_2D(xrefPoint,xEdgeTemp,xEdge_surfNorm,gamma_cutoff,hsml_const,pi)
@@ -221,29 +220,37 @@ do while (packing_in_progress)
         delC_avg= delC_avg + norm2(delC(:,a))/nreal
     enddo
     
-    !call outputPacking(iterstep,100,TPD,delC_avg) !input: iterStep, saveStep, TPD
-    !! Now we check if for every 1000 steps if the particle packing variable
-    !! is unchanged compared to its previous value
-    !if(mod(iterstep,1000) .eq. 0) then
-    !    ! Select the particle packing variable (like TPD)
-    !    PP_variable =TPD
-    !    
-    !    if((abs(PP_Variable - PP_Variable_prev)) .lt. 1.D-2*PP_Variable) then
-    !        cutoff_step = cutoff_step + 1
-    !    elseif((cutoff_step .eq. 2) .and. quick_converge_step2C) then
-    !        cutoff_step = cutoff_step + 1
-    !    endif
-    !    
-    !    PP_variable_prev = PP_variable
-    !endif
-    
     ! uncomment above lines to run previous code
-    call outputPacking(iterstep,1,TPD,delC_avg)
-    if((cutoff_step .eq. 0) .and. (mod(iterstep,100) .eq. 0)) then
-        cutoff_step = cutoff_step + 1
+    
+    
+    if(iterstep .eq. 1) then
+        PP_variable_prev = 1000.D0 !random highnumber
+        PP_variable = 0.D0
+    elseif(mod(iterstep,1000) .eq. 0) then
+        PP_variable_prev = PP_variable
+        PP_variable = TPD
     endif
-    if((cutoff_step .eq. 2) .and. (mod(iterstep,100) .eq. 0)) then
+    
+    call outputPacking(iterstep,1,TPD,delC_avg)
+    
+    ! check if step2a can be ended
+    if((cutoff_step .eq. 0) .and. (mod(iterstep,pack_step2a) .eq. 0)) then
         cutoff_step = cutoff_step + 1
+        write(*,*) "First Cut off step at iteration ", iterstep
+    elseif((cutoff_step .eq. 0) .and. (mod(iterstep,1000) .eq. 0) .and. &
+            & (abs(PP_Variable - PP_Variable_prev) .lt. 1.D-2*PP_Variable) ) then
+        cutoff_step = cutoff_step + 1
+        write(*,*) "First Cut off step at iteration ", iterstep       
+    endif
+    
+    ! check if step2c can be ended
+    if((cutoff_step .eq. 2) .and. (mod(iterstep,pack_step2c) .eq. 0)) then
+        cutoff_step = cutoff_step + 1
+        write(*,*) "Second Cut off step at iteration ", iterstep
+    elseif((cutoff_step .eq. 2) .and. (mod(iterstep,1000) .eq. 0) .and. &
+            & (abs(PP_Variable - PP_Variable_prev) .lt. 1.D-2*PP_Variable) ) then
+        cutoff_step = cutoff_step + 1
+        write(*,*) "Second Cut off step at iteration ", iterstep
     endif
     
     
