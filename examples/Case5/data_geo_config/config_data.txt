@@ -5,8 +5,8 @@ backup_step 1000000
 dx_r 4.D-2
 ExtInputMeshType 5
 packagingIterations 0
-pack_stap2a 100
-pack_step2b 1.D0
+pack_step2a 100
+pack_step2b 6.D-1
 pack_step2c 200
 hsml_const 8.D-2
 rho_init 1000.D0
