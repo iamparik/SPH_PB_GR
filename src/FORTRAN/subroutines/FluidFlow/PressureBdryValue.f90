@@ -23,7 +23,12 @@ elseif(ID .eq. 3) then
     call ParticlePressureEOS(prsr_, rho_comp, itype_, itype_virtual)    
     prsr_ = prsr_ - rho_*c_sound*dot_product(vx_-bdryVal_seg_(1:SPH_dim), surf_norm(:,s)) 
     
-elseif(ID .eq. 4) then
+elseif(ID .eq. 4) then    
+    rho_comp=max(rho_,(rho_/(dx_r/2.D0))*(2.D0*(dx_r/2.D0)-norm2(x_-mid_pt_for_edge(:,s))))    
+    call ParticlePressureEOS(prsr_, rho_comp, itype_, itype_virtual)    
+    prsr_ = prsr_ - rho_*c_sound*dot_product(vx_-bdryVal_seg_(1:SPH_dim), surf_norm(:,s)) 
+    
+elseif(ID .eq. 5) then
     !rho_wall_compress=max(rho(a),rho(a)*(gamma_cont(a) + 0.5D0 - 2.D0*gamma_wall_cutoff)/(0.5D0-gamma_wall_cutoff))
     rho_comp=max(rho_,(rho_/(dx_r/4.D0))*(2.D0*(dx_r/4.D0)-norm2(x_-mid_pt_for_edge(:,s))))
     
