@@ -69,7 +69,8 @@
 		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\artificialViscosityOperator.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\densDiffusionOperator.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\maxTimeStepFluid.f90"/>
-		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\ParticlePressureEOS.f90"/></Filter>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\ParticlePressureEOS.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\PressureBdryValue.f90"/></Filter>
 		<Filter Name="InputFiles">
 		<File RelativePath="..\..\src\FORTRAN\subroutines\Input\inputCADtoEdgeData.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\Input\inputCADtoParticleData.f90"/>
@@ -90,6 +91,7 @@
 		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\nnps_algorithm.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\particlePair.f90"/></Filter>
 		<Filter Name="OutputRoutines">
+		<File RelativePath=".\caseBasedOutput.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\Output\createOutputFolder.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\Output\output_flow_simplified.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\Output\outputPacking.f90"/>
