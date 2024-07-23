@@ -236,13 +236,13 @@ do while (packing_in_progress)
                 write(*,*) "First Cut off step at iteration ", iterstep
                 PP_variable = delC_avg
                 step2a_iter = 0
-            elseif(mod(iterstep,pack_step2a) .eq. 0) then
+            elseif(iterstep .eq. pack_step2a) then
                 cutoff_step = cutoff_step + 1
                 write(*,*) "First Cut off step at iteration ", iterstep
                 PP_variable = delC_avg
                 step2a_iter = 0
             endif
-        elseif(mod(iterstep,pack_step2a) .eq. 0) then
+        elseif(iterstep .eq. pack_step2a) then
             cutoff_step = cutoff_step + 1
             write(*,*) "First Cut off step at iteration ", iterstep
             PP_variable = delC_avg
@@ -259,11 +259,11 @@ do while (packing_in_progress)
             if(abs(PP_Variable - PP_Variable_prev) .lt. 1.D-2*PP_Variable) then
                 cutoff_step = cutoff_step + 1
                 write(*,*) "Second Cut off step at iteration ", iterstep
-            elseif(mod(iterstep,pack_step2c) .eq. 0) then
+            elseif(iterstep .eq. pack_step2c) then
                 cutoff_step = cutoff_step + 1
                 write(*,*) "Second Cut off step at iteration ", iterstep
             endif
-        elseif(mod(iterstep,pack_step2c) .eq. 0) then
+        elseif(iterstep .eq. pack_step2c) then
             cutoff_step = cutoff_step + 1
             write(*,*) "Second Cut off step at iteration ", iterstep
         endif
