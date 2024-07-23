@@ -1,4 +1,4 @@
-time_step 1.D-3
+time_step 4.D-4
 print_step 100
 save_step 100
 backup_step 1000000
