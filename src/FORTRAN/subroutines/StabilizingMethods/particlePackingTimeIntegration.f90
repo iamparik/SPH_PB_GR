@@ -26,11 +26,13 @@ implicit none
 real(8) dt, xEdgeTemp(2,2), xrefPoint(2), xEdge_surfNorm(2),gamma_cutoff, scale_k, &
     &   dCF, TPD, delC_avg
 real(8) PP_Variable_prev, PP_Variable, grad_b_term, maxShift, w_dxr, delr(SPH_dim), &
-    & extra_vec(SPH_dim), dstress(SPH_dim), dx_as, w_dxas, ps_pa, PSTShift
-integer(4) iterstep, a, b, k,s,d, cutoff_step, step2a_iter
+    & extra_vec(SPH_dim), dstress(SPH_dim), dx_as, w_dxas, ps_pa, PSTShift, &
+    & temp_matrix(SPH_dim,SPH_dim), temp_scalar
+integer(4) iterstep, a, b, k,s,d, cutoff_step, step2a_iter,n_step2a
 logical packing_in_progress
-logical, DIMENSION(:),ALLOCATABLE :: packableParticle
+logical, DIMENSION(:),ALLOCATABLE :: packableParticle,step2a_particle
 real(8),DIMENSION(:,:),ALLOCATABLE :: bdry_push
+integer(4),DIMENSION(:),ALLOCATABLE :: sel_particle_link
 character (40) :: x2name
 
 
@@ -38,6 +40,9 @@ call sml_mult_factor(scale_k)
 
 Allocate(xStart(SPH_dim,ntotal))
 xStart=x   
+
+temp_matrix=0.D0
+temp_scalar=0.D0
 
 !intialize the start of the loop
 iterstep=0
@@ -57,78 +62,87 @@ do while (packing_in_progress)
         write(*,*)'______________________________________________'
     endif    
     
-    ! Nearest Neighbor Particle search algorithm is called to find particle pairs
-    ! These Particle pairs interact within the volume integral in SPH formulation
-    ! In a discrete sense this requires particles with mass for summation
-    call nnps_algorithm
-
-    ! Nearest Neighbor Edge Search algorithm is called to find particles whose Kernels
-    ! are truncated at the edge boundaries. This is needed to evaluate boundary integral 
-    ! in SPH formulation.
-    call nnes_algorithm
-    
-    ! Call the analytical del_gamma evaluation Boundary_integral(W*n_s)
-    ! However, this analytical determination is only for the discretized boundary with linear boundary elements.
-    ! So to find the del_gamma for the real boundary, the boundary discretization
-    ! needs to refined. So, a Circular boundary's  del_gamma will only be reproduced when the n polygon representing
-    ! tends to infinity vertices polygon. However, for a given polygon boudnary approxiamtion, analytical del_gamm calculated below,
-    ! gives the accurate value of del_gamma for that n-polygon.
-    call dgamma_analytical
-    
-
-    ! Value of continuos gamma can be evaluated either from the del_gamma like in Ferrand's work,
-    ! or by defining a divergence oeprator and evaluating gamma with an analyical formula
-    ! call gamma_continuous_Ferrand(dt)
-    call gamma_continuous_leroy
-    
-    ! Call the function to determine kernel weights  at 0 radius, as 
-    ! interpolation of 0th order functions require value of weigths at center of the kernel
-    call smoothing_w0
-    
-    ! Call the discrete version of gamma summation(W_ab*m_b/rho_b)
-    call gamma_discrete1_factor
-    
     ! We define particles that can be packed initially, following Algorithm of Boregowda et. al 2024
-    if (iterstep .eq. 1) then
-        ALLOCATE(packableParticle(ntotal))
-        packableParticle(:) = .true.
+    if(iterstep .eq. 1) then
+        call nnps_algorithm(2.D0)
+        call nnes_algorithm
+        call dgamma_analytical
+        call gamma_continuous_leroy
+        
+        ALLOCATE(step2a_particle(ntotal))
+        step2a_particle=.false.
         
         ! We only want to pack particles next to boundary initially
-        do a = 1, ntotal
-            if(gamma_cont(a) .eq. 1.D0) packableParticle(a) = .false.                
+        ! Check if a particle needs to be included in particle search algorithm
+        do k =1,niac
+            a = pair_i(k)
+            b = pair_j(k)            
+            if( (gamma_cont(a) .lt. 1.D0 ) .or. (gamma_cont(b) .lt. 1.D0)) then
+                step2a_particle(a) = .true.
+                step2a_particle(b) = .true.
+            endif    
         enddo
+        
+        !Find total number of particles in step2a and link step2a particle numbers to 
+        ! general particle numbers
+        allocate(packableParticle(ntotal),sel_particle_link(ntotal))    
+        sel_particle_link=0
+        packableParticle(:) = .true.
+        n_step2a=0
+        do a = 1, ntotal
+            if(step2a_particle(a)) then
+                n_step2a=n_step2a+1
+                sel_particle_link(n_step2a) =a
+            endif
+            if(gamma_cont(a) .eq. 1.D0) packableParticle(a) = .false. 
+        enddo
+        deallocate(step2a_particle)
         
         !Initialize the previous particle packing variable to be zero
         PP_Variable_prev=0.D0
+        
+        deallocate(gamma_cont,del_gamma_as, del_gamma, epair_a, epair_s, pair_i, pair_j, w,dwdx)
+    endif
+    
+    if(cutoff_step .eq. 0) then
+        call direct_find_reduced(sel_particle_link, n_step2a)
+        call direct_edge_find_reduced(sel_particle_link, n_step2a)
+        call dgamma_analytical
+        call gamma_continuous_leroy
+    else
+        call nnps_algorithm(1.D0)
+        call nnes_algorithm
+        call dgamma_analytical
+        call gamma_continuous_leroy
+        
+        if( cutoff_step .eq. 1 ) then
+            deallocate(sel_particle_link)
+            xEdgeTemp(:,:)= 0.D0
+            xrefPoint(:)=0.D0
+            xEdge_surfNorm(:)=0.D0
+            xEdgeTemp(1,1)= -scale_k*hsml_const 
+            xEdgeTemp(1,2)= scale_k*hsml_const 
+            xrefPoint(2) = -pack_step2b*dx_r
+            xEdge_surfNorm(2)= -1.D0
+        
+            call gamma_analytical_leroy_2D(xrefPoint,xEdgeTemp,xEdge_surfNorm,gamma_cutoff,hsml_const,pi)
+            gamma_cutoff=1-gamma_cutoff
+        
+            write(*,*) "gamma_cutoff for the particle packing scheme is : " , gamma_cutoff
+        
+            do a = 1, ntotal
+                if(gamma_cont(a) .lt. gamma_cutoff) then 
+                    packableParticle(a) = .false.  
+                else
+                    packableParticle(a) = .true. 
+                endif            
+            enddo
+        
+            cutoff_step = 2
+        endif
+        
+    endif
 
-    endif
-    
-    if( cutoff_step .eq. 1 ) then
-        
-        xEdgeTemp(:,:)= 0.D0
-        xrefPoint(:)=0.D0
-        xEdge_surfNorm(:)=0.D0
-        xEdgeTemp(1,1)= -scale_k*hsml_const 
-        xEdgeTemp(1,2)= scale_k*hsml_const 
-        xrefPoint(2) = -pack_step2b*dx_r
-        xEdge_surfNorm(2)= -1.D0
-        
-        call gamma_analytical_leroy_2D(xrefPoint,xEdgeTemp,xEdge_surfNorm,gamma_cutoff,hsml_const,pi)
-        gamma_cutoff=1-gamma_cutoff
-        
-        write(*,*) "gamma_cutoff for the particle packing scheme is : " , gamma_cutoff
-        
-        do a = 1, ntotal
-            if(gamma_cont(a) .lt. gamma_cutoff) then 
-                packableParticle(a) = .false.  
-            else
-                packableParticle(a) = .true. 
-            endif            
-        enddo
-        
-        cutoff_step = 2
-    endif
-    
     
 !Call the packaging algorithm
     ! Define the coeffecient of particle shifting technique used for packing particles
@@ -150,8 +164,8 @@ do while (packing_in_progress)
     
         ! Calculate particle-particle term for concentration gradient
         call CorrectedScaGradPtoP(delC(:,a),delC(:,b),dCF,dCF,dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
-                    & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                    & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
+                    & gamma_cont(a), temp_scalar, temp_matrix, temp_matrix, temp_matrix, &
+                    & gamma_cont(b), temp_scalar, temp_matrix, temp_matrix, temp_matrix, &
                     & 0,0,SPH_dim, 1, 1) ! SPH_dim, correctionFactorID, grad_type
     enddo
 
@@ -171,7 +185,7 @@ do while (packing_in_progress)
     
         ! Calculate boundary term for cincentration gradient
         call CorrectedScaGradPtoB(delC(:,a),1.D0,dCF,del_gamma_as(:,k),  &
-                            & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                            & gamma_cont(a), temp_scalar, temp_matrix, temp_matrix, temp_matrix, &
                             & 0,SPH_dim, 1, 1)
         
         ! Add boundary force function below
@@ -189,7 +203,7 @@ do while (packing_in_progress)
         dCF=0.5D0*(ps_pa -1.D0)
     
         call CorrectedScaGradPtoB(bdry_push(:,a),1.D0,dCF,del_gamma_as(:,k),  &
-                            & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                            & gamma_cont(a), temp_scalar, temp_matrix, temp_matrix, temp_matrix, &
                             & 0,SPH_dim, 1, 1)
     enddo  
 
@@ -275,7 +289,7 @@ do while (packing_in_progress)
     
 
         
-    deallocate(gamma_cont,del_gamma_as, del_gamma, epair_a, epair_s, pair_i, pair_j, w,dwdx, w_aa, gamma_discrt)
+    deallocate(gamma_cont,del_gamma_as, del_gamma, epair_a, epair_s, pair_i, pair_j, w,dwdx)
   
     if( cutoff_step .eq. 3) then
         write(*,*) "packing ends at iterstep = ", iterstep

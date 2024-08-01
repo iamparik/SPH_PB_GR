@@ -280,7 +280,7 @@ use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, 
   ve_total=num_ver
   nperiodic=kpBC
   
-  call  nnps_algorithm
+  call  nnps_algorithm(1.D0)
   
   call  nnes_algorithm
   
