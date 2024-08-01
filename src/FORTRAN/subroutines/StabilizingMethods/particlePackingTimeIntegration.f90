@@ -233,10 +233,19 @@ do while (packing_in_progress)
     !Initialize total particle displacement to zero and average concgradient to zero
     TPD=0.D0
     delC_avg = 0.D0
-    do a=1,nreal        
-        TPD = TPD + norm2(xStart(:,a)-x(:,a))/nreal
-        delC_avg= delC_avg + norm2(delC(:,a))/nreal
-    enddo
+    if(cutoff_step .eq. 0) then
+        do a=1,n_step2a     
+            b=sel_particle_link(a)
+            TPD = TPD + norm2(xStart(:,b)-x(:,b))/n_step2a
+            delC_avg= delC_avg + norm2(delC(:,b))/n_step2a
+        enddo
+    else
+         do a=1,nreal        
+            TPD = TPD + norm2(xStart(:,a)-x(:,a))/nreal
+            delC_avg= delC_avg + norm2(delC(:,a))/nreal
+        enddo
+    endif
+    
     
     call system_clock(count=ic2)
     !write(*,*) iterstep, " : ", dble((ic2-ic1)/real(crate1))
