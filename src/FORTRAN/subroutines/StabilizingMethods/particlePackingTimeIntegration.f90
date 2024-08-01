@@ -27,13 +27,14 @@ real(8) dt, xEdgeTemp(2,2), xrefPoint(2), xEdge_surfNorm(2),gamma_cutoff, scale_
     &   dCF, TPD, delC_avg
 real(8) PP_Variable_prev, PP_Variable, grad_b_term, maxShift, w_dxr, delr(SPH_dim), &
     & extra_vec(SPH_dim), dstress(SPH_dim), dx_as, w_dxas, ps_pa, PSTShift, &
-    & temp_matrix(SPH_dim,SPH_dim), temp_scalar
+    & temp_matrix(SPH_dim,SPH_dim), temp_scalar,time_elapsed
 integer(4) iterstep, a, b, k,s,d, cutoff_step, step2a_iter,n_step2a
 logical packing_in_progress
 logical, DIMENSION(:),ALLOCATABLE :: packableParticle,step2a_particle
 real(8),DIMENSION(:,:),ALLOCATABLE :: bdry_push
 integer(4),DIMENSION(:),ALLOCATABLE :: sel_particle_link
 character (40) :: x2name
+integer(8) :: ic1, crate1, cmax1, ic2
 
 
 call sml_mult_factor(scale_k)
@@ -60,7 +61,10 @@ do while (packing_in_progress)
         write(*,*)'______________________________________________'
         write(*,*)'  Starting the Packaging Alorithm'
         write(*,*)'______________________________________________'
+        time_elapsed=0.D0
     endif    
+    
+    call system_clock(count=ic1, count_rate=crate1, count_max=cmax1)
     
     ! We define particles that can be packed initially, following Algorithm of Boregowda et. al 2024
     if(iterstep .eq. 1) then
@@ -233,13 +237,19 @@ do while (packing_in_progress)
         TPD = TPD + norm2(xStart(:,a)-x(:,a))/nreal
         delC_avg= delC_avg + norm2(delC(:,a))/nreal
     enddo
-
+    
+    call system_clock(count=ic2)
+    !write(*,*) iterstep, " : ", dble((ic2-ic1)/real(crate1))
+    time_elapsed=time_elapsed+dble((ic2-ic1)/real(crate1))
 
     call outputPacking(iterstep,1,TPD,delC_avg)
     
     !Use TPD for step2a convergence criteria
-    if(iterstep .eq. 1) PP_variable =TPD
-    
+    if(iterstep .eq. 1) then
+         write (*,*)'        Elapsed time for iteration ', iterstep, " is",  time_elapsed, 'sec'
+         time_elapsed=0.D0
+        PP_variable =TPD
+    endif
     ! check if step2a can be ended
     if(cutoff_step .eq. 0) then
         if(mod(iterstep,100) .eq. 0) then
@@ -247,18 +257,21 @@ do while (packing_in_progress)
             PP_variable = TPD
             if(abs(PP_Variable - PP_Variable_prev) .lt. 1.D-2*PP_Variable) then
                 cutoff_step = cutoff_step + 1
-                write(*,*) "First Cut off step at iteration ", iterstep
+                write(*,*) "First Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-1)
+                time_elapsed=0.D0
                 PP_variable = delC_avg
-                step2a_iter = 0
+                step2a_iter = iterstep
             elseif(iterstep .eq. pack_step2a) then
                 cutoff_step = cutoff_step + 1
-                write(*,*) "First Cut off step at iteration ", iterstep
+                write(*,*) "First Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-1)
+                time_elapsed=0.D0
                 PP_variable = delC_avg
-                step2a_iter = 0
+                step2a_iter = iterstep
             endif
         elseif(iterstep .eq. pack_step2a) then
             cutoff_step = cutoff_step + 1
-            write(*,*) "First Cut off step at iteration ", iterstep
+            write(*,*) "First Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-1)
+            time_elapsed=0.D0
             PP_variable = delC_avg
             step2a_iter = iterstep
         endif
@@ -267,19 +280,19 @@ do while (packing_in_progress)
     
     ! check if step2c can be ended
     if(cutoff_step .eq. 2) then
-        if(mod(iterstep,100) .eq. step2a_iter) then
+        if(mod(iterstep-step2a_iter,100) .eq. 0) then
             PP_variable_prev = PP_variable
             PP_variable = delC_avg
             if(abs(PP_Variable - PP_Variable_prev) .lt. 1.D-2*PP_Variable) then
                 cutoff_step = cutoff_step + 1
-                write(*,*) "Second Cut off step at iteration ", iterstep
+                write(*,*) "Second Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-step2a_iter)
             elseif(iterstep .eq. pack_step2c) then
                 cutoff_step = cutoff_step + 1
-                write(*,*) "Second Cut off step at iteration ", iterstep
+                write(*,*) "Second Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-step2a_iter)
             endif
-        elseif(iterstep .eq. pack_step2c) then
+        elseif(iterstep-step2a_iter .eq. pack_step2c) then
             cutoff_step = cutoff_step + 1
-            write(*,*) "Second Cut off step at iteration ", iterstep
+            write(*,*) "Second Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-step2a_iter)
         endif
         
     endif
