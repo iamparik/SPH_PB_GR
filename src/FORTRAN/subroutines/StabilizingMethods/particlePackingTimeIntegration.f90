@@ -28,7 +28,7 @@ real(8) dt, xEdgeTemp(2,2), xrefPoint(2), xEdge_surfNorm(2),gamma_cutoff, scale_
 real(8) PP_Variable_prev, PP_Variable, grad_b_term, maxShift, w_dxr, delr(SPH_dim), &
     & extra_vec(SPH_dim), dstress(SPH_dim), dx_as, w_dxas, ps_pa, PSTShift, &
     & temp_matrix(SPH_dim,SPH_dim), temp_scalar, &
-    & time_elapsed, maxtime_elapsed, mintime_elapsed,cur_tt, prev_tt
+    & time_elapsed, maxtime_elapsed, mintime_elapsed,cur_tt
 integer(4) iterstep, a, b, k,s,d, cutoff_step, step2a_iter,n_step2a
 logical packing_in_progress
 logical, DIMENSION(:),ALLOCATABLE :: packableParticle,step2a_particle
@@ -258,15 +258,15 @@ do while (packing_in_progress)
     if(iterstep .eq. 1) then
          write (*,*)'        Elapsed time for iteration ', iterstep, " is",  cur_tt, 'sec'
          time_elapsed=0.D0
-         prev_tt=cur_tt
+         maxtime_elapsed=0.D0
+         mintime_elapsed=1.D6         
         PP_variable =TPD
     endif
     
     ! Calcualte time elapsed paramters
-    maxtime_elapsed=max(cur_tt, prev_tt)
-    mintime_elapsed=min(cur_tt, prev_tt)
+    maxtime_elapsed=max(cur_tt, maxtime_elapsed)
+    mintime_elapsed=min(cur_tt, mintime_elapsed)
     time_elapsed=time_elapsed+cur_tt
-    prev_tt=cur_tt
     
     ! check if step2a can be ended
     if(cutoff_step .eq. 0) then
@@ -278,6 +278,8 @@ do while (packing_in_progress)
                 write(*,*) "First Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-1), &
                     & " min time = ",mintime_elapsed, " max time = ", maxtime_elapsed
                 time_elapsed=0.D0
+                maxtime_elapsed=0.D0
+                mintime_elapsed=1.D6 
                 PP_variable = delC_avg
                 step2a_iter = iterstep
             elseif(iterstep .eq. pack_step2a) then
@@ -285,6 +287,8 @@ do while (packing_in_progress)
                 write(*,*) "First Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-1), &
                     & " min time = ",mintime_elapsed, " max time = ", maxtime_elapsed
                 time_elapsed=0.D0
+                maxtime_elapsed=0.D0
+                mintime_elapsed=1.D6 
                 PP_variable = delC_avg
                 step2a_iter = iterstep
             endif
@@ -293,6 +297,8 @@ do while (packing_in_progress)
             write(*,*) "First Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-1), &
                     & " min time = ",mintime_elapsed, " max time = ", maxtime_elapsed
             time_elapsed=0.D0
+            maxtime_elapsed=0.D0
+            mintime_elapsed=1.D6 
             PP_variable = delC_avg
             step2a_iter = iterstep
         endif
