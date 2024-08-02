@@ -27,7 +27,8 @@ real(8) dt, xEdgeTemp(2,2), xrefPoint(2), xEdge_surfNorm(2),gamma_cutoff, scale_
     &   dCF, TPD, delC_avg
 real(8) PP_Variable_prev, PP_Variable, grad_b_term, maxShift, w_dxr, delr(SPH_dim), &
     & extra_vec(SPH_dim), dstress(SPH_dim), dx_as, w_dxas, ps_pa, PSTShift, &
-    & temp_matrix(SPH_dim,SPH_dim), temp_scalar,time_elapsed
+    & temp_matrix(SPH_dim,SPH_dim), temp_scalar, &
+    & time_elapsed, maxtime_elapsed, mintime_elapsed,cur_tt, prev_tt
 integer(4) iterstep, a, b, k,s,d, cutoff_step, step2a_iter,n_step2a
 logical packing_in_progress
 logical, DIMENSION(:),ALLOCATABLE :: packableParticle,step2a_particle
@@ -246,19 +247,27 @@ do while (packing_in_progress)
         enddo
     endif
     
-    
+    ! use clock to capture time taken for packing iteration
     call system_clock(count=ic2)
-    !write(*,*) iterstep, " : ", dble((ic2-ic1)/real(crate1))
-    time_elapsed=time_elapsed+dble((ic2-ic1)/real(crate1))
+    cur_tt= dble((ic2-ic1)/real(crate1))
+    !write(*,*) iterstep, " : ", cur_tt 
 
     call outputPacking(iterstep,1,TPD,delC_avg)
     
     !Use TPD for step2a convergence criteria
     if(iterstep .eq. 1) then
-         write (*,*)'        Elapsed time for iteration ', iterstep, " is",  time_elapsed, 'sec'
+         write (*,*)'        Elapsed time for iteration ', iterstep, " is",  cur_tt, 'sec'
          time_elapsed=0.D0
+         prev_tt=cur_tt
         PP_variable =TPD
     endif
+    
+    ! Calcualte time elapsed paramters
+    maxtime_elapsed=max(cur_tt, prev_tt)
+    mintime_elapsed=min(cur_tt, prev_tt)
+    time_elapsed=time_elapsed+cur_tt
+    prev_tt=cur_tt
+    
     ! check if step2a can be ended
     if(cutoff_step .eq. 0) then
         if(mod(iterstep,100) .eq. 0) then
@@ -266,20 +275,23 @@ do while (packing_in_progress)
             PP_variable = TPD
             if(abs(PP_Variable - PP_Variable_prev) .lt. 1.D-2*PP_Variable) then
                 cutoff_step = cutoff_step + 1
-                write(*,*) "First Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-1)
+                write(*,*) "First Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-1), &
+                    & " min time = ",mintime_elapsed, " max time = ", maxtime_elapsed
                 time_elapsed=0.D0
                 PP_variable = delC_avg
                 step2a_iter = iterstep
             elseif(iterstep .eq. pack_step2a) then
                 cutoff_step = cutoff_step + 1
-                write(*,*) "First Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-1)
+                write(*,*) "First Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-1), &
+                    & " min time = ",mintime_elapsed, " max time = ", maxtime_elapsed
                 time_elapsed=0.D0
                 PP_variable = delC_avg
                 step2a_iter = iterstep
             endif
         elseif(iterstep .eq. pack_step2a) then
             cutoff_step = cutoff_step + 1
-            write(*,*) "First Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-1)
+            write(*,*) "First Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-1), &
+                    & " min time = ",mintime_elapsed, " max time = ", maxtime_elapsed
             time_elapsed=0.D0
             PP_variable = delC_avg
             step2a_iter = iterstep
@@ -294,14 +306,17 @@ do while (packing_in_progress)
             PP_variable = delC_avg
             if(abs(PP_Variable - PP_Variable_prev) .lt. 1.D-2*PP_Variable) then
                 cutoff_step = cutoff_step + 1
-                write(*,*) "Second Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-step2a_iter)
-            elseif(iterstep .eq. pack_step2c) then
+                write(*,*) "Second Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-step2a_iter), &
+                    & " min time = ",mintime_elapsed, " max time = ", maxtime_elapsed
+            elseif((iterstep-step2a_iter) .eq. pack_step2c) then
                 cutoff_step = cutoff_step + 1
-                write(*,*) "Second Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-step2a_iter)
+                write(*,*) "Second Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-step2a_iter), &
+                    & " min time = ",mintime_elapsed, " max time = ", maxtime_elapsed
             endif
-        elseif(iterstep-step2a_iter .eq. pack_step2c) then
+        elseif((iterstep-step2a_iter) .eq. pack_step2c) then
             cutoff_step = cutoff_step + 1
-            write(*,*) "Second Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-step2a_iter)
+            write(*,*) "Second Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-step2a_iter), &
+                    & " min time = ",mintime_elapsed, " max time = ", maxtime_elapsed
         endif
         
     endif
