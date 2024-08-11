@@ -3,11 +3,11 @@ print_step 100
 save_step 100
 backup_step 1000000
 dx_r 4.D-2
-ExtInputMeshType 5
-packagingIterations 0
-pack_step2a 100000
+ExtInputMeshType 2
+packagingIterations 1
+pack_step2a 10000
 pack_step2b 6.D-1
-pack_step2c 100000
+pack_step2c 1000
 hsml_const 8.D-2
 rho_init 1000.D0
 mu_const 1.D1
@@ -43,5 +43,5 @@ SPH_dim 2
 skf 5
 eos 2
 solver_type 1
-edge_to_dx_ratio 2
+edge_to_dx_ratio 10
 time_ev_par_op 1

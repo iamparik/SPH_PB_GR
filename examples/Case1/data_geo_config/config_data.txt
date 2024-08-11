@@ -5,7 +5,7 @@ backup_step 1000000
 dx_r 2.D-3
 ExtInputMeshType 2
 packagingIterations 0
-pack_stap2a 20
+pack_step2a 20
 pack_step2b 1.D0
 pack_step2c 100
 hsml_const 4.D-3

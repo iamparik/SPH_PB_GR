@@ -84,7 +84,9 @@
 		<File RelativePath="..\..\src\FORTRAN\module\particle_data.f90"/></Filter>
 		<Filter Name="NeighborSearch">
 		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\direct_edge_find.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\direct_edge_find_reduced.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\direct_find.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\direct_find_reduced.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\edge_particle_pair_2D.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\linkedList.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\nnes_algorithm.f90"/>

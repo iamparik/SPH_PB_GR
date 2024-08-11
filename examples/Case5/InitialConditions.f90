@@ -30,7 +30,7 @@ subroutine ICinputValue(initalVal_particle,num_var, itype)
     integer(4) :: d
     real(8):: hydroStaticHeight
     
-    hydroStaticHeight =1
+    hydroStaticHeight =1.D0
         
     if(itype .eq. 3) then
         

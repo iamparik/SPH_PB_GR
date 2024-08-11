@@ -432,7 +432,7 @@ def fillDomainWParticle2D(x_min, x_max, dx,bdryPolygon, output_file_path, bdry_t
 #Define the main function
 def main():
     root_directory="../../../"
-    ref_directory="examples/Case3_b/"  #"examples/Case2/" #"src/Python/NXtoParticle/" 
+    ref_directory="examples/Case7_b/"  #"examples/Case2/" #"src/Python/NXtoParticle/" 
     print("current ref_directory is in: ", ref_directory)        
 
     input_directory="inputCAD/"
