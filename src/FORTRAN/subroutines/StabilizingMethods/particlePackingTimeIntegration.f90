@@ -29,7 +29,7 @@ real(8) PP_Variable_prev, PP_Variable, grad_b_term, maxShift, w_dxr, delr(SPH_di
     & extra_vec(SPH_dim), dstress(SPH_dim), dx_as, w_dxas, ps_pa, PSTShift, &
     & temp_matrix(SPH_dim,SPH_dim), temp_scalar, &
     & time_elapsed, maxtime_elapsed, mintime_elapsed,cur_tt
-integer(4) iterstep, a, b, k,s,d, cutoff_step, step2a_iter,n_step2a
+integer(4) iterstep, a, b, k,s,d, cutoff_step, step2a_iter,n_step2a, n_pack
 logical packing_in_progress
 logical, DIMENSION(:),ALLOCATABLE :: packableParticle,step2a_particle
 real(8),DIMENSION(:,:),ALLOCATABLE :: bdry_push
@@ -94,12 +94,17 @@ do while (packing_in_progress)
         sel_particle_link=0
         packableParticle(:) = .true.
         n_step2a=0
+        n_pack =0 
         do a = 1, ntotal
             if(step2a_particle(a)) then
                 n_step2a=n_step2a+1
                 sel_particle_link(n_step2a) =a
             endif
-            if(gamma_cont(a) .eq. 1.D0) packableParticle(a) = .false. 
+            if(gamma_cont(a) .eq. 1.D0) then
+                packableParticle(a) = .false. 
+            else
+                n_pack = n_pack+1
+            endif
         enddo
         deallocate(step2a_particle)
         
@@ -135,11 +140,14 @@ do while (packing_in_progress)
         
             write(*,*) "gamma_cutoff for the particle packing scheme is : " , gamma_cutoff
         
+            n_pack=0
+            
             do a = 1, ntotal
                 if(gamma_cont(a) .lt. gamma_cutoff) then 
                     packableParticle(a) = .false.  
                 else
                     packableParticle(a) = .true. 
+                    n_pack=n_pack+1
                 endif            
             enddo
         
@@ -237,13 +245,18 @@ do while (packing_in_progress)
     if(cutoff_step .eq. 0) then
         do a=1,n_step2a     
             b=sel_particle_link(a)
-            TPD = TPD + norm2(xStart(:,b)-x(:,b))/n_step2a
-            delC_avg= delC_avg + norm2(delC(:,b))/n_step2a
+            
+            if(packableParticle(a)) then
+                TPD = TPD + norm2(xStart(:,b)-x(:,b))/n_pack
+                delC_avg= delC_avg + norm2(delC(:,b))/n_pack
+            endif
         enddo
     else
          do a=1,nreal        
-            TPD = TPD + norm2(xStart(:,a)-x(:,a))/nreal
-            delC_avg= delC_avg + norm2(delC(:,a))/nreal
+            if(packableParticle(a)) then
+                TPD = TPD + norm2(xStart(:,a)-x(:,a))/n_pack
+                delC_avg= delC_avg + norm2(delC(:,a))/n_pack
+            endif
         enddo
     endif
     
