@@ -11,7 +11,7 @@
 !   Last Modified:  04/18/2022       by  PARIKSHIT BOREGOWDA 
 !****************************************************************************
 
-subroutine direct_find
+subroutine direct_find(adnl_srch_rds)
     use config_parameter, only:SPH_dim, itype_virtual, hsml_const
     use particle_data ,   only: niac,ntotal,itype,x,hsml,max_interaction, &     
         & pair_i,pair_j,w,dwdx       
@@ -25,12 +25,15 @@ subroutine direct_find
 
     integer(4) i,j,d   
     real(8) scale_k,mhsml
+    real(8), intent(in) :: adnl_srch_rds
     
 !  The maximum relative distance is determined, after which the kernel will be zero,
 ! scale_k is not to be confused with kappa which modifies smoothening length
 ! scale_k is only the factor used in the kernel to approximate various sections
 ! as 0<R<1, 1<R<2 will all have different curve approximations.
     call sml_mult_factor(scale_k)
+    
+   scale_k= adnl_srch_rds*scale_k
 
  ! We initailize the variable storing the number of interactions 
     niac=0

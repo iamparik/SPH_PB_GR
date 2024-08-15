@@ -22,7 +22,7 @@ subroutine PositionDependentFactors
     ! Nearest Neighbor Particle search algorithm is called to find particle pairs
     ! These Particle pairs interact within the volume integral in SPH formulation
     ! In a discrete sense this requires particles with mass for summation
-    call nnps_algorithm
+    call nnps_algorithm(1.D0)
 
     ! Nearest Neighbor Edge Search algorithm is called to find particles whose Kernels
     ! are truncated at the edge boundaries. This is needed to evaluate boundary integral 

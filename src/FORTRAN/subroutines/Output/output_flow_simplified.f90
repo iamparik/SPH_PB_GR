@@ -10,7 +10,7 @@
 subroutine  output_flow_simplified(itimestep,dt)
     use config_parameter, only:dataOutputPath, SPH_dim, itype_real_max, itype_real_min, &
         & etype_real_max, etype_real_min, etype_virtual, itype_virtual, itype_periodic, &
-        & save_step, g_const, hydroStaticHeight
+        & save_step
     use particle_data ,   only: x, mass, rho, p, vx, &
         & ntotal,etotal, itype, etype, gamma_cont, gamma_discrt,del_gamma, delC, &
         & gamma_density_cont, ve_total, x_ve, vx_ve, mid_pt_for_edge, free_surf_val

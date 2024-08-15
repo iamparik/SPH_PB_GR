@@ -366,3 +366,5 @@ FodyWeavers.xsd
 # Folders with data_output and data_packing should not be synced
 data_packing/
 data_output*/
+/examples/Case5/GPUCache
+/examples/Case5/VTune Profiler Results/ExampleCase5

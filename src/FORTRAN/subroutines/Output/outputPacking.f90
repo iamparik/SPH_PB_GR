@@ -33,7 +33,7 @@ subroutine  outputPacking(iterStep, saveStep, TPD, delC_avg)
         open (1, file = x2name)
         write(1,'(A)') 'variables = Iterations, TPD , delC_avg'
         close(1)
-    elseif (mod(iterStep,100).eq. 0) then
+    elseif (mod(iterStep,1).eq. 0) then
         write(x2name, '(A,A)') dataPackingPath,'/energy.dat'
         open (1, file = x2name,  position='append')
         write(1,*) iterStep, TPD, delC_avg

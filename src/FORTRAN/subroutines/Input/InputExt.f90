@@ -13,8 +13,8 @@
     use config_parameter, only: SPH_dim,etype_periodic, etype_SolidWall1, etype_SolidWall2, &
         & etype_FreeSurface1, etype_thermal_neumann, etype_thermal_dirichlet, etype_FarWall, &
         & DataConfigPath, itype_virtual, itype_real_min, &
-        & dx_r, hsml_const,hydrostaticHeight, rho_init, mu_const, &
-        &  g_const, c_sound, F_ext, ExtInputMeshType, packagingIterations, edge_to_dx_ratio
+        & dx_r, hsml_const,rho_init, mu_const, &
+        & c_sound, F_ext, ExtInputMeshType, packagingIterations, edge_to_dx_ratio
     use particle_data ,   only: maxn, max_interaction, max_e_interaction, maxnv,  &
         & x,vx,mass,rho, vol,p,itype,hsml,mu, temp, nreal, nedge, nflow, nghost, ntotal, edge, &
         & surf_norm, etype, etotal, maxedge, &
@@ -52,11 +52,11 @@
     
     additionalParticles= 100 ! This is necessary only if expect to use periodic particles, or unflow, outflow particles
     if (packagingIterations) then
-        maxedge=int((len_bulkBdry/dx_r)*(dble(edge_to_dx_ratio)*2.D0+1.D0)) ! *2.D0 is used to account for the 2X vertices of issue #48
+        maxedge=int((len_bulkBdry/dx_r)*(dble(edge_to_dx_ratio)*5.D0+1.D0)) ! *2.D0 is used to account for the 2X vertices of issue #48
         maxnv=10*maxedge 
         maxn= max(nreal_mesh, nrealCartesian)+ maxedge +additionalParticles
     else
-        maxedge=int((len_domainBdry/dx_r)*(dble(edge_to_dx_ratio)*2.D0+1.D0))
+        maxedge=int((len_domainBdry/dx_r)*(dble(edge_to_dx_ratio)*5.D0+1.D0))
         maxnv=10*maxedge 
         maxn= max(nreal_mesh, nrealCartesian)+ maxedge + additionalParticles
     endif
@@ -189,10 +189,11 @@
 
     ! Now perform the particle packing algorithm 
     if(packagingIterations) then
-        call particlePackingTimeIntegration(.true.)
-    !input : quick_converge_step2C  ! use .true. to enable quickconverge    
+        call particlePackingTimeIntegration  
    
         deallocate(simGridSize, x, vol, itype)
+        deallocate(x_ve,etype, edge, surf_norm)
+        deallocate(integ_pts_for_edge, val_integ_pts, mid_pt_for_edge)
     endif
 
     DEALLOCATE(mass, rho, hsml)

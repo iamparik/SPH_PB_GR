@@ -66,7 +66,7 @@ module config_parameter
 ! Below are variables that can be defiend at run time
     public  SPH_dim, skf, eos, solver_type, &
         & time_step,print_step,save_step,backup_step, dx_r, ExtInputMeshType, packagingIterations,  &
-        & hsml_const, rho_init, mu_const, hydroStaticHeight, g_const, ref_vel_max, c_sound, F_ext,  &
+        & hsml_const, rho_init, mu_const, ref_vel_max, c_sound, F_ext,  &
         & NumericalSimCase,  timeIntegrationScheme, SumDenstype, summationDensity, artViscType, MLS_density_bound,  &
         & MLS_step,BILtype, PrsrGradtype,PSTCoeff, ConDivtype, densDiffType, delta_SPH, prsrBdryType, HG_density_correction,PSTtype, &
         & nnps, nnes,WallBoundaryLayer, FScutoff
@@ -117,10 +117,6 @@ module config_parameter
     
     real(8) :: mu_const
     
-    real(8) :: hydroStaticHeight
-    
-    real(8) :: g_const
-    
     real(8) :: ref_vel_max
     
     real(8) :: c_sound
@@ -155,6 +151,8 @@ module config_parameter
     
     logical :: HG_density_correction
     
+    logical :: FS_density_correction = .false.
+    
     integer(4) :: PSTtype
     
     real(8) :: PSTCoeff
@@ -174,6 +172,16 @@ module config_parameter
     real(8) :: FScutoff
     
     integer(4) :: edge_to_dx_ratio
+    
+    integer(4) :: pack_step2a
+    
+    real(8) :: pack_step2b
+    
+    integer(4) :: pack_step2c
+    
+    integer(4) :: PST_step
+    
+    logical :: time_ev_par_op =.false.
     
     contains
 
@@ -208,13 +216,14 @@ module config_parameter
         write(*, *) 'poisson eqn solver_type = ', solver_type
         write(*, *) 'time_step =  ', time_step
         write(*, *) 'dx_r = ', dx_r
-        write(*,*) 'ExtInputMeshType = ', ExtInputMeshType
+        write(*,*)  'ExtInputMeshType = ', ExtInputMeshType
         write(*, *) 'packagingIterations = ', packagingIterations
+        write(*, *) 'pack_step2a = ',  pack_step2a
+        write(*, *) 'pack_step2b = ',  pack_step2b
+        write(*, *) 'pack_step2c = ',  pack_step2c
         write(*, *) 'hsml_const = ', hsml_const
         write(*, *) 'rho_init = ', rho_init
         write(*, *) 'mu_const = ', mu_const
-        write(*, *) 'hydroStaticHeight = ', hydroStaticHeight
-        write(*, *) 'g_const = ', g_const
         write(*, *) 'ref_vel_max = ', ref_vel_max
         write(*, *) 'c_sound = ', c_sound
         write(*, *) 'F_ext = ', F_ext
@@ -232,13 +241,16 @@ module config_parameter
         write(*, *) 'delta_SPH = ', delta_SPH
         write(*, *) 'prsrBdryType = ', prsrBdryType
         write(*, *) 'HG_density_correction = ', HG_density_correction
+        write(*, *) 'FS_density_correction = ', FS_density_correction
         write(*, *) 'PSTtype = ',PSTtype
+        write(*, *) 'PST_step = ',PST_step
         write(*, *) 'PSTCoeff = ', PSTCoeff
         write(*, *) 'WallBoundaryLayer = ', WallBoundaryLayer
         write(*, *) 'nnps = ', nnps
         write(*, *) 'nnes = ', nnes 
         write(*,*) 'FScutoff = ' , FScutoff
         write(*,*) 'edge_to_dx_ratio = ' , edge_to_dx_ratio
+        write(*,*) 'time_ev_par_op = ', time_ev_par_op
         
     end subroutine read_config_file
     
@@ -276,16 +288,18 @@ module config_parameter
                 else
                     packagingIterations = .true.    
                 endif  
+            case ('pack_step2a')
+                pack_step2a =param_value
+            case ('pack_step2b')
+                pack_step2b =param_value
+            case ('pack_step2c')
+                pack_step2c =param_value
             case ('hsml_const')
                 hsml_const = param_value
             case ('rho_init')
                 rho_init = param_value
             case ('mu_const')
                 mu_const = param_value
-            case ('hydroStaticHeight')
-                hydroStaticHeight = param_value
-            case ('g_const')
-                g_const = param_value
             case ('ref_vel_max')
                 ref_vel_max= param_value
             case ('c_sound')
@@ -334,8 +348,16 @@ module config_parameter
                 else
                     HG_density_correction = .true.    
                 endif  
+            case ('FS_density_correction')
+                if(param_value .eq. 0) then
+                    FS_density_correction = .false.
+                else
+                    FS_density_correction = .true.    
+                endif  
             case ('PSTtype') 
                 PSTtype = param_value
+            case('PST_step')
+                PST_step = param_value
             case('PSTCoeff')
                 PSTCoeff = param_value
             case('delC_Cap')
@@ -355,6 +377,12 @@ module config_parameter
                 FScutoff = param_value
             case ('edge_to_dx_ratio')
                 edge_to_dx_ratio =param_value
+            case('time_ev_par_op')            
+                if(param_value .eq. 1) then
+                    time_ev_par_op = .true.
+                else
+                    time_ev_par_op = .false.    
+                endif
             case default
                 ! Handle unknown parameter name
                 write(*, *) 'Unknown parameter: ', trim(param_name)

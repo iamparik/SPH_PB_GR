@@ -9,7 +9,7 @@
 !   Last Modified:  04/18/2022       by  PARIKSHIT BOREGOWDA 
 !****************************************************************************
     
-subroutine nnps_algorithm
+subroutine nnps_algorithm(adnl_srch_rds)
     use config_parameter, only: SPH_dim, nnps
     use particle_data ,   only: itimestep, max_interaction, &
         & pair_i,pair_j,w,dwdx, niac
@@ -39,6 +39,7 @@ subroutine nnps_algorithm
 !---------------------------------------------------------------------------------
     integer(4) i
     character (40) :: xname
+    real(8), intent(in) :: adnl_srch_rds
     
 if (.NOT. Allocated(pair_i)) allocate(pair_i(max_interaction)) 
 if (.NOT. Allocated(pair_j)) allocate(pair_j(max_interaction)) 
@@ -57,7 +58,7 @@ dwdx=0
 ! When one of the search algorithms is called the first time
 ! this code also displays the algorithm used
 if (nnps.eq.1) then 
-    call direct_find
+    call direct_find(adnl_srch_rds)
     if (itimestep.eq.1)   then
         write(*,'(A)') 'direct_find for particle particle pair has been called!'
         write(*,*) ' Total number of particle particle itneractions =', niac

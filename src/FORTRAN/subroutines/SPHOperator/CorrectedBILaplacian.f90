@@ -1,7 +1,7 @@
 ﻿subroutine CorrectedBILapPtoP(dF_a,dF_b,F_a,F_b,dwdx, mass_a, mass_b, rho_a, rho_b, &
                     & gamma_cont_a, gamma_discrt_a, gamma_mat_a, gamma_mat_inv_a, xi1_mat_inv_a, &
                     & gamma_cont_b, gamma_discrt_b, gamma_mat_b, gamma_mat_inv_b, xi1_mat_inv_b, &
-                    & dim, x_ab,BIL_type) 
+                    & FS_a,FS_b,dim, x_ab,BIL_type) 
     !Morris/Brookshaw's Laplacian for two particles is calculated, by first correctign the kernel gradient
     
     implicit none
@@ -11,18 +11,19 @@
         & gamma_cont_b, gamma_discrt_b, gamma_mat_b(dim,dim), gamma_mat_inv_b(dim,dim), xi1_mat_inv_b(dim,dim)
     real(8), intent(inout) :: dF_a,dF_b
     integer(4) :: d, Scalar0Matrix1 , CF_ID
+    integer(2) :: FS_a,FS_b
     real(8) :: Cdwdx_a(dim), Cdwdx_b(dim), matrix_factor(dim,dim), scalar_factor
     
     ! By default only gamma_cont is used for BILaplacian formulation
     CF_ID =1
     
     call CorrectionFactorParsing(scalar_factor,matrix_factor,CF_ID,Scalar0Matrix1, &
-        & gamma_cont_a, gamma_discrt_a, gamma_mat_a, gamma_mat_inv_a, xi1_mat_inv_a, dim)            
+        & gamma_cont_a, gamma_discrt_a, gamma_mat_a, gamma_mat_inv_a, xi1_mat_inv_a,FS_a, dim)            
     Cdwdx_a(:)=dwdx(:)
     call CorrectedKernelGradient(Cdwdx_a, scalar_factor, matrix_factor, Scalar0Matrix1, dim)
             
     call CorrectionFactorParsing(scalar_factor,matrix_factor,CF_ID,Scalar0Matrix1, &
-        & gamma_cont_b, gamma_discrt_b, gamma_mat_b, gamma_mat_inv_b, xi1_mat_inv_b, dim)
+        & gamma_cont_b, gamma_discrt_b, gamma_mat_b, gamma_mat_inv_b, xi1_mat_inv_b,FS_b, dim)
     Cdwdx_b(:)=-dwdx(:)
     call CorrectedKernelGradient(Cdwdx_b, scalar_factor, matrix_factor, Scalar0Matrix1, dim)    
 
@@ -40,7 +41,7 @@ endsubroutine
     
 subroutine CorrectedBILapPtoB(dF_a, vec_val, scalar_val, del_gamma_as,&
                     & gamma_cont_a, gamma_discrt_a, gamma_mat_a, gamma_mat_inv_a, xi1_mat_inv_a, &
-                    & dim, dirich0Neum1, CF_ID) 
+                    & FS_a, dim, dirich0Neum1, CF_ID) 
 
     !vector divergence for particle itneracting with boundary is calculated, by first correcting the kernel gradient
 
@@ -50,10 +51,11 @@ subroutine CorrectedBILapPtoB(dF_a, vec_val, scalar_val, del_gamma_as,&
         & gamma_cont_a, gamma_discrt_a, gamma_mat_a(dim,dim), gamma_mat_inv_a(dim,dim), xi1_mat_inv_a(dim,dim)
     real(8), intent(inout) :: dF_a 
     integer(4) :: d, Scalar0Matrix1
+    integer(2) :: FS_a
     real(8) :: Cdgmas(dim), matrix_factor(dim,dim), scalar_factor
     
     call CorrectionFactorParsing(scalar_factor,matrix_factor,CF_ID,Scalar0Matrix1, &
-                & gamma_cont_a, gamma_discrt_a, gamma_mat_a, gamma_mat_inv_a, xi1_mat_inv_a, dim)       
+                & gamma_cont_a, gamma_discrt_a, gamma_mat_a, gamma_mat_inv_a, xi1_mat_inv_a,FS_a, dim)       
     Cdgmas(:)=del_gamma_as(:)
     call CorrectedKernelGradient(Cdgmas, scalar_factor, matrix_factor, Scalar0Matrix1, dim)  
     
