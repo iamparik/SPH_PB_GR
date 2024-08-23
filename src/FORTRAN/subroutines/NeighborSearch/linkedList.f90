@@ -39,15 +39,12 @@ subroutine link_list
     
     !do d=1,13
     !    write(*,*) directions(:,d)
-    if(SPH_dim .eq. 3) write(*,*) "Note 3D linkedlist not eyt tested!!"
+    if(SPH_dim .eq. 3) write(*,*) "Note 3D linkedlist not yet tested!!"
     !enddo
     
     !Here we define the width of each background cell. This can be further
     !multiplied by a factor to decrease or increase the width
-    cellwidth = max(1.D0*scale_k*hsml_const,scale_k*hsml_const)
-    
-    adjCells=1   !max(1, ceiling((scale_k*hsml_const)/cellwidth)) !-1
-    
+    cellwidth = 2.D0*scale_k*hsml_const !max(2.D0*scale_k*hsml_const,scale_k*hsml_const)  
     
 
     !initialize number of cells in the domain as 0
@@ -59,7 +56,7 @@ subroutine link_list
     !First we find number of cells in each direction, using simulation bounds of grid size
     do d=1,SPH_dim
         gridMax(d) = ceiling((simGridSize(d,2) - simGridSize(d,1))/cellwidth)
-        if( gridMax(d) .eq. 0) gridMax(d) = 1 ! this to ensure if a dimension input with no thickness is accoutned accurately
+        if( gridMax(d) .eq. 0) gridMax(d) = 1 ! this to ensure if a dimension input with no thickness is accounted accurately
     enddo
     
     !total cells, is simple i*j*k
@@ -80,13 +77,13 @@ subroutine link_list
                 nc(d) = ceiling((x(d,a) - simGridSize(d,1))/cellwidth)
                 if (nc(d) .eq. 0) nc(d) =1
                 if (nc(d) .lt. 0) then
-                    write(*,*) "value of cell number negative in linkedlist NNPS algorithm"    
+                    write(*,*) "value of cell number negative in linkedlist NNPS algorithm for x at ", x(:,a), "for d =", d   
                     pause
                     nc(d)=1
                 endif            
             enddo   
         
-            cell= (nc(3)-1)*gridMax(2)*gridMax(1)+(nc(2)-1)*gridMax(1)+ (nc(1)-1)+1
+            cell= (nc(3)-1)*gridMax(2)*gridMax(1)+(nc(2)-1)*gridMax(1)+ nc(1)
         
             if(cell .gt. numcells) then
                 write(*,*) "A particle has left the boundary"    
@@ -187,13 +184,9 @@ subroutine link_list
                                 
                     endif
                 endif
-            enddo    
-             
-             
-             
-        endif
-        
+            enddo                 
+        endif     
     enddo
-end subroutine
     
-  
+    
+end subroutine

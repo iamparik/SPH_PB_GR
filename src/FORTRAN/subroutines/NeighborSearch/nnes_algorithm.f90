@@ -12,7 +12,7 @@
 subroutine nnes_algorithm
     use config_parameter, only: SPH_dim, nnes
     use particle_data ,   only: itimestep,epair_a, epair_s, max_e_interaction, &
-            &   etotal, pBC_epair_a, pBC_epair_s
+            &   etotal,eniac, pBC_epair_a, pBC_epair_s
     
     implicit none
 !-------------------------------------------------------------------
@@ -62,5 +62,5 @@ if (nnes.eq.1) then
     call direct_edge_find
     if (itimestep.eq.1)   write(*,'(A)') 'direct_find for edge + particle pair has been called!'
 endif
-
+write(*,*) ' Total number of particle particle itneractions =', eniac
 end

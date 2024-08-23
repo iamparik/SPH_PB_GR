@@ -61,15 +61,14 @@ if (nnps.eq.1) then
     call direct_find(adnl_srch_rds)
     if (itimestep.eq.1)   then
         write(*,'(A)') 'direct_find for particle particle pair has been called!'
-        write(*,*) ' Total number of particle particle itneractions =', niac
     endif
 elseif (nnps.eq.2) then
     call link_list
     if (itimestep.eq.1)   then
-        write(*,'(A)') 'direct_find for particle particle pair has been called!'
-        write(*,*) ' Total number of particle particle itneractions =', niac
+        write(*,'(A)') 'linkedList for particle particle pair has been called!'
     endif
 endif
+write(*,*) ' Total number of particle particle itneractions =', niac
 
 !write(*,*) ' Total number of particle particle itneractions =', niac
     !write(xname, '(A)') 'PPInteract_directfind.dat'

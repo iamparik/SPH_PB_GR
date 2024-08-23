@@ -35,7 +35,7 @@ PST_step 2
 PSTCoeff 5.D-1
 delC_Cap 1.D-4
 WallBoundaryLayer 0
-nnps 1
+nnps 2
 nnes 1
 FScutoff 1.5D0
 SPH_dim 2
