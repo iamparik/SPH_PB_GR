@@ -9,7 +9,7 @@
 !   CREATED:        4/1/2020       by  PARIKSHIT BOREGOWDA
 !   Last Modified:  11/27/2023       by  PARIKSHIT BOREGOWDA 
 !****************************************************************************  
-subroutine link_list
+subroutine linkedList
     use config_parameter, only:SPH_dim, itype_virtual, hsml_const
     use particle_data ,   only: niac,ntotal,itype,x,hsml,max_interaction, &     
         & simGridSize,pair_i,pair_j,w,dwdx       
@@ -44,7 +44,7 @@ subroutine link_list
     
     !Here we define the width of each background cell. This can be further
     !multiplied by a factor to decrease or increase the width
-    cellwidth = 2.D0*scale_k*hsml_const !max(2.D0*scale_k*hsml_const,scale_k*hsml_const)  
+    cellwidth = scale_k*hsml_const !max(2.D0*scale_k*hsml_const,scale_k*hsml_const)  
     
 
     !initialize number of cells in the domain as 0
@@ -188,5 +188,5 @@ subroutine link_list
         endif     
     enddo
     
-    
+    deallocate(firstPinCell,lastPinCell, linkedPlist)
 end subroutine
