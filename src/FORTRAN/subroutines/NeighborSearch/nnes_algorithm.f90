@@ -40,7 +40,7 @@ subroutine nnes_algorithm
 !---------------------------------------------------------------------------------
 integer(4) max_pBC_e_interaction
 
-max_pBC_e_interaction=int(40*max_e_interaction/etotal)
+max_pBC_e_interaction=int(max_e_interaction) ! this can be reduced further
     
 if (.NOT. Allocated(epair_a)) allocate(epair_a(max_e_interaction)) 
 if (.NOT. Allocated(epair_s)) allocate(epair_s(max_e_interaction)) 

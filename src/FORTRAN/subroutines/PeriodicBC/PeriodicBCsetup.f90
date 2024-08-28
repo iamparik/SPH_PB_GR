@@ -271,14 +271,15 @@ use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, 
   enddo
   
   !update grid size:
-  simGridSize(:,1)= MINVAL(x_ve,2) -dx_r
-  simGridSize(:,2)= MAXVAL(x_ve,2) +dx_r
+  simGridSize(:,1)= min(MINVAL(x_ve,2),MINVAL(x,2) ) -dx_r
+  simGridSize(:,2)= max(MAXVAL(x_ve,2), MAXVAL(x,2)) +dx_r
   
   !update the total particle and edge numbers
   ntotal=kn
   etotal=ke
   ve_total=num_ver
   nperiodic=kpBC
+  
   
   call  nnps_algorithm(1.D0)
   
