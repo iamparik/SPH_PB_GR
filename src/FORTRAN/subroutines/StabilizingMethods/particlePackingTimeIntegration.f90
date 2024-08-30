@@ -186,8 +186,6 @@ do while (packing_in_progress)
     do k= 1, eniac
         a=epair_a(k)
         s=epair_s(k)
-
-        
         ! The below lines find distance between particle to edge mid point 
         ! and the corresponding smoothing function value for that distance 
         dx_as=norm2(x(:,a)-mid_pt_for_edge(:,s)) ! 

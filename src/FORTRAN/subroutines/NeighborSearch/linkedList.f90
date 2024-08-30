@@ -9,12 +9,13 @@
 !   CREATED:        4/1/2020       by  PARIKSHIT BOREGOWDA
 !   Last Modified:  11/27/2023       by  PARIKSHIT BOREGOWDA 
 !****************************************************************************  
-subroutine linkedList
+subroutine linkedList(adnl_srch_rds)
     use config_parameter, only:SPH_dim, itype_virtual, hsml_const
     use particle_data ,   only: niac,ntotal,itype,x,hsml,max_interaction, &     
         & simGridSize,pair_i,pair_j,w,dwdx       
     implicit none
     
+    real(8), intent(in) :: adnl_srch_rds
     integer(4) gridMax(3), adjCells, d, dd, numCells , nc(3), cell, &
         & a,b,c, i,j,k, ii,jj,kk, cell2
     real(8) cellwidth, scale_k, mhsml
@@ -36,6 +37,9 @@ subroutine linkedList
     
     ! we need to find k of kh
     call sml_mult_factor(scale_k)
+    
+    !accounts for additional search radius
+    scale_k=(adnl_srch_rds)*scale_k
     
     !do d=1,13
     !    write(*,*) directions(:,d)

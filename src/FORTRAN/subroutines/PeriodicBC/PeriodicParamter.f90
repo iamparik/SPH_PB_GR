@@ -11,10 +11,10 @@
 !****************************************************************************
     
     
-subroutine PeriodicParameter(fx)
+subroutine PeriodicParameterScalar(fx,dim)
     use particle_data, only: nperiodic,pBC_duplicate_pair, ntotal
     implicit none
-    integer(4) a
+    integer(4):: a, dim
     real(8) ::fx(ntotal)
     
     
@@ -22,5 +22,34 @@ subroutine PeriodicParameter(fx)
         fx(pBC_duplicate_pair(2,a))=fx(pBC_duplicate_pair(1,a))
     enddo
     
-end
+end subroutine
+    
+subroutine PeriodicParameterVector(fx,dim)
+    use particle_data, only: nperiodic,pBC_duplicate_pair, ntotal
+    implicit none
+    integer(4) :: a,dim
+    real(8) ::fx(dim,ntotal)
+    
+    
+    do  a= 1,nperiodic
+        fx(:,pBC_duplicate_pair(2,a))=fx(:,pBC_duplicate_pair(1,a))
+    enddo
+    
+    end subroutine
+    
+subroutine PeriodicParameterTensor(fx,dim)
+    use particle_data, only: nperiodic,pBC_duplicate_pair, ntotal
+    implicit none
+    integer(4):: a,dim
+    real(8) ::fx(dim,dim,ntotal)
+    
+    
+    do  a= 1,nperiodic
+        fx(:,:,pBC_duplicate_pair(2,a))=fx(:,:,pBC_duplicate_pair(1,a))
+    enddo
+    
+end subroutine
 
+
+    
+    

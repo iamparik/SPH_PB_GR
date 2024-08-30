@@ -39,7 +39,7 @@ subroutine PositionDependentFactors
  
     ! update w_aa for periodic particles
     if (Allocated(pBC_edges)) then
-        call PeriodicParameter(w_aa)
+        call PeriodicParameterScalar(w_aa,SPH_dim)
     endif
         
         
@@ -50,7 +50,7 @@ subroutine PositionDependentFactors
     
     ! update gamma_discrt for periodic particles
     if (Allocated(pBC_edges)) then
-        call PeriodicParameter(gamma_discrt)
+        call PeriodicParameterScalar(gamma_discrt,SPH_dim)
     endif
 
     ! Call the analytical del_gamm evaluation Boundary_integral(W*n_s)
@@ -76,7 +76,7 @@ subroutine PositionDependentFactors
 
     ! update gamma_cont for periodic particles
     if (Allocated(pBC_edges)) then
-        call PeriodicParameter(gamma_cont)
+        call PeriodicParameterScalar(gamma_cont,SPH_dim)
     endif
  
     !Xi is the factor that is used to calculate Xi〖 ξ_a〗_ij=∑_b〖(〖x_b〗_i-〖x_a〗_i )  m_b/ρ_b  ∂_j_a W_ab 〗

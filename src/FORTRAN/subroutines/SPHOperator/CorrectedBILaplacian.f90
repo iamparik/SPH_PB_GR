@@ -67,7 +67,6 @@ subroutine CorrectedBILapPtoB(dF_a, vec_val, scalar_val, del_gamma_as,&
     endif
         
 
-    
 endsubroutine
     
 
@@ -80,7 +79,8 @@ subroutine BILViscousBdry(vec_val,scalar_val,dirich0Neum1, grad_vel_a, grad_vel_
     implicit none
     integer(4), intent(in) :: d, dim, BIL_type
     integer(4), intent(out) :: dirich0Neum1
-    real(8), intent(out) :: vec_val(dim), scalar_val 
+    real(8):: tan_vec(dim)
+    real(8), intent(out) :: vec_val(dim), scalar_val
     real(8), intent(in) :: grad_vel_a(dim), grad_vel_s(dim), vx_a(dim), vx_s(dim), delx_ab(dim), surf_norm_s(dim), dx_r
 
     if(BIL_type .eq. 0) then !Use this to mask BIL formulation in code
@@ -103,13 +103,16 @@ subroutine BILViscousBdry(vec_val,scalar_val,dirich0Neum1, grad_vel_a, grad_vel_
         dirich0Neum1=1
     
     elseif(BIL_type .eq. 5) then    !BIL-NTG formulation
-        scalar_val=2.D0*(vx_a(d)-vx_s(d))/dot_product(delx_ab, surf_norm_s) 
+        scalar_val=2.D0*(vx_a(d)-vx_s(d))/(dot_product(delx_ab, surf_norm_s) + (dx_r*0.0001)**2)
         dirich0Neum1=1
      
     elseif(BIL_type .eq. 6) then    !BIL-BLT (USAW) formulation
-
-        vec_val(:)=(vx_a - dot_product(vx_a,surf_norm_s) * surf_norm_s) &
-                    & /(max(dot_product(delx_ab,surf_norm_s), dx_r))
+        
+        !tan_vec(:)= (vx_a - dot_product(vx_a,surf_norm_s)*surf_norm_s)/norm2(vx_a - dot_product(vx_a,surf_norm_s)*surf_norm_s + (dx_r*0.0001)**2)
+        !tan_vec(:)=tan_vec(:)/norm2(tan_vec(:))
+        !vec_val(:)= (dot_product(vx_a,tan_vec))*tan_vec(:)/(max((dot_product(delx_ab,surf_norm_s)), dx_r))
+        vec_val(:)=2.D0*(vx_a - dot_product(vx_a,surf_norm_s) * surf_norm_s) &
+                    & /(max(dabs(dot_product(delx_ab,surf_norm_s)), dx_r))
         scalar_val = vec_val(d)
         dirich0Neum1=1
     else
