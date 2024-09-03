@@ -10,7 +10,7 @@
 !****************************************************************************
     
 subroutine nnps_algorithm(adnl_srch_rds)
-    use config_parameter, only: SPH_dim, nnps
+    use config_parameter, only: SPH_dim, nnps, print_step 
     use particle_data ,   only: itimestep, max_interaction, &
         & pair_i,pair_j,w,dwdx, niac
     implicit none
@@ -59,17 +59,18 @@ dwdx=0
 ! this code also displays the algorithm used
 if (nnps.eq.1) then 
     call direct_find(adnl_srch_rds)
-    if (itimestep.eq.1)   then
+    if (mod(itimestep,print_step).eq.0)   then
         write(*,'(A)') 'direct_find for particle particle pair has been called!'
         write(*,*) ' Total number of particle particle itneractions =', niac
     endif
 elseif (nnps.eq.2) then
-    call link_list
-    if (itimestep.eq.1)   then
-        write(*,'(A)') 'direct_find for particle particle pair has been called!'
+    call linkedList(adnl_srch_rds)
+    if (mod(itimestep,print_step).eq.0)   then
+        write(*,'(A)') 'linkedList for particle particle pair has been called!'
         write(*,*) ' Total number of particle particle itneractions =', niac
     endif
 endif
+
 
 !write(*,*) ' Total number of particle particle itneractions =', niac
     !write(xname, '(A)') 'PPInteract_directfind.dat'

@@ -63,7 +63,7 @@
 		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\PositionDependentFactors.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\xi_discrete1_factor.f90"/></Filter>
 		<Filter Name="ExampleCase_BC_IC">
-		<File RelativePath=".\BoundaryConditions_0.f90"/>
+		<File RelativePath=".\BoundaryConditions_2.f90"/>
 		<File RelativePath=".\InitialConditions.f90"/></Filter>
 		<Filter Name="FluidSubroutine">
 		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\artificialViscosityOperator.f90"/>
@@ -89,8 +89,10 @@
 		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\direct_find_reduced.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\edge_particle_pair_2D.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\linkedList.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\linkedList_edge_find.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\nnes_algorithm.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\nnps_algorithm.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\particleEdgePair.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\particlePair.f90"/></Filter>
 		<Filter Name="OutputRoutines">
 		<File RelativePath=".\caseBasedOutput.f90"/>

@@ -171,8 +171,8 @@
     
     ! find size of the simulation
     ALLOCATE( simGridSize(SPH_dim,2))
-    simGridSize(:,1)= MINVAL(x_ve,2) 
-    simGridSize(:,2)= MAXVAL(x_ve,2) 
+    simGridSize(:,1)= min(MINVAL(x_ve,2),MINVAL(x,2) ) -dx_r
+    simGridSize(:,2)= max(MAXVAL(x_ve,2), MAXVAL(x,2)) +dx_r
     write(*,*)'**************************************************'   
     write(*,*) "simulation domain size is ", simGridSize, "with xmin = ", simGridSize(1,1), "xmax=",simGridSize(1,2)
     write(*,*) "with ymin = ", simGridSize(2,1), "ymax=",simGridSize(2,2)

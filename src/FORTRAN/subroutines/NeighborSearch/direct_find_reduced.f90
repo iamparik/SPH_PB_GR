@@ -63,10 +63,8 @@ subroutine direct_find_reduced(sel_part_list, n_reduced)
                     ! Since we are considering cosntant smoothing length,
                     ! we can use mean smoothing length as either hsml(i) or hsml(j)
                     mhsml = hsml_const !hsml(i)
-            
                     call particlePair(ii,jj,scale_k, mhsml)
                 endif
-            
             enddo
         endif
    enddo

@@ -156,10 +156,9 @@ correction_types=10
         
         ! if there was periodic BC applied, for periodic particles and points update variables used 
         if (Allocated(pBC_edges)) then
-            call PeriodicParameter(vx(1,:))
-            call PeriodicParameter(vx(2,:))
-            call PeriodicParameter(rho)
-            call PeriodicParameter(p)
+            call PeriodicParameterVector(vx,SPH_dim)
+            call PeriodicParameterScalar(rho,SPH_dim)
+            call PeriodicParameterScalar(p,SPH_dim)
         endif
         
         ! Allocate variables necessary
@@ -329,9 +328,9 @@ correction_types=10
         
         ! The varioables need to be updated for periodic particles
         if (Allocated(pBC_edges)) then
-            call PeriodicParameter(rho)
-            call PeriodicParameter(p)
-            call PeriodicParameter(vol)
+            call PeriodicParameterScalar(rho,SPH_dim)
+            call PeriodicParameterScalar(p,SPH_dim)
+            call PeriodicParameterScalar(vol,SPH_dim)
         endif
         
         
@@ -402,12 +401,7 @@ correction_types=10
         
         ! The varioables need to be updated for periodic particles
         if (Allocated(pBC_edges)) then
-            do i =1, SPH_dim
-                do j =1,SPH_dim
-                    call PeriodicParameter(grad_vel(i,j,:))
-                enddo
-            enddo
-            
+           call PeriodicParameterTensor(grad_vel,SPH_dim)            
         endif
         
         
@@ -492,8 +486,7 @@ correction_types=10
         enddo
         
         if (Allocated(pBC_edges)) then
-            call PeriodicParameter(vx(1,:))
-            call PeriodicParameter(vx(2,:))
+            call PeriodicParameterVector(vx,SPH_dim)
         endif
         
         allocate(x_ve_temp(SPH_dim,SPH_dim))

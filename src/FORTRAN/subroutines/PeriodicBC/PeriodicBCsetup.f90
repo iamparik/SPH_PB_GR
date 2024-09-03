@@ -12,7 +12,7 @@
 !this subroutine needs to further generalized to be applied in other scenarios
 subroutine PeriodicBCsetup2D 
 use config_parameter, only:SPH_dim,etype_periodic,etype_virtual, itype_periodic, &
-            & itype_virtual, hsml_const
+            & itype_virtual, hsml_const, dx_r
 use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, &
             & pBC_edges, pBC_epair_a, pBC_epair_s, pBC_eniac, tangent_pBC, edge_pBC_pairs, &
             & x,rho,mass, itype, hsml, edge, etype, pBC_duplicate_pair, nperiodic, simGridSize, &
@@ -271,14 +271,15 @@ use particle_data ,   only: ntotal, etotal, ntotal_prev,etotal_prev, surf_norm, 
   enddo
   
   !update grid size:
-  simGridSize(:,1)= MINVAL(x,2) 
-  simGridSize(:,2)= MAXVAL(x,2) 
+  simGridSize(:,1)= min(MINVAL(x_ve,2),MINVAL(x,2) ) -dx_r
+  simGridSize(:,2)= max(MAXVAL(x_ve,2), MAXVAL(x,2)) +dx_r
   
   !update the total particle and edge numbers
   ntotal=kn
   etotal=ke
   ve_total=num_ver
   nperiodic=kpBC
+  
   
   call  nnps_algorithm(1.D0)
   

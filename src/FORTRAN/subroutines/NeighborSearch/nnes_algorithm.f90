@@ -10,9 +10,9 @@
 !****************************************************************************
     
 subroutine nnes_algorithm
-    use config_parameter, only: SPH_dim, nnes
+    use config_parameter, only: SPH_dim, nnes,print_step
     use particle_data ,   only: itimestep,epair_a, epair_s, max_e_interaction, &
-            &   etotal, pBC_epair_a, pBC_epair_s
+            &   etotal,eniac, pBC_epair_a, pBC_epair_s, pbc_eniac
     
     implicit none
 !-------------------------------------------------------------------
@@ -40,7 +40,7 @@ subroutine nnes_algorithm
 !---------------------------------------------------------------------------------
 integer(4) max_pBC_e_interaction
 
-max_pBC_e_interaction=int(40*max_e_interaction/etotal)
+max_pBC_e_interaction=int(max_e_interaction) ! this can be reduced further
     
 if (.NOT. Allocated(epair_a)) allocate(epair_a(max_e_interaction)) 
 if (.NOT. Allocated(epair_s)) allocate(epair_s(max_e_interaction)) 
@@ -60,7 +60,19 @@ pBC_epair_s=0
 ! this code also displays the algorithm used
 if (nnes.eq.1) then 
     call direct_edge_find
-    if (itimestep.eq.1)   write(*,'(A)') 'direct_find for edge + particle pair has been called!'
+    if (mod(itimestep,print_step).eq.0)   then
+        write(*,'(A)') 'direct_find for edge + particle pair has been called!'
+        write(*,*) ' Total number of particle edge itneractions =', eniac
+        write(*,*) ' Total number of periodic particle edge itneractions =', pbc_eniac
+    endif
+    
+elseif (nnes .eq. 2) then
+    call linkedList_edge_find
+    if (mod(itimestep,print_step).eq.0)   then
+        write(*,'(A)') 'linkedList for edge + particle pair has been called!'
+        write(*,*) ' Total number of particle edge itneractions =', eniac
+        write(*,*) ' Total number of periodic particle edge itneractions =', pbc_eniac
+    endif
 endif
 
 end

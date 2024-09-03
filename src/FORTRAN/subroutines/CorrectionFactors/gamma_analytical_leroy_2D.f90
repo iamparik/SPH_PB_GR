@@ -22,8 +22,6 @@ real(8), intent(out) :: gamma_as
 real(8) :: zeta(2), ra0(2), rav1(2), rav2(2), qa0, qa0_tilda, y1, y2, s_tangent(2), &
         & phi1, phi2
 
-
-
 rav1(:)= xv(:,1) - xa(:) !xa(:)-xv(:,1)
 rav2(:)= xv(:,2) - xa(:) ! xa(:)-xv(:,2)
 
@@ -41,6 +39,8 @@ ra0(:)= xa(:)-ra0(:)
 qa0= norm2(ra0)/h
 qa0_tilda= min( qa0, 2.D0)
 
+!The below is added to avoid NAN 
+qa0= qa0_tilda
 
 y1= dot_product(rav1,s_tangent)
 y2= dot_product(rav2,s_tangent)
@@ -70,7 +70,10 @@ endif
 gamma_as= sign(1.D0, dot_product(s_norm,ra0))*(dsign(1.D0,y2)*phi2 - dsign(1.D0,y1)*phi1)/(4.D0*pi)
 
 
-
+    if(isNAN(gamma_as)) then
+        write(*,*) "gamma_as is NAN for xa =", xa , " and xv =", xv
+        pause
+    endif
 
 
 end
