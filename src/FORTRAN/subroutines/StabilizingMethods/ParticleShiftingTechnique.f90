@@ -58,14 +58,14 @@ endif
             dCF= 1.D0
         endif
     
-        call CorrectedScaGradPtoP(delC(:,a),delC(:,b),dCF,dCF,dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
+        call CorrectedScaGradPtoP(delC(:,a),delC(:,b),a,b,dCF,dCF,dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
                     & free_surf_particle(a),free_surf_particle(b),SPH_dim, 1, 1) ! SPH_dim, correctionFactorID, grad_type
     
         do d=1,SPH_dim 
             ! add an if condition with PCBI for inside and WCBI near bdry if needed
-            call CorrectedScaGradPtoP(grad_vel(d,:,a),grad_vel(d,:,b),vx(d,a),vx(d,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
+            call CorrectedScaGradPtoP(grad_vel(d,:,a),grad_vel(d,:,b),a,b,vx(d,a),vx(d,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
                     & free_surf_particle(a),free_surf_particle(b),SPH_dim, 3, 2) ! SPH_dim, correctionFactorID, grad_type
@@ -89,14 +89,14 @@ endif
             dCF= 1.D0
         endif
     
-        call CorrectedScaGradPtoB(delC(:,a),1.D0,dCF,del_gamma_as(:,k),  &
+        call CorrectedScaGradPtoB(delC(:,a),a,s,1.D0,dCF,del_gamma_as(:,k),  &
                             & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                             & free_surf_particle(a),SPH_dim, 1, 1)
     
         do d=1,SPH_dim
         
             F_b(:) = bdryVal_seg(1:SPH_dim,s)
-            call CorrectedScaGradPtoB(grad_vel(d,:,a),vx(d,a),F_b(d),del_gamma_as(:,k),  &
+            call CorrectedScaGradPtoB(grad_vel(d,:,a),a,s,vx(d,a),F_b(d),del_gamma_as(:,k),  &
                             & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                             & free_surf_particle(a),SPH_dim, 3, 2) ! SPH_dim, correctionFactorID, grad_type
         enddo    

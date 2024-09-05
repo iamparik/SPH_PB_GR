@@ -180,7 +180,7 @@ integer(4):: itimestep
     integer(4):: nperiodic
     
 ! physics based paramters for flow problems
-    public drho,rho_prev, dstress, dtemp, temp_prev, temp_analytical, dgrho_prev
+    public drho,rho_prev, dstress, dtemp, temp_prev, temp_analytical, dgrho_prev, rho_s
     real(8), dimension(:),allocatable:: drho 
     real(8), dimension(:),allocatable:: rho_prev
     real(8), dimension(:,:),allocatable:: dstress
@@ -188,6 +188,7 @@ integer(4):: itimestep
     real(8), dimension(:),allocatable:: temp_prev 
     real(8), dimension(:),allocatable:: temp_analytical  
     real(8), dimension(:),allocatable:: dgrho_prev
+    real(8), dimension(:),allocatable:: rho_s
     
 ! paramter/s for boundary values
     public bdryVal_seg, p_counter

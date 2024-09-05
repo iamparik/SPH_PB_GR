@@ -176,7 +176,7 @@ do while (packing_in_progress)
         dCF= 1.D0
     
         ! Calculate particle-particle term for concentration gradient
-        call CorrectedScaGradPtoP(delC(:,a),delC(:,b),dCF,dCF,dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
+        call CorrectedScaGradPtoP(delC(:,a),delC(:,b),a,b,dCF,dCF,dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                     & gamma_cont(a), temp_scalar, temp_matrix, temp_matrix, temp_matrix, &
                     & gamma_cont(b), temp_scalar, temp_matrix, temp_matrix, temp_matrix, &
                     & 0,0,SPH_dim, 1, 1) ! SPH_dim, correctionFactorID, grad_type
@@ -195,7 +195,7 @@ do while (packing_in_progress)
         dCF= 1.D0
     
         ! Calculate boundary term for cincentration gradient
-        call CorrectedScaGradPtoB(delC(:,a),1.D0,dCF,del_gamma_as(:,k),  &
+        call CorrectedScaGradPtoB(delC(:,a),a,s,1.D0,dCF,del_gamma_as(:,k),  &
                             & gamma_cont(a), temp_scalar, temp_matrix, temp_matrix, temp_matrix, &
                             & 0,SPH_dim, 1, 1)
         
@@ -213,7 +213,7 @@ do while (packing_in_progress)
         
         dCF=0.5D0*(ps_pa -1.D0)
     
-        call CorrectedScaGradPtoB(bdry_push(:,a),1.D0,dCF,del_gamma_as(:,k),  &
+        call CorrectedScaGradPtoB(bdry_push(:,a),a,s,1.D0,dCF,del_gamma_as(:,k),  &
                             & gamma_cont(a), temp_scalar, temp_matrix, temp_matrix, temp_matrix, &
                             & 0,SPH_dim, 1, 1)
     enddo  

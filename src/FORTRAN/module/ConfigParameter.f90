@@ -69,7 +69,7 @@ module config_parameter
         & hsml_const, rho_init, mu_const, ref_vel_max, c_sound, F_ext,  &
         & NumericalSimCase,  timeIntegrationScheme, SumDenstype, summationDensity, artViscType, MLS_density_bound,  &
         & MLS_step,BILtype, PrsrGradtype,PSTCoeff, ConDivtype, densDiffType, delta_SPH, prsrBdryType, HG_density_correction,PSTtype, &
-        & nnps, nnes,WallBoundaryLayer, FScutoff
+        & nnps, nnes,WallBoundaryLayer, FScutoff, calc_prsr_bdry_IDs
     
 !SPH_dim : Dimension of the problem (1, 2 or 3)    
     integer(4) :: SPH_dim
@@ -182,6 +182,8 @@ module config_parameter
     integer(4) :: PST_step
     
     logical :: time_ev_par_op =.false.
+    
+    integer(4) :: calc_prsr_bdry_IDs(2) = (/6, 7/)
     
     contains
 
