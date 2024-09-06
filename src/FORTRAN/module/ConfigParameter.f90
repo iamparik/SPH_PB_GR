@@ -183,7 +183,7 @@ module config_parameter
     
     logical :: time_ev_par_op =.false.
     
-    integer(4) :: calc_prsr_bdry_IDs(2) = (/6, 7/)
+    integer(4) :: calc_prsr_bdry_IDs(3) = (/6, 7, 8/)
     
     contains
 

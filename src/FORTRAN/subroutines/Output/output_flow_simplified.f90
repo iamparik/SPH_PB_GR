@@ -13,7 +13,7 @@ subroutine  output_flow_simplified(itimestep,dt)
         & save_step
     use particle_data ,   only: x, mass, rho, p, vx, &
         & ntotal,etotal, itype, etype, gamma_cont, gamma_discrt,del_gamma, delC, &
-        & gamma_density_cont, ve_total, x_ve, vx_ve, mid_pt_for_edge, free_surf_val, 
+        & gamma_density_cont, ve_total, x_ve, vx_ve, mid_pt_for_edge, free_surf_val, &
         & prsr_bdry_val, rho_s
     
     implicit none

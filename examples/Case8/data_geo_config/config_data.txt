@@ -19,8 +19,8 @@ F_ext_y	-9.81D0
 NumericalSimCase 4
 timeIntegrationScheme 1
 BILtype 23
-PrsrGradtype 31
-ConDivtype 21
+PrsrGradtype 41
+ConDivtype 0
 SumDenstype 5
 summationDensity 1
 artViscType 0
@@ -28,7 +28,7 @@ MLS_density_bound 0
 MLS_step 1
 densDiffType 0
 delta_SPH 0.1D0
-prsrBdryType 7
+prsrBdryType 8
 HG_density_correction 0
 PSTtype 0
 PST_step 1

@@ -26,7 +26,8 @@ subroutine DerivativeOperator(dF_a,dF_b,a,b,F_a,F_b,Cdwdx_a, Cdwdx_b, mass_a, ma
    elseif(id .eq. 4) then
         
         dF_a= dF_a + rho_a*rho_b*(F_b/rho_b**2+F_a/rho_a**2)*Cdwdx_a*mass_b/rho_b
-        dF_b= dF_b + rho_a*rho_b*(F_a/rho_a**2+F_b/rho_b**2)*Cdwdx_b*mass_a/rho_a     
+        dF_b= dF_b + rho_a*rho_b*(F_a/rho_a**2+F_b/rho_b**2)*Cdwdx_b*mass_a/rho_a   
+        
     elseif(id .eq. 5) then
         
         dF_a= dF_a + rho_a*rho_b*(F_b/(gamma_cont(b)*rho_b**2)+F_a/(gamma_cont(a)*rho_a**2))*Cdwdx_a*mass_b/rho_b
@@ -62,7 +63,7 @@ subroutine DerivativeOperatorB(dF_a,a,s,F_a,F_s,Cdgmas, id)
     
     elseif(id .eq. 4) then
         
-        dF_a= dF_a - rho(a)*(F_s/(rho_s(s)**2)+F_a/(rho(a)**2))*Cdgmas
+        dF_a= dF_a - rho_s(s)*rho(a)*(F_s/(rho_s(s)**2)+F_a/(rho(a)**2))*Cdgmas
     
     elseif(id .eq. 5) then
         
