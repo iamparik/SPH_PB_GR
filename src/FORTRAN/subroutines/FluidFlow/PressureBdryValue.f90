@@ -37,14 +37,18 @@ elseif(ID .eq. 5) then
                             !& - rho(a)*dot_product(F_ext, x(:,a)- mid_pt_for_edge(:,s)) &
                             !& + rho(a)*c_sound*norm2(vx(:,a)-bdryVal_seg(1:SPH_dim,s))*max(0.6D0-gamma_cont(a), 0.D0) &
                             & + 0.D0
-    
+
 elseif(ID .eq. 6) then
     call ParticlePressureEOS(prsr_s, rho_, itype_, itype_virtual)    
-    prsr_s = (prsr_s/rho_  - dot_product(F_ext, x_- mid_pt_for_edge(:,s)))/rho_s(s)
+    !prsr_s = (prsr_s/rho_  - dot_product(F_ext, x_- mid_pt_for_edge(:,s)))*rho_s(s)
     
 elseif(ID .eq. 7) then
     call ParticlePressureEOS(prsr_s, rho_, itype_, itype_virtual)    
-    prsr_s = (prsr_s/rho_ + norm2(vx_ - bdryVal_seg_(1:SPH_dim))**2  - dot_product(F_ext, x_- mid_pt_for_edge(:,s)))/rho_s(s)
+    prsr_s = (prsr_s/rho_  - dot_product(F_ext, x_- mid_pt_for_edge(:,s)))*rho_s(s)
+    
+elseif(ID .eq. 8) then
+    call ParticlePressureEOS(prsr_s, rho_, itype_, itype_virtual)    
+    prsr_s = (prsr_s/rho_ + 0.5D0*norm2(vx_ - bdryVal_seg_(1:SPH_dim))**2  - dot_product(F_ext, x_- mid_pt_for_edge(:,s)))*rho_s(s)
     
 else
     call ParticlePressureEOS(prsr_s, rho_, itype_, itype_virtual)    

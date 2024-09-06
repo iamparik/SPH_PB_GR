@@ -40,11 +40,11 @@
             dgrho_prev(a)= rho_*gamma_cont(a)- rho_a !( [𝜌a *𝛾𝑎 ] - [∑𝑚𝑏*𝑊𝑎𝑏] )
             rho_a = rho_
         else
+            
             rho_ = rho_a + dgrho_prev(a) !  [𝜌a *𝛾𝑎 ]_current =[∑𝑚𝑏*𝑊𝑎𝑏]_current + ( [𝜌a *𝛾𝑎 ]_prev - [∑𝑚𝑏*𝑊𝑎𝑏]_prev )
             dgrho_prev(a)= rho_ - rho_a
             rho_a= rho_/gamma_cont(a)    
         endif 
-        
     endif
 
 end subroutine

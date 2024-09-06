@@ -33,11 +33,12 @@ integer(4) :: correction_types, CF_density, ID_density, CF_pressure, ID_pressure
     & CF_BIL_visc, ID_BIL_visc,dirich0Neum1, num_bdry_var_seg, num_bdry_var_ve, &
     & CF_densDiff, ID_densDiff
 real(8) :: scalar_factor, Sca_Bdry_val, current_time, prsr_wall_compress,gamma_wall_cutoff, rho_wall_compress
-real(8), DIMENSION(:), allocatable  :: F_a, F_b,DF_a, DF_b, Cdwdx_a, Cdwdx_b, Cdgmas
+real(8), DIMENSION(:), allocatable  :: F_a, F_b,DF_a, DF_b, Cdwdx_a, Cdwdx_b, Cdgmas,temp_vector, dxiac
 real(8), DIMENSION(:,:,:), allocatable :: grad_vel
 real(8), DIMENSION(:,:), allocatable :: matrix_factor, stress,bdryVal_ve, grad_rho ,grad_vel_s_temp, x_ve_temp
-real(8), DIMENSION(:), allocatable :: div_vel, delx_ab, dens_diffusion, gamma_discrt_s, prsr_bdry_val, rho_temp
+real(8), DIMENSION(:), allocatable :: div_vel, delx_ab, dens_diffusion, gamma_discrt_s, rho_temp
 logical ::prsr_bdry_preCalc 
+real(8) ::temp_scalar, driac, w_temp
 
 
 correction_types=10
@@ -49,6 +50,8 @@ correction_types=10
 ! input particle configuration data
     call inputSPHConfig
     
+    allocate(temp_vector(SPH_dim),dxiac(SPH_dim))
+    
 ! Allocate variables important for physics simulation
     ALLOCATE(vx(SPH_dim,maxn), mass(maxn), rho(maxn), p(maxn), hsml(maxn), mu(maxn))
     vx=0.D0
@@ -57,8 +60,6 @@ correction_types=10
     p=0.D0
     hsml = hsml_const
     mu =0.D0
-    
-    
 
 ! the size of the vector is the same as size of all variables assosciated 
 ! with particle position (including particle position)
@@ -138,8 +139,6 @@ correction_types=10
     
     do itimestep = current_ts+1, max_timesteps
         
-        
-        
         !initialize velocity to 0
         vx_ve=0.D0
         
@@ -176,6 +175,8 @@ correction_types=10
             call PeriodicParameterVector(vx,SPH_dim)
             call PeriodicParameterScalar(rho,SPH_dim)
             call PeriodicParameterScalar(p,SPH_dim)
+            call PeriodicParameterScalar(mass,SPH_dim)
+            call PeriodicParameterScalar(vol,SPH_dim)
         endif
         
         ! Allocate variables necessary
@@ -183,15 +184,14 @@ correction_types=10
         !allocate(drho(ntotal),rho_prev(ntotal))
         !drho=0.D0
         
-        allocate(div_vel(ntotal), stress(SPH_dim, ntotal),grad_rho(SPH_dim, ntotal) ,grad_vel(SPH_dim, SPH_dim, ntotal),  &
-            &  dens_diffusion(ntotal), grad_vel_s_temp(SPH_dim,SPH_dim), free_surf_particle(ntotal), free_surf_val(ntotal)) ! this can be reduced by accoutnign for nreal and nedge correctly
-        div_vel=0.D0
+        allocate(stress(SPH_dim, ntotal),grad_vel(SPH_dim, SPH_dim, ntotal),  &
+            &   grad_vel_s_temp(SPH_dim,SPH_dim), free_surf_particle(ntotal), free_surf_val(ntotal)) ! this can be reduced by accoutnign for nreal and nedge correctly
+        
         grad_vel =0.D0
-        grad_rho=0.D0
         stress =0.D0
-        dens_diffusion=0.D0
         free_surf_particle=0
         free_surf_val=0.D0
+        
         
         
         
@@ -241,9 +241,11 @@ correction_types=10
             endif
             
             call sumDens(rho_temp)
+            
+            
              
             if(itimestep .eq. 1) then
-                do a = 1,ntotal
+                do a = 1,nreal
                     call summationDensityOperatorPtoP( rho_temp(a), a, .true., SumDenstype)
                     
                     rho(a) = rho_temp(a)
@@ -255,13 +257,14 @@ correction_types=10
                     call ParticlePressureEOS(p(a), rho(a), itype(a), itype_virtual)    
                 enddo
             else
-                do a = 1,ntotal
-                    call summationDensityOperatorPtoP( rho(a), a, .false., SumDenstype)
+                do a = 1,nreal
+                    call summationDensityOperatorPtoP( rho_temp(a), a, .false., SumDenstype)
                     
                     rho(a) = rho_temp(a)
                     
                     !Update Volume, since density is updated
                     vol(a) = mass(a)/rho(a)
+                    
             
                     ! Update Pressure as it depends on density for WCSPH
                     call ParticlePressureEOS(p(a), rho(a), itype(a), itype_virtual)   
@@ -271,6 +274,12 @@ correction_types=10
             deallocate(rho_temp)
             
         else
+            
+            allocate(grad_rho(SPH_dim, ntotal),dens_diffusion(ntotal),div_vel(ntotal)) 
+            grad_rho=0.D0
+            dens_diffusion=0.D0
+            div_vel = 0.D0
+            
             ! Use all particle-particle interaction to find non boundary terms
             do k= 1,niac
                 a= pair_i(k)
@@ -356,8 +365,6 @@ correction_types=10
 
             deallocate(grad_rho)
         
-        
-        
             ! Update variables for the next time step
             do a =1, nreal
                 ! Calcualate density as (𝐷𝜌_𝑎)/𝐷𝑡=− 𝜌_𝑎  ∇∙𝑣_𝑎
@@ -375,7 +382,6 @@ correction_types=10
                 ! Update Pressure as it depends on density for WCSPH
                 call ParticlePressureEOS(p(a), rho(a), itype(a), itype_virtual)    
             
-            
             enddo
         
             deallocate(dens_diffusion, div_vel)
@@ -386,6 +392,7 @@ correction_types=10
             call PeriodicParameterScalar(rho,SPH_dim)
             call PeriodicParameterScalar(p,SPH_dim)
             call PeriodicParameterScalar(vol,SPH_dim)
+            call PeriodicParameterScalar(mass,SPH_dim)
         endif
         
         
@@ -396,19 +403,45 @@ correction_types=10
             gamma_discrt_s=0.D0
             rho_s=0.D0
             
-            do k= 1,eniac
-                a= epair_a(k)
-                s= epair_s(k)
-                rho_s(s) = rho_s(s)+ mass(a)*w(k)
-                gamma_discrt_s(s) = gamma_discrt_s(s) + vol(a)*w(k)
-            enddo  
             
             do k= 1,eniac
                 a= epair_a(k)
                 s= epair_s(k)
+                
+                driac=0.D0
+                do d=1,SPH_dim
+                    dxiac(d) = x(d,a) - mid_pt_for_edge(d,s)
+                    driac    = driac + dxiac(d)*dxiac(d)
+                enddo                
+                driac=sqrt(driac)
+                call kernel(driac,dxiac,hsml(a),w_temp,temp_vector)                
+                rho_s(s) = rho_s(s)+ mass(a)*w_temp
+                
+                gamma_discrt_s(s) = gamma_discrt_s(s) + vol(a)*w_temp
+            enddo  
+            
+            do s=1,etotal
+                if( rho_s(s) .lt. 1.D-10) then
+                    rho_s(s) = 0.D0
+                else
+                    rho_s(s)=rho_s(s)/gamma_discrt_s(s)
+                endif
+            enddo
+            
+            do k= 1,eniac
+                a= epair_a(k)
+                s= epair_s(k)
+                
+                driac=0.D0
+                do d=1,SPH_dim
+                    dxiac(d) = x(d,a) - mid_pt_for_edge(d,s)
+                    driac    = driac + dxiac(d)*dxiac(d)
+                enddo                
+                driac=sqrt(driac)
+                call kernel(driac,dxiac,hsml(a),w_temp,temp_vector)  
+                
                 call PressureBdryValue(Sca_Bdry_val,rho(a),x(:,a), vx(:,a), itype(a),bdryVal_seg(:,s), num_bdry_var_seg, s, prsrBdryType)
-                gamma_discrt_s(s)= gamma_discrt_s(s) + vol(a)*w(k)
-                prsr_bdry_val(s)=prsr_bdry_val(s) + Sca_Bdry_val
+                prsr_bdry_val(s)=prsr_bdry_val(s) + Sca_Bdry_val*vol(a)*w_temp
             enddo    
             
             do s=1,etotal
@@ -419,7 +452,7 @@ correction_types=10
                 endif
             enddo
             
-            deallocate(gamma_discrt_s, rho_s)
+            deallocate(gamma_discrt_s)
         endif
         
         
@@ -460,7 +493,7 @@ correction_types=10
             
             !------ Find Pressure Gradient term (to be used in momentum equation) -------------!
             DF_a=0.D0
-            gamma_wall_cutoff=0.6D0
+            !gamma_wall_cutoff=0.6D0
             
             if(prsr_bdry_preCalc) then
                 Sca_Bdry_val = prsr_bdry_val(s)
@@ -486,8 +519,7 @@ correction_types=10
             
         enddo
         
-        if( allocated(prsr_bdry_val)) deallocate(prsr_bdry_val)
-        if (allocated(rho_s)) deallocate(rho_s)
+        
         
         ! The varioables need to be updated for periodic particles
         if (Allocated(pBC_edges)) then
@@ -617,6 +649,9 @@ correction_types=10
         
         if ((mod(itimestep,save_step).eq.0) .or. (itimestep.eq.1)) call output_flow_simplified(itimestep,dt)   
         
+        if( allocated(prsr_bdry_val)) deallocate(prsr_bdry_val)
+        if(allocated(rho_s)) deallocate(rho_s)
+        
         !-----------------------------------------------------------
         deallocate(delC)
         !deallocate(free_surf_particle)
@@ -654,6 +689,8 @@ Deallocate(surf_norm, edge, etype )
 if(Allocated(dgrho_prev)) DEALLOCATE(dgrho_prev)
 if(Allocated(drho)) DEALLOCATE(drho)
 if(Allocated(rho_prev)) DEALLOCATE(rho_prev)
+
+deallocate(temp_vector,dxiac)
 
 !Pause is used so that the terminal is closed only after hitting enter/return on keyboard
 write(*,*) 'The code has finished executing, press return to exit'
