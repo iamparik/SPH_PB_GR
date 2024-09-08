@@ -31,13 +31,13 @@ logical ::  runSPH = .true.
 integer(4) :: k, a, b , d, s, i, j, Scalar0Matrix1
 integer(4) :: correction_types, CF_density, ID_density, CF_pressure, ID_pressure, &
     & CF_BIL_visc, ID_BIL_visc,dirich0Neum1, num_bdry_var_seg, num_bdry_var_ve, &
-    & CF_densDiff, ID_densDiff
+    & CF_densDiff, ID_densDiff, ID_prsrBdryType
 real(8) :: scalar_factor, Sca_Bdry_val, current_time, prsr_wall_compress,gamma_wall_cutoff, rho_wall_compress
 real(8), DIMENSION(:), allocatable  :: F_a, F_b,DF_a, DF_b, Cdwdx_a, Cdwdx_b, Cdgmas,temp_vector, dxiac
 real(8), DIMENSION(:,:,:), allocatable :: grad_vel
 real(8), DIMENSION(:,:), allocatable :: matrix_factor, stress,bdryVal_ve, grad_rho ,grad_vel_s_temp, x_ve_temp
 real(8), DIMENSION(:), allocatable :: div_vel, delx_ab, dens_diffusion, gamma_discrt_s, rho_temp
-logical ::prsr_bdry_preCalc 
+logical ::prsr_bdry_preCalc = .false.
 real(8) ::temp_scalar, driac, w_temp
 
 
@@ -133,7 +133,9 @@ correction_types=10
     ID_BIL_visc=int( BILtype/correction_types)
     
     
-    prsr_bdry_preCalc=any(calc_prsr_bdry_IDs == prsrBdryType)
+     
+    if(int(prsrBdryType/correction_types) .ge. 1) prsr_bdry_preCalc = .true.
+    ID_prsrBdryType = mod(prsrBdryType, correction_types)
     
     allocate(bdryVal_seg(num_bdry_var_seg,maxedge), bdryVal_ve(num_bdry_var_ve, SPH_dim), vx_ve(SPH_dim,maxnv))
     
@@ -440,7 +442,7 @@ correction_types=10
                 driac=sqrt(driac)
                 call kernel(driac,dxiac,hsml(a),w_temp,temp_vector)  
                 
-                call PressureBdryValue(Sca_Bdry_val,rho(a),x(:,a), vx(:,a), itype(a),bdryVal_seg(:,s), num_bdry_var_seg, s, prsrBdryType)
+                call PressureBdryValue(Sca_Bdry_val,rho(a),x(:,a), vx(:,a), itype(a),bdryVal_seg(:,s), num_bdry_var_seg, a,s, ID_prsrBdryType)
                 prsr_bdry_val(s)=prsr_bdry_val(s) + Sca_Bdry_val*vol(a)*w_temp
             enddo    
             
@@ -498,7 +500,7 @@ correction_types=10
             if(prsr_bdry_preCalc) then
                 Sca_Bdry_val = prsr_bdry_val(s)
             else
-                call PressureBdryValue(Sca_Bdry_val,rho(a),x(:,a), vx(:,a), itype(a),bdryVal_seg(:,s), num_bdry_var_seg, s, prsrBdryType)
+                call PressureBdryValue(Sca_Bdry_val,rho(a),x(:,a), vx(:,a), itype(a),bdryVal_seg(:,s), num_bdry_var_seg, a,s, ID_prsrBdryType)
             endif
             
             call CorrectedScaGradPtoB(DF_a,a,s,P(a),Sca_Bdry_val,del_gamma_as(:,k),  &

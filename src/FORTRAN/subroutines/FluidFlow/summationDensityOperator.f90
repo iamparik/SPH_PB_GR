@@ -18,7 +18,7 @@
         
     elseif(sum_dens_type .eq. 3) then
         Kbt=30000.D0
-        bt=exp(-Kbt*(min(gamma_discrt(a)/gamma_cont(a),1.D0)-1.D0)**2)  
+        bt=exp(-Kbt*(min(gamma_discrt(a)/gamma_cont(a),1.D0)-1.D0)**2) 
         rho_a= rho_a/(gamma_cont(a)*bt+(1-bt)*gamma_discrt(a)) 
         
     elseif(sum_dens_type .eq. 4) then
@@ -45,6 +45,20 @@
             rho_ = rho_a + dgrho_prev(a) !  [𝜌a *𝛾𝑎 ]_current =[∑𝑚𝑏*𝑊𝑎𝑏]_current + ( [𝜌a *𝛾𝑎 ]_prev - [∑𝑚𝑏*𝑊𝑎𝑏]_prev )
             dgrho_prev(a)= rho_ - rho_a
             rho_a= rho_/(gamma_cont(a)*bt+(1-bt)*gamma_discrt(a))  
+        endif   
+    
+    elseif(sum_dens_type .eq. 6) then
+        Kbt=30000.D0
+        bt=exp(-Kbt*(min(gamma_discrt(a)/gamma_cont(a),1.D0)-1.D0)**2)  
+        if(start_Setup) then            
+            rho_= rho_a/(gamma_cont(a)*bt+(1-bt)*gamma_discrt(a))   
+            dgrho_prev(a)= rho_*gamma_cont(a)- rho_a !( [𝜌a *𝛾𝑎 ] - [∑𝑚𝑏*𝑊𝑎𝑏] )
+            rho_a = rho_
+        else
+            rho_ = rho_a + dgrho_prev(a) !  [𝜌a *𝛾𝑎 ]_current =[∑𝑚𝑏*𝑊𝑎𝑏]_current + ( [𝜌a *𝛾𝑎 ]_prev - [∑𝑚𝑏*𝑊𝑎𝑏]_prev )
+            rho_ = rho_/gamma_cont(a)
+            dgrho_prev(a)= rho_*gamma_cont(a) - rho_a
+            rho_a= rho_
         endif   
         
     endif
