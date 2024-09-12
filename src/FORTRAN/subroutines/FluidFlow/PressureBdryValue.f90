@@ -14,11 +14,12 @@ real(8) ::xEdgeTemp(SPH_dim,SPH_dim), xrefPoint(SPH_dim), xEdge_surfNorm(SPH_dim
 if(ID .eq. 1) then
      prsr_s = p(a) - rho_*c_sound*dot_product(vx_-bdryVal_seg_(1:SPH_dim), surf_norm(:,s))
      
-elseif(ID .eq. 2) then
-    prsr_s = p(a) + rho_*0.5D0*norm2(vx_-bdryVal_seg_(1:SPH_dim))**2- rho_*dot_product(F_ext, x_-mid_pt_for_edge(:,s))
+elseif(ID .eq. 2) then    
+    prsr_s = p(a) + 0.5D0*rho_*(norm2(vx_)**2 - norm2(bdryVal_seg_(1:SPH_dim))**2) - rho_*dot_product(F_ext, x_-mid_pt_for_edge(:,s))
     
 elseif(ID .eq. 3) then    
-    if( gamma_dens_cut_off .eq. 0.D0) then
+    if( .not. allocated(gamma_dens_cut_off) ) then
+        gamma_dens_cut_off=0.D0
         !This needs to happen only once per particle close to the boundary
         call sml_mult_factor(scale_k)
         xEdgeTemp(:,:)= 0.D0
@@ -42,7 +43,7 @@ elseif(ID .eq. 4) then
     prsr_s = prsr_s - rho_*c_sound*dot_product(vx_-bdryVal_seg_(1:SPH_dim), surf_norm(:,s)) 
     
 elseif(ID .eq. 5) then
-    prsr_s = p(a) + 0.5D0*rho_*(norm2(vx_)**2 - norm2(bdryVal_seg_(1:SPH_dim))**2) - rho_*dot_product(F_ext, x_-mid_pt_for_edge(:,s))
+    prsr_s = p(a) + rho_*0.5D0*norm2(vx_-bdryVal_seg_(1:SPH_dim))**2- rho_*dot_product(F_ext, x_-mid_pt_for_edge(:,s))
 
 elseif(ID .eq. 6) then
     call ParticlePressureEOS(prsr_s, rho_, itype_, itype_virtual)    

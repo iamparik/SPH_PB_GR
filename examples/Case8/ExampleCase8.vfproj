@@ -68,6 +68,7 @@
 		<Filter Name="FluidSubroutine">
 		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\artificialViscosityOperator.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\densDiffusionOperator.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\FluidVariableAtBdry.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\maxTimeStepFluid.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\ParticlePressureEOS.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\PressureBdryValue.f90"/>

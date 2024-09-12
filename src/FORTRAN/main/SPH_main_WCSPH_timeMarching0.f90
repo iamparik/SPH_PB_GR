@@ -36,7 +36,7 @@ real(8) :: scalar_factor, Sca_Bdry_val, current_time, prsr_wall_compress,gamma_w
 real(8), DIMENSION(:), allocatable  :: F_a, F_b,DF_a, DF_b, Cdwdx_a, Cdwdx_b, Cdgmas,temp_vector, dxiac
 real(8), DIMENSION(:,:,:), allocatable :: grad_vel
 real(8), DIMENSION(:,:), allocatable :: matrix_factor, stress,bdryVal_ve, grad_rho ,grad_vel_s_temp, x_ve_temp
-real(8), DIMENSION(:), allocatable :: div_vel, delx_ab, dens_diffusion, gamma_discrt_s, rho_temp
+real(8), DIMENSION(:), allocatable :: div_vel, delx_ab, dens_diffusion, rho_temp
 logical ::prsr_bdry_preCalc = .false.
 real(8) ::temp_scalar, driac, w_temp
 
@@ -398,64 +398,10 @@ correction_types=10
         endif
         
         
-        if( prsr_bdry_preCalc ) then  
-            
-            allocate( prsr_bdry_val(etotal),gamma_discrt_s(etotal) ,rho_s(etotal))
-            prsr_bdry_val=0.D0
-            gamma_discrt_s=0.D0
-            rho_s=0.D0
-            
-            
-            do k= 1,eniac
-                a= epair_a(k)
-                s= epair_s(k)
-                
-                driac=0.D0
-                do d=1,SPH_dim
-                    dxiac(d) = x(d,a) - mid_pt_for_edge(d,s)
-                    driac    = driac + dxiac(d)*dxiac(d)
-                enddo                
-                driac=sqrt(driac)
-                call kernel(driac,dxiac,hsml(a),w_temp,temp_vector)                
-                rho_s(s) = rho_s(s)+ mass(a)*w_temp
-                
-                gamma_discrt_s(s) = gamma_discrt_s(s) + vol(a)*w_temp
-            enddo  
-            
-            do s=1,etotal
-                if( rho_s(s) .lt. 1.D-10) then
-                    rho_s(s) = 0.D0
-                else
-                    rho_s(s)=rho_s(s)/gamma_discrt_s(s)
-                endif
-            enddo
-            
-            do k= 1,eniac
-                a= epair_a(k)
-                s= epair_s(k)
-                
-                driac=0.D0
-                do d=1,SPH_dim
-                    dxiac(d) = x(d,a) - mid_pt_for_edge(d,s)
-                    driac    = driac + dxiac(d)*dxiac(d)
-                enddo                
-                driac=sqrt(driac)
-                call kernel(driac,dxiac,hsml(a),w_temp,temp_vector)  
-                
-                call PressureBdryValue(Sca_Bdry_val,rho(a),x(:,a), vx(:,a), itype(a),bdryVal_seg(:,s), num_bdry_var_seg, a,s, ID_prsrBdryType)
-                prsr_bdry_val(s)=prsr_bdry_val(s) + Sca_Bdry_val*vol(a)*w_temp
-            enddo    
-            
-            do s=1,etotal
-                if( prsr_bdry_val(s) .lt. 1.D-10) then
-                    prsr_bdry_val(s) = 0.D0
-                else
-                    prsr_bdry_val(s)=prsr_bdry_val(s)/gamma_discrt_s(s)
-                endif
-            enddo
-            
-            deallocate(gamma_discrt_s)
-        endif
+
+        !Calcualte density and pressure boundary   
+        call FluidVariableAtBdry(num_bdry_var_seg,ID_prsrBdryType)
+
         
         
         ! Use all particle-particle interaction to find non boundary terms
@@ -691,6 +637,7 @@ Deallocate(surf_norm, edge, etype )
 if(Allocated(dgrho_prev)) DEALLOCATE(dgrho_prev)
 if(Allocated(drho)) DEALLOCATE(drho)
 if(Allocated(rho_prev)) DEALLOCATE(rho_prev)
+if(Allocated(gamma_dens_cut_off)) Deallocate(gamma_dens_cut_off)
 
 deallocate(temp_vector,dxiac)
 

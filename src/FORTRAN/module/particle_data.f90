@@ -190,7 +190,7 @@ integer(4):: itimestep
     real(8), dimension(:),allocatable:: dgrho_prev
     real(8), dimension(:),allocatable:: rho_s
     real(8), dimension(:),allocatable:: prsr_bdry_val
-    real(8) :: gamma_dens_cut_off
+    real(8),allocatable :: gamma_dens_cut_off
     
 ! paramter/s for boundary values
     public bdryVal_seg, p_counter
