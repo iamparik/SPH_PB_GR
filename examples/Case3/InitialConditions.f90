@@ -22,12 +22,23 @@ end subroutine
     
     
 subroutine ICinputValue(initalVal_particle,num_var, itype)
-    use config_parameter , only : rho_init, c_sound, hsml_const, mu_const
+    use config_parameter , only : rho_init, c_sound, hsml_const, mu_const,&
+        & additional_particle_params, DataConfigPath
+    use particle_data, only: p
     implicit none
     integer(2), intent(in) :: itype
     integer(4), intent(in) ::  num_var
     real(8), dimension(num_var), intent(inout) :: initalVal_particle
-    integer(4) :: d
+    integer(4) :: d, k
+    
+    !if( .not. additional_particle_params) then
+    !    open(1,file= DataConfigPath // '/input_particles_param_value.dat',status='old')
+    !    k=0
+    !    do while (.not.eof(1))
+    !        k=k+1
+    !        read(1,*) p(k)   
+    !    enddo
+    !endif
     
     
     if(itype .eq. 3) then
@@ -42,4 +53,4 @@ subroutine ICinputValue(initalVal_particle,num_var, itype)
     endif
     
     
-end subroutine
+    end subroutine
