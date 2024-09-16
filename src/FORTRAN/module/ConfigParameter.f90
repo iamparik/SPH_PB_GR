@@ -70,7 +70,7 @@ module config_parameter
         & NumericalSimCase,  timeIntegrationScheme, SumDenstype, summationDensity, artViscType, MLS_density_bound,  &
         & MLS_step,BILtype, PrsrGradtype,PSTCoeff, ConDivtype, densDiffType, delta_SPH, prsrBdryType, HG_density_correction,PSTtype, &
         & nnps, nnes,WallBoundaryLayer, FScutoff, edge_to_dx_ratio, pack_step2a, pack_step2b, pack_step2c, PST_step, &
-        & time_ev_par_op, additional_particle_params
+        & time_ev_par_op, external_input_InitialCondition
     
 !SPH_dim : Dimension of the problem (1, 2 or 3)    
     integer(4) :: SPH_dim
@@ -184,7 +184,7 @@ module config_parameter
     
     logical :: time_ev_par_op =.false.
     
-    logical :: additional_particle_params = .false.
+    logical :: external_input_InitialCondition = .false.
     
     !integer(4) :: calc_prsr_bdry_IDs(4) = (/6, 7, 8, 9/)
     
@@ -256,6 +256,7 @@ module config_parameter
         write(*,*) 'FScutoff = ' , FScutoff
         write(*,*) 'edge_to_dx_ratio = ' , edge_to_dx_ratio
         write(*,*) 'time_ev_par_op = ', time_ev_par_op
+        write(*,*) 'external_input_InitialCondition = ', external_input_InitialCondition
         
     end subroutine read_config_file
     
@@ -387,6 +388,12 @@ module config_parameter
                     time_ev_par_op = .true.
                 else
                     time_ev_par_op = .false.    
+                endif
+            case ('external_input_InitialCondition')
+                if(param_value .eq. 1) then
+                    external_input_InitialCondition = .true.
+                else
+                    external_input_InitialCondition = .false.    
                 endif
             case default
                 ! Handle unknown parameter name

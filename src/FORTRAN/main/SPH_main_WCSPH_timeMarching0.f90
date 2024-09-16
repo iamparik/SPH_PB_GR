@@ -60,7 +60,9 @@ correction_types=10
     p=0.D0
     hsml = hsml_const
     mu =0.D0
-
+    
+    if(external_input_InitialCondition) call external_file_IC
+    
 ! the size of the vector is the same as size of all variables assosciated 
 ! with particle position (including particle position)
     allocate(F_a(8)) 
@@ -69,6 +71,11 @@ correction_types=10
     do a=1,nreal
         
         F_a(1:SPH_dim) = x(:,a)
+        F_a(SPH_dim+1:SPH_dim*2)= vx(:,a) 
+        F_a(5)=rho(a)
+        F_a(SPH_dim*2+2) = p(a) 
+        F_a(SPH_dim*2+3) = hsml(a)
+        F_a(SPH_dim*2+4) = mu(a) 
         
         call ICinputValue(F_a,8, itype(a))      
         

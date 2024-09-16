@@ -45,3 +45,4 @@ eos 2
 solver_type 1
 edge_to_dx_ratio 2
 time_ev_par_op 0
+external_input_InitialCondition 1
