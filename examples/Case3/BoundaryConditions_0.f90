@@ -11,8 +11,8 @@ subroutine BCinput(etype, tempType, packing)
     integer etype, tempType
     logical packing
 
-    if(tempType .eq. 1) etype = 2
-    
+    etype = tempType
+        
     
     if(packing) etype=2
 
@@ -31,25 +31,9 @@ subroutine BCinputValue(bdryVal_seg,num_bdry_seg, bdryVal_ve, num_bdry_ve, etype
     integer(4) :: d
     
     
-    if(etype .eq. 2) then
-        
-        bdryVal_seg(1)= 0.D0
-        bdryVal_seg(2)= 0.D0
-        bdryVal_seg(3)= rho_init 
-    endif
-    
-    if(etype .eq. 4) then
-        
-        do d=1,dim
-            bdryVal_ve(3,d)= 0.D0
-            bdryVal_ve(4,d)= 0.D0
-        enddo
-        
-        bdryVal_seg(1)= (bdryVal_ve(3,1)+bdryVal_ve(3,2))/2.D0
-        bdryVal_seg(2)= (bdryVal_ve(4,1)+bdryVal_ve(4,2))/2.D0
-        !bdryVal_seg(2)= 1.D-2*1.D2*cos(current_time/(1.D-2))
-        bdryVal_seg(3)= rho_init
-    endif
+    bdryVal_seg(1)= 0.D0
+    bdryVal_seg(2)= 0.D0
+    bdryVal_seg(3)= rho_init 
     
 end subroutine
 
