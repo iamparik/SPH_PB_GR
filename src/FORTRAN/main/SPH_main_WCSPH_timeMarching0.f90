@@ -407,7 +407,12 @@ correction_types=10
         
 
         !Calcualte density and pressure boundary   
-        call FluidVariableAtBdry(num_bdry_var_seg,ID_prsrBdryType)
+        if (prsr_bdry_preCalc) then
+            call FluidVariableAtBdry(num_bdry_var_seg,ID_prsrBdryType)
+        else
+            call FluidVariableAtBdry(num_bdry_var_seg,0)
+        endif
+        
 
         
         

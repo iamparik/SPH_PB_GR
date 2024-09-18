@@ -49,7 +49,7 @@ elseif(ID .eq. 6) then
     call ParticlePressureEOS(prsr_s, rho_, itype_, itype_virtual)    
     prsr_s = (prsr_s/rho_ + 0.5D0*(norm2(vx_)**2 - norm2(bdryVal_seg_(1:SPH_dim))**2) - dot_product(F_ext, x_-mid_pt_for_edge(:,s)))*rho_s(s)
 else
-    call ParticlePressureEOS(prsr_s, rho_, itype_, itype_virtual)    
+    prsr_s = p(a) 
 endif
 
 end subroutine
