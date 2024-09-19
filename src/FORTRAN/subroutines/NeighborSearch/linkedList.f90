@@ -84,7 +84,12 @@ subroutine linkedList(adnl_srch_rds)
                     write(*,*) "value of cell number negative in linkedlist NNPS algorithm for x at ", x(:,a), "for d =", d   
                     !pause
                     nc(d)=1
-                endif            
+                endif    
+                if (nc(d) .gt. gridMax(d)) then
+                    write(*,*) "value of cell number negative in linkedlist NNPS algorithm for x at ", x(:,a), "for d =", d   
+                    !pause
+                    nc(d)=gridMax(d)
+                endif  
             enddo   
         
             cell= (nc(3)-1)*gridMax(2)*gridMax(1)+(nc(2)-1)*gridMax(1)+ nc(1)
