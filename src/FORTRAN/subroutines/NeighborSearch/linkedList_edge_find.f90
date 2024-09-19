@@ -67,7 +67,7 @@ subroutine linkedList_edge_find
                 if (nc(d) .eq. 0) nc(d) =1
                 if (nc(d) .lt. 0) then
                     write(*,*) "value of cell number negative in linkedlist NNPS algorithm for x at ", x(:,a), "for d =", d   
-                    pause
+                    !pause
                     nc(d)=1
                 endif            
             enddo   
@@ -76,7 +76,7 @@ subroutine linkedList_edge_find
         
             if(cell .gt. numcells) then
                 write(*,*) "A particle has left the boundary"    
-                pause
+                !pause
             endif
             
             if (lastPinCell(cell) .eq. 0) then
@@ -103,7 +103,7 @@ subroutine linkedList_edge_find
                 if (nc(d) .eq. 0) nc(d) =1
                 if (nc(d) .lt. 0) then
                     write(*,*) "value of cell number negative in linkedlist NNPS algorithm for x at ", x_ve(:, edge(dd,s)), "for d =", d   
-                    pause
+                    !pause
                     nc(d)=1
                 endif   
                 coord_min(d)= max(min(nc(d),coord_min(d))-1,1)
