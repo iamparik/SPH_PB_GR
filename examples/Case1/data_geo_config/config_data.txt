@@ -30,6 +30,7 @@ densDiffType 25
 delta_SPH 0.1D0
 prsrBdryType 4
 HG_density_correction 0
+FS_density_correction 0
 PSTtype 1
 PST_step 2
 PSTCoeff 5.D-1
@@ -43,3 +44,5 @@ skf 5
 eos 2
 solver_type 1
 edge_to_dx_ratio 10
+time_ev_par_op 1
+external_input_InitialCondition 0
