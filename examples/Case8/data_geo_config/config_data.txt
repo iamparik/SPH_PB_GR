@@ -21,14 +21,14 @@ timeIntegrationScheme 1
 BILtype 23
 PrsrGradtype 41
 ConDivtype 0
-SumDenstype 3
+SumDenstype 6
 summationDensity 1
 artViscType 0
 MLS_density_bound 0
 MLS_step 1
 densDiffType 0
 delta_SPH 0.1D0
-prsrBdryType 13
+prsrBdryType 12
 HG_density_correction 0
 PSTtype 0
 PST_step 1

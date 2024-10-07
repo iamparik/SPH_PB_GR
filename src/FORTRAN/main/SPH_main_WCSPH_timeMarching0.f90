@@ -603,6 +603,64 @@ correction_types=10
         !call FreeSurfaceDetection
         call ParticleShiftingTechnique(PSTtype,PSTcoeff, PST_Step, itimestep)
         
+        allocate(grad_rho(SPH_dim, ntotal),grad_vel(SPH_dim, SPH_dim, ntotal)) 
+        grad_rho =0.D0
+        grad_vel =0.D0
+        if ((mod(itimestep,PST_step).eq.0) .and. PSTtype .ge. 1) then
+            do k= 1,niac
+                a= pair_i(k)
+                b= pair_j(k)
+            
+                !-------------- Find density Gradient term (to be used in density diffusion equation) --------------!
+                    call CorrectedScaGradPtoP(grad_rho(:,a), grad_rho(:,b),a,b,rho(a),rho(b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
+                            & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                            & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
+                            & free_surf_particle(a),free_surf_particle(b),SPH_dim, CF_densDiff, ID_densDiff) ! SPH_dim, correctionFactorID, grad_type
+                
+                !-------------- Find velocity gradient term (to be used to find viscous stress in momentum equation) --------------!
+                do d =1, SPH_dim
+                    call CorrectedScaGradPtoP(grad_vel(d,:,a),grad_vel(d,:,b),a,b,vx(d,a),vx(d,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
+                            & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                            & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
+                            & free_surf_particle(a),free_surf_particle(b),SPH_dim, CF_BIL_visc, 2) ! SPH_dim, correctionFactorID, grad_type
+                enddo
+                !-------------------------------------------------------------------------------------------------------------!
+            enddo
+        
+             do k= 1, eniac
+                a=epair_a(k)
+                s=epair_s(k)
+
+            
+                !------ Find velocity gradient term (to be used to find viscous stress in momentum equation) ------------
+                F_b(:) = bdryVal_seg(1:SPH_dim,s)
+                do d = 1, SPH_dim
+                    call CorrectedScaGradPtoB(grad_vel(d,:,a),a,s,vx(d,a),F_b(d),del_gamma_as(:,k),  &
+                            & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                            & free_surf_particle(a),SPH_dim, 3, 2) ! SPH_dim, correctionFactorID, grad_type
+                enddo
+            
+                !------ Find density Gradient term (to be used in density diffusion equation) -------------!         
+                Sca_Bdry_val = rho_s(s)
+            
+                call CorrectedScaGradPtoB(grad_rho(:,a),a,s,rho(a),Sca_Bdry_val,del_gamma_as(:,k),  &
+                        & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
+                        & free_surf_particle(a),SPH_dim, 5, 2) ! SPH_dim, correctionFactorID, grad_type
+            
+            enddo  
+        
+            do a=1,nreal
+                rho(a) = rho(a) + dot_product(grad_rho(:,a),x(:,a) - x_prev(:,a))
+                do d=1,SPH_dim
+                    vx(d,a)= vx(d,a) + dot_product(grad_vel(d,:,a),x(:,a) - x_prev(:,a))
+                enddo            
+            enddo
+            
+            deallocate(x_prev)
+        endif
+        
+        deallocate(grad_rho,grad_vel)
+        
         !------------------------ export parameter values as output -----------------!
                
         if(time_ev_par_op)call caseBasedOutput(itimestep,dt)
