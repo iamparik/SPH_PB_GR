@@ -13,7 +13,8 @@ subroutine  output_flow_simplified(itimestep,dt)
         & save_step
     use particle_data ,   only: x, mass, rho, p, vx, &
         & ntotal,etotal, itype, etype, gamma_cont, gamma_discrt,del_gamma, delC, &
-        & gamma_density_cont, ve_total, x_ve, vx_ve, mid_pt_for_edge, free_surf_val
+        & gamma_density_cont, ve_total, x_ve, vx_ve, mid_pt_for_edge, free_surf_val, &
+        & prsr_bdry_val, rho_s
     
     implicit none
 !----------------------------------------------------------------------           
@@ -21,8 +22,9 @@ subroutine  output_flow_simplified(itimestep,dt)
 !                   d:      A variable used to iterate dimensions
 !                   xname:  Path of the file which needs to be created
 !------------------------------------------------------------------------
-    integer(4):: i,d,s, itimestep,f_dim
-    real(8):: dt
+    integer(4), intent(in) :: itimestep
+    real(8), intent(in):: dt
+    integer(4):: i,d,s,f_dim
     character (40) :: xname, x2name 
     logical :: text_print
 
@@ -86,12 +88,19 @@ text_print=.true.
     text_print=.true.
 ! Export data of all particles representative of boundary, which are used in interpolation,
 ! called edge particles
-    
-    do s=1,etotal 
-        if(text_print) write(1,'(A)')'ZONE T="Edge Mid-Points",F=Point,C=Red'
-        write(1,1001) (mid_pt_for_edge(d,s), d=1,SPH_dim), 0.D0 ,0.D0, (0.D0, d = 1, SPH_dim), 0.D0, 0.D0, 0.D0, (0.D0, d = 1, SPH_dim), (0.D0, d = 1, SPH_dim), 0.D0
-        text_print=.false.                           
-    enddo
+    if(allocated(prsr_bdry_val) .and. allocated(rho_s)) then
+        do s=1,etotal 
+            if(text_print) write(1,'(A)')'ZONE T="Edge Mid-Points",F=Point,C=Red'
+            write(1,1001) (mid_pt_for_edge(d,s), d=1,SPH_dim), 0.D0 ,rho_s(s), (0.D0, d = 1, SPH_dim), prsr_bdry_val(s), 0.D0, 0.D0, (0.D0, d = 1, SPH_dim), (0.D0, d = 1, SPH_dim), 0.D0
+            text_print=.false.                                                     
+        enddo
+    else
+        do s=1,etotal 
+            if(text_print) write(1,'(A)')'ZONE T="Edge Mid-Points",F=Point,C=Red'
+            write(1,1001) (mid_pt_for_edge(d,s), d=1,SPH_dim), 0.D0 ,0.D0, (0.D0, d = 1, SPH_dim), 0.D0, 0.D0, 0.D0, (0.D0, d = 1, SPH_dim), (0.D0, d = 1, SPH_dim), 0.D0
+            text_print=.false.                                                     
+        enddo
+    endif
 
     text_print=.true.       
     
@@ -123,5 +132,5 @@ text_print=.true.
       
       close(1)
 
-end
+end subroutine
       

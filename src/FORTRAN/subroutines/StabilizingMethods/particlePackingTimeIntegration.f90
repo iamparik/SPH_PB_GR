@@ -12,7 +12,7 @@ subroutine particlePackingTimeIntegration
 
 use config_parameter, only: SPH_dim, pi, DataConfigPath, &
     & print_step, save_step, hsml_const, dx_r, &
-    & pack_step2a, pack_step2b, pack_step2c
+    & pack_step2a, pack_step2b, pack_step2c, shorten_step2a, shorten_step2c
 use particle_data, only: nreal, w_aa, w, dwdx, &
         & gamma_discrt, gamma_cont, del_gamma_as, del_gamma, &
         & xi1_mat, beta_mat,gamma_mat,xi_cont_mat, &
@@ -176,7 +176,7 @@ do while (packing_in_progress)
         dCF= 1.D0
     
         ! Calculate particle-particle term for concentration gradient
-        call CorrectedScaGradPtoP(delC(:,a),delC(:,b),dCF,dCF,dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
+        call CorrectedScaGradPtoP(delC(:,a),delC(:,b),a,b,dCF,dCF,dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                     & gamma_cont(a), temp_scalar, temp_matrix, temp_matrix, temp_matrix, &
                     & gamma_cont(b), temp_scalar, temp_matrix, temp_matrix, temp_matrix, &
                     & 0,0,SPH_dim, 1, 1) ! SPH_dim, correctionFactorID, grad_type
@@ -195,7 +195,7 @@ do while (packing_in_progress)
         dCF= 1.D0
     
         ! Calculate boundary term for cincentration gradient
-        call CorrectedScaGradPtoB(delC(:,a),1.D0,dCF,del_gamma_as(:,k),  &
+        call CorrectedScaGradPtoB(delC(:,a),a,s,1.D0,dCF,del_gamma_as(:,k),  &
                             & gamma_cont(a), temp_scalar, temp_matrix, temp_matrix, temp_matrix, &
                             & 0,SPH_dim, 1, 1)
         
@@ -213,7 +213,7 @@ do while (packing_in_progress)
         
         dCF=0.5D0*(ps_pa -1.D0)
     
-        call CorrectedScaGradPtoB(bdry_push(:,a),1.D0,dCF,del_gamma_as(:,k),  &
+        call CorrectedScaGradPtoB(bdry_push(:,a),a,s,1.D0,dCF,del_gamma_as(:,k),  &
                             & gamma_cont(a), temp_scalar, temp_matrix, temp_matrix, temp_matrix, &
                             & 0,SPH_dim, 1, 1)
     enddo  
@@ -284,7 +284,7 @@ do while (packing_in_progress)
         if(mod(iterstep,100) .eq. 0) then
             PP_variable_prev = PP_variable
             PP_variable = TPD
-            if(abs(PP_Variable - PP_Variable_prev) .lt. 1.D-2*PP_Variable) then
+            if((abs(PP_Variable - PP_Variable_prev) .lt. 1.D-2*PP_Variable) .and. shorten_step2a ) then
                 cutoff_step = cutoff_step + 1
                 write(*,*) "First Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-1), &
                     & " min time = ",mintime_elapsed, " max time = ", maxtime_elapsed
@@ -321,7 +321,7 @@ do while (packing_in_progress)
         if(mod(iterstep-step2a_iter,100) .eq. 0) then
             PP_variable_prev = PP_variable
             PP_variable = delC_avg
-            if(abs(PP_Variable - PP_Variable_prev) .lt. 1.D-2*PP_Variable) then
+            if((abs(PP_Variable - PP_Variable_prev) .lt. 1.D-2*PP_Variable) .and. shorten_step2c) then
                 cutoff_step = cutoff_step + 1
                 write(*,*) "Second Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-step2a_iter), &
                     & " min time = ",mintime_elapsed, " max time = ", maxtime_elapsed

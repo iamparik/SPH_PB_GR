@@ -12,7 +12,8 @@
 subroutine PositionDependentFactors
     
     use particle_data, only: pBC_edges,nperiodic,pBC_duplicate_pair, w_aa, &
-                    & gamma_discrt, del_gamma, gamma_cont, xi1_mat, beta_mat, gamma_mat
+                    & gamma_discrt, del_gamma, gamma_cont, xi1_mat, beta_mat, gamma_mat, &
+                    & mass, rho,vol
     use config_parameter, only: SPH_dim
     
     implicit none
@@ -37,9 +38,12 @@ subroutine PositionDependentFactors
     ! interpolation of 0th order functions require value of weigths at center of the kernel
     call smoothing_w0
  
-    ! update w_aa for periodic particles
+    ! update w_aa, rho, mass, vol, for periodic particles
     if (Allocated(pBC_edges)) then
         call PeriodicParameterScalar(w_aa,SPH_dim)
+        call PeriodicParameterScalar(rho,SPH_dim)
+        call PeriodicParameterScalar(mass,SPH_dim)
+        call PeriodicParameterScalar(vol,SPH_dim)
     endif
         
         

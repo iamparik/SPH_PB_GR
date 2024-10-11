@@ -99,3 +99,5 @@ r=5 => Xi correction (PCBI without boundary terms) as correction factor
 q=1 => Strictly Kernel consistent formulation with only F_b
 q=2 => F_b-F_a formulation
 q=3 => F_b+F_a formulation
+q=4 => Ferrand et. al Formulation
+q=5 => Kulasegaram et. al Formulation (rememeber to use r=0 with this)

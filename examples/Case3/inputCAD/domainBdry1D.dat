@@ -51,8 +51,11 @@ $*  Mesh Collector: Plotel Collector(1)
 $*  Mesh: 1d_mesh(1)
 PLOTEL,1,1,2
 PLOTEL,2,2,3
-PLOTEL,3,3,4
 PLOTEL,4,4,5
 PLOTEL,5,5,6
 PLOTEL,6,6,7
+PLOTEL,7,7,1
+$*  Mesh Collector: Plotel Collector(2)
+$*  Mesh: 1d_mesh(2)
+PLOTEL,3,3,4
 ENDDATA

@@ -11,7 +11,7 @@ use config_parameter, only:SPH_dim, hsml_const, dx_r, FScutoff
 use particle_data, only: niac,pair_i, pair_j,eniac,epair_a, epair_s, &
     & w, dwdx, delC, surf_norm, del_gamma_as, ntotal, nreal, etotal, &
     & mass, rho, x, vx, itype,free_surf_particle, bdryVal_seg, &
-    & gamma_cont, gamma_discrt, gamma_mat, gamma_mat_inv,xi1_mat_inv
+    & gamma_cont, gamma_discrt, gamma_mat, gamma_mat_inv,xi1_mat_inv, x_prev
 
 
 implicit none
@@ -31,8 +31,7 @@ maxShift=0.2D0*dx_r
 
 extra_vec=0.D0
 
-Allocate( grad_vel(SPH_dim, SPH_dim, ntotal),delC(SPH_dim,ntotal))
-grad_vel=0.D0
+Allocate( delC(SPH_dim,ntotal))
 delC=0.D0
 
 if ((mod(itimestep_,PST_step_).eq.0) .and. PSTtype .ge. 1) then
@@ -58,19 +57,10 @@ endif
             dCF= 1.D0
         endif
     
-        call CorrectedScaGradPtoP(delC(:,a),delC(:,b),dCF,dCF,dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
+        call CorrectedScaGradPtoP(delC(:,a),delC(:,b),a,b,dCF,dCF,dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                     & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                     & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
                     & free_surf_particle(a),free_surf_particle(b),SPH_dim, 1, 1) ! SPH_dim, correctionFactorID, grad_type
-    
-        do d=1,SPH_dim 
-            ! add an if condition with PCBI for inside and WCBI near bdry if needed
-            call CorrectedScaGradPtoP(grad_vel(d,:,a),grad_vel(d,:,b),vx(d,a),vx(d,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
-                    & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                    & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
-                    & free_surf_particle(a),free_surf_particle(b),SPH_dim, 3, 2) ! SPH_dim, correctionFactorID, grad_type
-        enddo
-
     
     enddo
 
@@ -89,24 +79,19 @@ endif
             dCF= 1.D0
         endif
     
-        call CorrectedScaGradPtoB(delC(:,a),1.D0,dCF,del_gamma_as(:,k),  &
+        call CorrectedScaGradPtoB(delC(:,a),a,s,1.D0,dCF,del_gamma_as(:,k),  &
                             & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                             & free_surf_particle(a),SPH_dim, 1, 1)
     
-        do d=1,SPH_dim
-        
-            F_b(:) = bdryVal_seg(1:SPH_dim,s)
-            call CorrectedScaGradPtoB(grad_vel(d,:,a),vx(d,a),F_b(d),del_gamma_as(:,k),  &
-                            & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
-                            & free_surf_particle(a),SPH_dim, 3, 2) ! SPH_dim, correctionFactorID, grad_type
-        enddo    
+
     enddo  
 
     ! Now perform particle shifting
 if(perform_shifting) then 
-    
+    Allocate( x_prev(SPH_dim,ntotal))
     do a=1,nreal    
         delr=0.D0
+        x_prev(:,a)=x(:,a)
 
         dstress(:) = -grad_b_term*delC(:,a)
         PSTShift = min(norm2(dstress(:)), maxShift)
@@ -117,14 +102,10 @@ if(perform_shifting) then
         ! account for free surface
         delr=dble(1-free_surf_particle(a))*delr
         
-        x(:,a) = x(:,a)+ delr
-        do d=1,SPH_dim
-            vx(d,a)= vx(d,a) + dot_product(grad_vel(d,:,a),delr)
-        enddo  
+        x(:,a) = x_prev(:,a)+ delr     
 
     enddo
 endif
 
-deallocate(grad_vel)
 
 end
