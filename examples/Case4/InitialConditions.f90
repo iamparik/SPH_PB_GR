@@ -46,4 +46,8 @@ subroutine ICinputValue(initalVal_particle,num_var, itype)
     endif
     
     
-end subroutine
+    end subroutine
+    
+    subroutine external_file_ic
+    
+    end subroutine

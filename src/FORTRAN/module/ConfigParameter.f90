@@ -69,7 +69,7 @@ module config_parameter
         & hsml_const, rho_init, mu_const, ref_vel_max, c_sound, F_ext,  &
         & NumericalSimCase,  timeIntegrationScheme, SumDenstype, summationDensity, artViscType, MLS_density_bound,  &
         & MLS_step,BILtype, PrsrGradtype,PSTCoeff, ConDivtype, densDiffType, delta_SPH, prsrBdryType, HG_density_correction,PSTtype, &
-        & nnps, nnes,WallBoundaryLayer, FScutoff, edge_to_dx_ratio, pack_step2a, pack_step2b, pack_step2c, PST_step, &
+        & nnps, nnes,WallBoundaryLayer, FScutoff, edge_to_dx_ratio, pack_step2a, shorten_step2a, pack_step2b, pack_step2c, shorten_step2c, PST_step, &
         & time_ev_par_op, external_input_InitialCondition
     
 !SPH_dim : Dimension of the problem (1, 2 or 3)    
@@ -176,9 +176,13 @@ module config_parameter
     
     integer(4) :: pack_step2a
     
+    logical :: shorten_step2a =.true.
+    
     real(8) :: pack_step2b
     
     integer(4) :: pack_step2c
+    
+    logical :: shorten_step2c =.true.
     
     integer(4) :: PST_step
     
@@ -300,6 +304,18 @@ module config_parameter
                 pack_step2b =param_value
             case ('pack_step2c')
                 pack_step2c =param_value
+            case ('shorten_step2a')
+                if(param_value .eq. 0) then
+                    shorten_step2a = .false.
+                else
+                    shorten_step2a = .true.
+                endif 
+            case ('shorten_step2c')
+                if(param_value .eq. 0) then
+                    shorten_step2c = .false.
+                else
+                    shorten_step2c = .true.
+                endif 
             case ('hsml_const')
                 hsml_const = param_value
             case ('rho_init')

@@ -611,13 +611,13 @@ correction_types=10
                 a= pair_i(k)
                 b= pair_j(k)
             
-                !-------------- Find density Gradient term (to be used in density diffusion equation) --------------!
+                !-------------- Find density Gradient term --------------!
                     call CorrectedScaGradPtoP(grad_rho(:,a), grad_rho(:,b),a,b,rho(a),rho(b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                             & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
                             & gamma_cont(b), gamma_discrt(b), gamma_mat(:,:,b), gamma_mat_inv(:,:,b), xi1_mat_inv(:,:,b), &
                             & free_surf_particle(a),free_surf_particle(b),SPH_dim, CF_densDiff, ID_densDiff) ! SPH_dim, correctionFactorID, grad_type
                 
-                !-------------- Find velocity gradient term (to be used to find viscous stress in momentum equation) --------------!
+                !-------------- Find velocity gradient term --------------!
                 do d =1, SPH_dim
                     call CorrectedScaGradPtoP(grad_vel(d,:,a),grad_vel(d,:,b),a,b,vx(d,a),vx(d,b),dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
                             & gamma_cont(a), gamma_discrt(a), gamma_mat(:,:,a), gamma_mat_inv(:,:,a), xi1_mat_inv(:,:,a), &
@@ -632,7 +632,7 @@ correction_types=10
                 s=epair_s(k)
 
             
-                !------ Find velocity gradient term (to be used to find viscous stress in momentum equation) ------------
+                !------ Find velocity gradient term  ------------
                 F_b(:) = bdryVal_seg(1:SPH_dim,s)
                 do d = 1, SPH_dim
                     call CorrectedScaGradPtoB(grad_vel(d,:,a),a,s,vx(d,a),F_b(d),del_gamma_as(:,k),  &
@@ -640,7 +640,7 @@ correction_types=10
                             & free_surf_particle(a),SPH_dim, 3, 2) ! SPH_dim, correctionFactorID, grad_type
                 enddo
             
-                !------ Find density Gradient term (to be used in density diffusion equation) -------------!         
+                !------ Find density Gradient term  -------------!         
                 Sca_Bdry_val = rho_s(s)
             
                 call CorrectedScaGradPtoB(grad_rho(:,a),a,s,rho(a),Sca_Bdry_val,del_gamma_as(:,k),  &
