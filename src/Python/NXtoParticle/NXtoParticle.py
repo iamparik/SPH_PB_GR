@@ -388,6 +388,9 @@ def domainBdryCase2D(input_file_directory, output_file_directory, dx, unit_conve
     else:
         total1DLength=0
         totalNum1DElements = 0
+        with open(output_file_path, 'w') as output_file:
+            output_file.write
+            output_file.write(f"")
 
 
     
@@ -432,7 +435,7 @@ def fillDomainWParticle2D(x_min, x_max, dx,bdryPolygon, output_file_path, bdry_t
 #Define the main function
 def main():
     root_directory="../../../"
-    ref_directory="examples/Case5/"  #"examples/Case2/" #"src/Python/NXtoParticle/" 
+    ref_directory="examples/Case9/"  #"examples/Case2/" #"src/Python/NXtoParticle/" 
     print("current ref_directory is in: ", ref_directory)        
 
     input_directory="inputCAD/"

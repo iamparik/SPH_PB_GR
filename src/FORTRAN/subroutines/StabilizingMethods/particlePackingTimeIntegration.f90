@@ -321,6 +321,7 @@ do while (packing_in_progress)
         if(mod(iterstep-step2a_iter,100) .eq. 0) then
             PP_variable_prev = PP_variable
             PP_variable = delC_avg
+            write(*,*) " delC convergence :", abs(PP_Variable - PP_Variable_prev)/PP_Variable
             if((abs(PP_Variable - PP_Variable_prev) .lt. 1.D-2*PP_Variable) .and. shorten_step2c) then
                 cutoff_step = cutoff_step + 1
                 write(*,*) "Second Cut off step at iteration ", iterstep, " and average time =",  time_elapsed/dble(iterstep-step2a_iter), &

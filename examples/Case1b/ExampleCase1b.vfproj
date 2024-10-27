@@ -68,6 +68,7 @@
 		<Filter Name="FluidSubroutine">
 		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\artificialViscosityOperator.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\densDiffusionOperator.f90"/>
+		<File RelativePath=".\CaseBasedDynamicForce.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\FluidVariableAtBdry.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\maxTimeStepFluid.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\ParticlePressureEOS.f90"/>
@@ -82,6 +83,7 @@
 		<File RelativePath="..\..\src\FORTRAN\subroutines\LinearAlgebra\inv2d.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\LinearAlgebra\inv3D.f90"/></Filter>
 		<Filter Name="Modules">
+		<File RelativePath=".\caes1b_mod.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\module\ConfigParameter.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\module\particle_data.f90"/></Filter>
 		<Filter Name="NeighborSearch">
