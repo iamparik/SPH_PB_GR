@@ -124,5 +124,5 @@
 		<File RelativePath="..\..\src\FORTRAN\subroutines\StabilizingMethods\particlePackingTimeIntegration.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\subroutines\StabilizingMethods\ParticleShiftingTechnique.f90"/></Filter>
 		<File RelativePath=".\ReadMe.txt"/>
-		<File RelativePath="..\..\src\FORTRAN\main\SPH_main_WCSPH_timeMarching0.f90"/></Filter></Files>
+		<File RelativePath="..\..\src\FORTRAN\main\SPH_main_WCSPH_timeMarching1.f90"/></Filter></Files>
 	<Globals/></VisualStudioProject>

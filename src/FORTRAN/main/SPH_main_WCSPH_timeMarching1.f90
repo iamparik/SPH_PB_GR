@@ -374,24 +374,26 @@ correction_types=10
 
             deallocate(grad_rho)
         
-            ! Update variables for the next time step
-            do a =1, nreal
-                ! Calcualate density as (𝐷𝜌_𝑎)/𝐷𝑡=− 𝜌_𝑎  ∇∙𝑣_𝑎
-                rho(a) = rho(a) - dt* rho(a) * div_vel(a) + dt*dens_diffusion(a)
+            if(itimestep .gt. 1) then
+                ! Update variables for the next time step
+                do a =1, nreal
+                    ! Calcualate density as (𝐷𝜌_𝑎)/𝐷𝑡=− 𝜌_𝑎  ∇∙𝑣_𝑎
+                    rho(a) = rho(a) - dt* rho(a) * div_vel(a) + dt*dens_diffusion(a)
             
-                ! Use Hughes density correction if necessary
-                if ((HG_density_correction) .and. (rho(a) .le. rho_init)) rho(a)=rho_init
+                    ! Use Hughes density correction if necessary
+                    if ((HG_density_correction) .and. (rho(a) .le. rho_init)) rho(a)=rho_init
             
-                ! for free surface impose 𝜌_𝑎= rho_free_surface
-                if(FS_density_correction) rho(a)=dble(1-free_surf_particle(a))*rho(a)+dble(free_surf_particle(a))*rho_init
+                    ! for free surface impose 𝜌_𝑎= rho_free_surface
+                    if(FS_density_correction) rho(a)=dble(1-free_surf_particle(a))*rho(a)+dble(free_surf_particle(a))*rho_init
             
-                !Update Volume, since density is updated
-                vol(a) = mass(a)/rho(a)
+                    !Update Volume, since density is updated
+                    vol(a) = mass(a)/rho(a)
             
-                ! Update Pressure as it depends on density for WCSPH
-                call ParticlePressureEOS(p(a), rho(a), itype(a), itype_virtual)    
+                    ! Update Pressure as it depends on density for WCSPH
+                    call ParticlePressureEOS(p(a), rho(a), itype(a), itype_virtual)    
             
-            enddo
+                enddo
+            endif
         
             deallocate(dens_diffusion, div_vel)
         endif
@@ -555,9 +557,6 @@ correction_types=10
             
         enddo
         
-        !Add dynamic force
-        
-       ! call CaseBasedDynamicForce(F_ext, dt)
         
         ! Update real particle position and velocity for the next time step
         do a =1, nreal
