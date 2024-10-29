@@ -368,3 +368,4 @@ data_packing/
 data_output*/
 /examples/Case5/GPUCache
 /examples/Case5/VTune Profiler Results/ExampleCase5
+/examples/Case1c/CFD_Data/inititalValuesCFD.csv
