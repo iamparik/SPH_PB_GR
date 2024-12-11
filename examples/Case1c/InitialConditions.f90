@@ -47,7 +47,7 @@ subroutine ICinputValue(initalVal_particle,num_var, itype)
     
     subroutine external_file_IC
     use config_parameter , only : DataConfigPath,P_EOS_extra, ExtInputMeshType
-    use particle_data, only: p, vx
+    use particle_data, only: p, vx, nreal
     integer(4) :: k
     real(8) :: tempx,tempy
     
@@ -56,8 +56,12 @@ subroutine ICinputValue(initalVal_particle,num_var, itype)
         k=0
         do while (.not.eof(1))
             k=k+1
-            read(1,*) tempx,tempy, vx(1,k), vx(2,k), p(k)   
+            read(1,*) tempx,tempy, vx(1,k), vx(2,k), p(k)
         enddo
 
-        P_EOS_extra=minval(p)
+        P_EOS_extra=minval(p(1:nreal))
+        
+        write(*,*) "P_EOS_extra=" , P_EOS_extra
+        write(*,*) "nreal = " , nreal, "max particles read", k
+        
     end subroutine
