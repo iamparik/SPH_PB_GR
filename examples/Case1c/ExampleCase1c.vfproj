@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VisualStudioProject ProjectCreator="Intel Fortran" Keyword="Console Application" Version="11.0" ProjectIdGuid="{2C956038-749B-4A44-82F6-EC1300C75A3E}">
+	<Platforms>
+		<Platform Name="Win32"/>
+		<Platform Name="x64"/></Platforms>
+	<Configurations>
+		<Configuration Name="Debug|Win32">
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" WarnInterfaces="true" Traceback="true" BoundsCheck="true" StackFrameCheck="true" RuntimeLibrary="rtMultiThreadedDebugDLL"/>
+				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true"/>
+				<Tool Name="VFCustomBuildTool"/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/>
+				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
+		<Configuration Name="Debug|x64">
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" WarnInterfaces="true" Traceback="true" BoundsCheck="true" StackFrameCheck="true" RuntimeLibrary="rtMultiThreadedDebugDLL"/>
+				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
+				<Tool Name="VFCustomBuildTool"/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/>
+				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
+		<Configuration Name="Release|Win32">
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" RuntimeLibrary="rtMultiThreadedDLL"/>
+				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" SubSystem="subSystemConsole"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true"/>
+				<Tool Name="VFCustomBuildTool"/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/>
+				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
+		<Configuration Name="Release|x64">
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true"/>
+				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" SubSystem="subSystemConsole"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
+				<Tool Name="VFCustomBuildTool"/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/>
+				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration></Configurations>
+	<Files>
+		<Filter Name="Header Files" Filter="fi;fd"/>
+		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"/>
+		<Filter Name="Source Files" Filter="f90;for;f;fpp;ftn;def;odl;idl">
+		<Filter Name="BoundaryGeoemtryFeatures">
+		<File RelativePath="..\..\src\FORTRAN\subroutines\BoundaryGeometryFeatures\centroidBdrySegment.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\BoundaryGeometryFeatures\surfaceNormalBdry.f90"/></Filter>
+		<Filter Name="CorrectionFactors">
+		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\beta_discrete_factor.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\CorrectionFactorMatrixInversion.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\dgamma_analytical.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\dgamma_analytical_Ferrand_2D.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\gamma_analytical_leroy_2D.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\gamma_continuous_leroy.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\gamma_discrete1_factor.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\gamma_mat_discrete_factor.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\PositionDependentFactors.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\xi_discrete1_factor.f90"/></Filter>
+		<Filter Name="ExampleCase_BC_IC">
+		<File RelativePath=".\BoundaryConditions_0.f90"/>
+		<File RelativePath=".\InitialConditions.f90"/></Filter>
+		<Filter Name="FluidSubroutine">
+		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\artificialViscosityOperator.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\densDiffusionOperator.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\FluidVariableAtBdry.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\maxTimeStepFluid.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\ParticlePressureEOS.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\PressureBdryValue.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\FluidFlow\summationDensityOperator.f90"/></Filter>
+		<Filter Name="InputFiles">
+		<File RelativePath="..\..\src\FORTRAN\subroutines\Input\inputCADtoEdgeData.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\Input\inputCADtoParticleData.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\Input\InputExt.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\Input\inputSPHConfig.f90"/></Filter>
+		<Filter Name="LinearAlgebra">
+		<File RelativePath="..\..\src\FORTRAN\subroutines\LinearAlgebra\inv2d.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\LinearAlgebra\inv3D.f90"/></Filter>
+		<Filter Name="Modules">
+		<File RelativePath="..\..\src\FORTRAN\module\ConfigParameter.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\module\particle_data.f90"/></Filter>
+		<Filter Name="NeighborSearch">
+		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\direct_edge_find.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\direct_edge_find_reduced.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\direct_find.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\direct_find_reduced.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\edge_particle_pair_2D.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\linkedList.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\linkedList_edge_find.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\nnes_algorithm.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\nnps_algorithm.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\particleEdgePair.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\NeighborSearch\particlePair.f90"/></Filter>
+		<Filter Name="OutputRoutines">
+		<File RelativePath=".\caseBasedOutput.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\Output\createOutputFolder.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\Output\output_flow_simplified.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\Output\outputPacking.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\Output\OutputSetup.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\Output\printTimeStep.f90"/></Filter>
+		<Filter Name="PeriodicBCRoutines">
+		<File RelativePath="..\..\src\FORTRAN\subroutines\PeriodicBC\PeriodicBCcorrectionFactors.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\PeriodicBC\PeriodicBCreset.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\PeriodicBC\PeriodicBCsetup.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\PeriodicBC\PeriodicParamter.f90"/></Filter>
+		<Filter Name="SPHOperators">
+		<File RelativePath="..\..\src\FORTRAN\subroutines\SPHOperator\CorrectedBILaplacian.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\SPHOperator\CorrectedKernelGradient.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\SPHOperator\CorrectedScalarGradient.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\SPHOperator\CorrectedVectorDivergence.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\SPHOperator\CorrectionFactorParsing.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\SPHOperator\DerivativeOperator.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\SPHOperator\kernel.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\SPHOperator\ScalarGradient.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\SPHOperator\sml_mult_factor.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\SPHOperator\smoothing_w0.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\SPHOperator\VectorDivergence.f90"/></Filter>
+		<Filter Name="StabilizingMethods">
+		<File RelativePath="..\..\src\FORTRAN\subroutines\StabilizingMethods\particlePackingTimeIntegration.f90"/>
+		<File RelativePath="..\..\src\FORTRAN\subroutines\StabilizingMethods\ParticleShiftingTechnique.f90"/></Filter>
+		<File RelativePath=".\ReadMe.txt"/>
+		<File RelativePath="..\..\src\FORTRAN\main\SPH_main_WCSPH_timeMarching0.f90"/></Filter></Files>
+	<Globals/></VisualStudioProject>
