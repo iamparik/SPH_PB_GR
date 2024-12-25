@@ -65,7 +65,7 @@ module config_parameter
         
 ! Below are variables that can be defiend at run time
     public  SPH_dim, skf, eos, solver_type, &
-        & time_step,print_step,save_step,backup_step, dx_r, ExtInputMeshType, packagingIterations,  &
+        & time_step,print_step,save_step,backup_step, save_packing, dx_r, ExtInputMeshType, packagingIterations,  &
         & hsml_const, rho_init, mu_const, ref_vel_max, c_sound, F_ext,  &
         & NumericalSimCase,  timeIntegrationScheme, SumDenstype, summationDensity, artViscType, MLS_density_bound,  &
         & MLS_step,BILtype, PrsrGradtype,PSTCoeff, ConDivtype, densDiffType, delta_SPH, prsrBdryType, HG_density_correction,PSTtype, &
@@ -103,6 +103,8 @@ module config_parameter
     integer(4) :: print_step
     
     integer(4) :: save_step
+    
+    integer(4) :: save_packing=1
     
     integer(4) :: backup_step
     

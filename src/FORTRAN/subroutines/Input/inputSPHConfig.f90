@@ -25,7 +25,7 @@ subroutine inputSPHConfig
         if(packagingIterations) then
             write(*,*) "BIPI algorithm implemented, press enter to now use BIPI config as input"
             !set external CAD input to type 5 
-            ExtInputMeshType = 5
+           ! ExtInputMeshType = 5
             packagingIterations = .false.
             
             call inputExt

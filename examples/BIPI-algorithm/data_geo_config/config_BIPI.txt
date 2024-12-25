@@ -1,4 +1,4 @@
-save_step 100
+save_packing 1
 dx_r 1.D-2
 packagingIterations 0
 pack_step2a 5000

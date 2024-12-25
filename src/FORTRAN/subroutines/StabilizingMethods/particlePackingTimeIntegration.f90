@@ -12,7 +12,8 @@ subroutine particlePackingTimeIntegration
 
 use config_parameter, only: SPH_dim, pi, DataConfigPath, &
     & print_step, save_step, hsml_const, dx_r, &
-    & pack_step2a, pack_step2b, pack_step2c, shorten_step2a, shorten_step2c
+    & pack_step2a, pack_step2b, pack_step2c, &
+    & shorten_step2a, shorten_step2c, save_packing
 use particle_data, only: nreal, w_aa, w, dwdx, &
         & gamma_discrt, gamma_cont, del_gamma_as, del_gamma, &
         & xi1_mat, beta_mat,gamma_mat,xi_cont_mat, &
@@ -263,7 +264,7 @@ do while (packing_in_progress)
     cur_tt= dble((ic2-ic1)/real(crate1))
     !write(*,*) iterstep, " : ", cur_tt 
 
-    call outputPacking(iterstep,1,TPD,delC_avg)
+    if( save_packing .gt. 0) call outputPacking(iterstep,save_packing,TPD,delC_avg)
     
     !Use TPD for step2a convergence criteria
     if(iterstep .eq. 1) then

@@ -60,19 +60,10 @@ pBC_epair_s=0
 ! this code also displays the algorithm used
 if (nnes.eq.1) then 
     call direct_edge_find
-    if (mod(itimestep,print_step).eq.0)   then
-        write(*,'(A)') 'direct_find for edge + particle pair has been called!'
-        write(*,*) ' Total number of particle edge itneractions =', eniac
-        write(*,*) ' Total number of periodic particle edge itneractions =', pbc_eniac
-    endif
-    
+
 elseif (nnes .eq. 2) then
     call linkedList_edge_find
-    if (mod(itimestep,print_step).eq.0)   then
-        write(*,'(A)') 'linkedList for edge + particle pair has been called!'
-        write(*,*) ' Total number of particle edge itneractions =', eniac
-        write(*,*) ' Total number of periodic particle edge itneractions =', pbc_eniac
-    endif
+
 endif
 
 end

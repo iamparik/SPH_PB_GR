@@ -65,7 +65,7 @@ module config_parameter
         
 ! Below are variables that can be defiend at run time
     public  SPH_dim, skf, eos, solver_type, &
-        & time_step,print_step,save_step,backup_step, dx_r, ExtInputMeshType, packagingIterations,  &
+        & time_step,print_step,save_step,save_packing, backup_step, dx_r, ExtInputMeshType, packagingIterations,  &
         & hsml_const, rho_init, mu_const, ref_vel_max, c_sound, F_ext,  &
         & NumericalSimCase,  timeIntegrationScheme, SumDenstype, summationDensity, artViscType, MLS_density_bound,  &
         & MLS_step,BILtype, PrsrGradtype,PSTCoeff, ConDivtype, densDiffType, delta_SPH, prsrBdryType, HG_density_correction,PSTtype, &
@@ -104,9 +104,13 @@ module config_parameter
     
     integer(4) :: save_step
     
+    integer(4) :: save_packing
+    
+    integer(4) :: backup_step
+    
     real(8) :: dx_r
     
-    integer(4), parameter :: ExtInputMeshType = 2
+    integer(4), parameter :: ExtInputMeshType =2
     
     logical :: packagingIterations
     
@@ -154,7 +158,7 @@ module config_parameter
     
     integer(4), parameter  :: PSTtype = 0
         
-    integer(4), parameter  :: PST_step = 1
+    integer(4)  :: PST_step = 1
     
     real(8) :: PSTCoeff
     
@@ -201,7 +205,7 @@ module config_parameter
         character(50) :: param_name
         real(8) :: param_value
 
-        filename = 'data_geo_config/config_data.txt'
+        filename = 'data_geo_config/config_BIPI.txt'
         open(unit=10, file=filename, status='old', action='read', iostat=io_status)
 
         do
@@ -227,7 +231,8 @@ module config_parameter
 
         ! Set the corresponding parameter based on its name
         select case (trim(param_name))
-            case ('save_step')
+            case ('save_packing')
+                save_packing = param_value
                 save_step= param_value
                 print_step= param_value
             case ('dx_r')

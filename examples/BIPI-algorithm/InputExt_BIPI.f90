@@ -20,7 +20,7 @@
     
     implicit none
     real(8) tempType
-    integer(4) k,d,s,ke,k_int_pt,i , additionalParticles
+    integer(4) k,d,s,ke,k_int_pt,i
     real(8)  mn, scale_k
     integer(4) nreal_mesh, nrealCartesian
     real(8) totVol, x_ve_temp(SPH_dim,SPH_dim), len_bulkBdry, len_domainBdry
@@ -43,7 +43,7 @@
     ! maximum number of edges and particles
     maxedge=int((len_bulkBdry/dx_r)*(dble(edge_to_dx_ratio)*5.D0+1.D0)) ! *2.D0 is used to account for the 2X vertices of issue #48
     maxnv=10*maxedge 
-    maxn= max(nreal_mesh, nrealCartesian)+ maxedge +additionalParticles
+    maxn= max(nreal_mesh, nrealCartesian)+ maxedge
     
     !variables required to define geometry are particle propoerties are allocated
     ALLOCATE(x(SPH_dim,maxn))
@@ -51,7 +51,6 @@
     
     ! The allocatable variables are now initialized
     x=0.D0
-    mass=0.D0
     vol=0.D0
     hsml=0.D0
     itype=0
@@ -66,7 +65,7 @@
     do while (.not.eof(1))
         k=k+1
         read(1,*) tempType, (x(d, k), d=1,SPH_dim), vol(k)  
-        itype(k) = int(tempType(k))
+        itype(k) = int(tempType)
     enddo
 
     nreal=k ! I can distinguish nreal and nedge here if needed
@@ -86,23 +85,6 @@
     write(*,*)'      Total number of boundary segments : ', etotal    	
     write(*,*)'**************************************************'      
 
-    ! Define the tangent for the periodic boundary, 
-    ! One needs to make sure the normals of the boundary should be pointing awat from
-    ! real domain for below to work
-    !Now, to determine the tangential sense of the periodic edges we calcualte tangent_pBC
-    if (allocated(pBC_edges)) then
-        Allocate(tangent_pBC(SPH_dim,2,1))
-        tangent_pBC(1,1,1)= x_ve(1,edge(2,pBC_edges(1,1)))- x_ve(1,edge(1,pBC_edges(1,1)))
-        tangent_pBC(2,1,1)= x_ve(2,edge(2,pBC_edges(1,1)))- x_ve(2,edge(1,pBC_edges(1,1)))
-        mn= norm2(tangent_pBC(:,1,1))
-        tangent_pBC(:,1,1)=tangent_pBC(:,1,1)/mn
-        
-        ! We change the tengent direction of one of the periodic edge of a given pair.
-        tangent_pBC(1,2,1)= x_ve(1,edge(1,pBC_edges(2,1)))- x_ve(1,edge(2,pBC_edges(2,1)))
-        tangent_pBC(2,2,1)= x_ve(2,edge(1,pBC_edges(2,1)))- x_ve(2,edge(2,pBC_edges(2,1)))
-        mn= norm2(tangent_pBC(:,2,1))
-        tangent_pBC(:,2,1)=tangent_pBC(:,2,1)/mn
-    endif
 
     !val_integ_pts initialized using maximum pts per edge times the number of edges
     ! here we use one itnegration pt per edge, hence 1*maxedge
@@ -147,8 +129,8 @@
     ntotal=nreal ! + nvirtual_points
     
     ! Maximum interactions for particle-particle and edge_temp-particle is defined
-    max_interaction= ceiling(edge_to_dx_ratio)*maxn*(ceiling((hsml_const/dx_r)*scale_k*2))**SPH_dim
-    max_e_interaction= ceiling(edge_to_dx_ratio)*maxedge*(ceiling((hsml_const/dx_r)*scale_k*2))**SPH_dim 
+    max_interaction= edge_to_dx_ratio*maxn*(ceiling((hsml_const/dx_r)*scale_k*2))**SPH_dim
+    max_e_interaction= edge_to_dx_ratio*maxedge*(ceiling((hsml_const/dx_r)*scale_k*2))**SPH_dim 
 
     write(*,*) "maximum particle-particle and particle-point interaction defined : ",max_interaction
     write(*,*) "maximum particle-edge_temp interaction defined : ",max_e_interaction
@@ -168,7 +150,8 @@
         hsml(k)=hsml_const
     enddo
     
-    call OutputSetup
+    !call OutputSetup
+    !needed i=only to debug
 
     ! Now perform the particle packing algorithm 
      call particlePackingTimeIntegration  

@@ -118,7 +118,7 @@ subroutine inputCADtoEdgeData(s, max_edge, input_file_name, avgEdgeSize_ratio )
                     write(*,*) "Increase value of max edge and rerun simulation"
                     write(*,*) "current maxedge =", max_edge 
                     write(*,*) "current num_vertex_pts =", num_vertex_pts 
-                    write(*,*) "Paused in do i = 1, num_divisions loop inside inputCADtoEdgeData"
+                    write(*,*) "Exception handled in do i = 1, num_divisions loop inside inputCADtoEdgeData"
                     pause
                 endif
                 

@@ -25,7 +25,7 @@ subroutine  outputPacking(iterStep, saveStep, TPD, delC_avg)
     real(8) :: TPD, delC_avg
     logical :: text_print
 
-    if (iterStep .eq. 1) call createOutputFolder(dataPackingPath)
+    if (iterStep .eq. saveStep) call createOutputFolder(dataPackingPath)
     
 !     output result as a continous plot against time   
     if (iterStep .eq. 1) then
