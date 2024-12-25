@@ -1,0 +1,17 @@
+save_step 100
+dx_r 1.D-2
+packagingIterations 0
+pack_step2a 5000
+pack_step2b 6.D-1
+pack_step2c 1000
+shorten_step2a 1
+shorten_step2c 1
+hsml_const 2.D-2
+delta_SPH 0.1D0
+PST_step 1
+PSTCoeff 5.D-1
+delC_Cap 1.D-4
+nnps 2
+nnes 2
+edge_to_dx_ratio 10
+time_ev_par_op 1

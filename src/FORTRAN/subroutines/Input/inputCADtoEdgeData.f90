@@ -1,5 +1,5 @@
 subroutine inputCADtoEdgeData(s, max_edge, input_file_name, avgEdgeSize_ratio )
-    use config_parameter, only : SPH_dim, ExtInputMeshType, DataConfigPath, dx_r, etype_periodic, periodic_pairs, packagingIterations
+    use config_parameter, only : SPH_dim, DataConfigPath, dx_r, etype_periodic, periodic_pairs, packagingIterations
     use particle_data, only : x_ve, etype, edge, surf_norm, pBC_edges, ve_total, maxnv
     
     implicit none
