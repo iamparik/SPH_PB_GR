@@ -65,7 +65,7 @@ module config_parameter
         
 ! Below are variables that can be defiend at run time
     public  SPH_dim, skf, eos, solver_type, &
-        & time_step,print_step,save_step,backup_step, save_packing, dx_r, ExtInputMeshType, packagingIterations,  &
+        & time_step,print_step,save_step,save_packing, backup_step, dx_r, ExtInputMeshType, packagingIterations,  &
         & hsml_const, rho_init, mu_const, ref_vel_max, c_sound, F_ext,  &
         & NumericalSimCase,  timeIntegrationScheme, SumDenstype, summationDensity, artViscType, MLS_density_bound,  &
         & MLS_step,BILtype, PrsrGradtype,PSTCoeff, ConDivtype, densDiffType, delta_SPH, prsrBdryType, HG_density_correction,PSTtype, &
@@ -73,7 +73,7 @@ module config_parameter
         & time_ev_par_op, external_input_InitialCondition, P_EOS_extra
     
 !SPH_dim : Dimension of the problem (1, 2 or 3)    
-    integer(4) :: SPH_dim
+    integer(4), parameter :: SPH_dim = 2
     
 !Smoothing kernel function 
 !skf = 1, cubic spline kernel by W4 - Spline (Monaghan 1985)
@@ -81,7 +81,7 @@ module config_parameter
 !      3, Quintic kernel (Morris 1997)
 !	   4, yang
 !      5. Wendland Quintic Kernel
-    integer(4) :: skf
+    integer(4), parameter :: skf=5
     
 !Equation of State 
 !eos = 1, Gamma law for ideal gas
@@ -91,78 +91,80 @@ module config_parameter
 !      5, Tillotson Equation of State
 !      6, JWL & Mie-Gruneisen
 !      7, Soil (From H.H.Bui')
-    integer(4) :: eos
+    integer(4), parameter :: eos =2
     
 ! Solver for linear system of equations (of pressure poisson)
 ! solver_type = 0 for Direct solution of Poisson's equation
 !               1 for BICGSTAB2 method
-    integer(4) :: solver_type
+    integer(4), parameter :: solver_type =1
     
-    real(8) :: time_step
+    real(8) :: time_step = 2.5D-4
     
     integer(4) :: print_step
     
     integer(4) :: save_step
     
-    integer(4) :: save_packing=1
+    integer(4) :: save_packing
     
     integer(4) :: backup_step
     
     real(8) :: dx_r
     
-    integer(4) :: ExtInputMeshType
+    integer(4), parameter :: ExtInputMeshType =2
     
-    logical :: packagingIterations
+    logical :: packagingIterations = .true.
     
     real(8) :: hsml_const
     
-    real(8) :: rho_init
+    real(8) , parameter :: rho_init = 1000.D0
     
-    real(8) :: mu_const
+    real(8), parameter  :: mu_const = 0.D0
     
-    real(8) :: ref_vel_max
+    real(8), parameter :: ref_vel_max = 2.5D0
     
-    real(8) :: c_sound
+    real(8) :: c_sound = 20.D0
     
-    real(8), dimension(2) :: F_ext    
+    real(8), dimension(2), parameter  :: F_ext = 0.D0 
     
-    integer(4) :: NumericalSimCase
+    integer(4) , parameter :: NumericalSimCase = 4
     
-    integer(4) :: timeIntegrationScheme
+    integer(4), parameter  :: timeIntegrationScheme =1
     
-    integer(4) :: BILtype
+    integer(4) , parameter :: BILtype= 23
     
-    integer(4) :: PrsrGradtype
+    integer(4), parameter  :: PrsrGradtype = 31
     
-    integer(4) :: ConDivtype
+    integer(4), parameter  :: ConDivtype = 21
     
-    integer(4) :: SumDenstype
+    integer(4) , parameter :: SumDenstype = 6
     
-    logical :: summationDensity
+    logical, parameter  :: summationDensity = .false.
     
-    integer(4) :: artViscType
+    integer(4), parameter  :: artViscType = 0
     
-    logical :: MLS_density_bound
+    logical, parameter  :: MLS_density_bound = .false.
     
-    integer(4) :: MLS_step
+    integer(4), parameter :: MLS_step = 1
     
-    integer(4) :: densDiffType
+    integer(4), parameter :: densDiffType = 0
     
-    real(8) :: delta_SPH
+    real(8) :: delta_SPH =0.1D0
     
-    integer(4) :: prsrBdryType 
+    integer(4), parameter  :: prsrBdryType = 12
     
-    logical :: HG_density_correction
+    logical, parameter  :: HG_density_correction = .false.
     
-    logical :: FS_density_correction = .false.
+    logical, parameter :: FS_density_correction = .false.
     
-    integer(4) :: PSTtype
+    integer(4), parameter  :: PSTtype = 0
+        
+    integer(4)  :: PST_step = 1
     
     real(8) :: PSTCoeff
     
-    real(8) :: delC_Cap
+    real(8) :: delC_Cap = 1.D-4
     
-    logical :: WallBoundaryLayer
+    logical, parameter :: WallBoundaryLayer = 0
     
 !Nearest neighbor particle searching (nnps) method
 !nnps = 1 : Simplest and direct searching
@@ -172,7 +174,7 @@ module config_parameter
     
     integer(4) :: nnes
     
-    real(8) :: FScutoff
+    real(8), parameter :: FScutoff = 1.5D0
     
     integer(4) :: edge_to_dx_ratio
     
@@ -185,12 +187,11 @@ module config_parameter
     integer(4) :: pack_step2c
     
     logical :: shorten_step2c =.true.
-    
-    integer(4) :: PST_step
-    
+   
     logical :: time_ev_par_op =.false.
     
     logical :: external_input_InitialCondition = .false.
+    
     real(8) :: P_EOS_extra=0.D0
     
     !integer(4) :: calc_prsr_bdry_IDs(4) = (/6, 7, 8, 9/)
@@ -205,7 +206,7 @@ module config_parameter
         character(50) :: param_name
         real(8) :: param_value
 
-        filename = 'data_geo_config/config_data.txt'
+        filename = 'data_geo_config/config_BIPI.txt'
         open(unit=10, file=filename, status='old', action='read', iostat=io_status)
 
         do
@@ -221,52 +222,6 @@ module config_parameter
 
         close(10)        
         
-        ! Now you can use the parameters in the config_parameters module
-        write(*, *) 'SPH_dim = ', SPH_dim
-        write(*, *) 'skf = ', skf
-        write(*, *) 'eos = ', eos
-        write(*, *) 'poisson eqn solver_type = ', solver_type
-        write(*, *) 'time_step =  ', time_step
-        write(*, *) 'dx_r = ', dx_r
-        write(*,*)  'ExtInputMeshType = ', ExtInputMeshType
-        write(*, *) 'packagingIterations = ', packagingIterations
-        write(*, *) 'pack_step2a = ',  pack_step2a
-        write(*, *) 'pack_step2b = ',  pack_step2b
-        write(*, *) 'pack_step2c = ',  pack_step2c
-        write(*, *) 'hsml_const = ', hsml_const
-        write(*, *) 'rho_init = ', rho_init
-        write(*, *) 'mu_const = ', mu_const
-        write(*, *) 'ref_vel_max = ', ref_vel_max
-        write(*, *) 'c_sound = ', c_sound
-        write(*, *) 'F_ext = ', F_ext
-        write(*, *) 'NumericalSimCase = ', NumericalSimCase
-        write(*, *) 'timeIntegrationScheme = ', timeIntegrationScheme
-        write(*, *) 'BILtype = ', BILtype
-        write(*, *) 'PrsrGradtype = ', PrsrGradtype
-        write(*, *) 'ConDivtype = ', ConDivtype
-        write(*, *) 'SumDenstype = ', SumDenstype
-        write(*, *) 'summationDensity = ', summationDensity
-        write(*, *) 'artViscType = ', artViscType
-        write(*, *) 'MLS_density_bound = ', MLS_density_bound
-        write(*, *) 'MLS_step = ', MLS_step
-        write(*, *) 'densDiffType = ', densDiffType
-        write(*, *) 'delta_SPH = ', delta_SPH
-        write(*, *) 'prsrBdryType = ', prsrBdryType
-        write(*, *) 'HG_density_correction = ', HG_density_correction
-        write(*, *) 'FS_density_correction = ', FS_density_correction
-        write(*, *) 'PSTtype = ',PSTtype
-        write(*, *) 'PST_step = ',PST_step
-        write(*, *) 'PSTCoeff = ', PSTCoeff
-        write(*, *) 'WallBoundaryLayer = ', WallBoundaryLayer
-        write(*, *) 'nnps = ', nnps
-        write(*, *) 'nnes = ', nnes 
-        write(*,*) 'FScutoff = ' , FScutoff
-        write(*,*) 'edge_to_dx_ratio = ' , edge_to_dx_ratio
-        write(*,*) 'time_ev_par_op = ', time_ev_par_op
-        write(*,*) 'external_input_InitialCondition = ', external_input_InitialCondition
-        write(*,*) 'P_EOS_extra =', P_EOS_extra
-        
-        
     end subroutine read_config_file
     
     
@@ -277,32 +232,12 @@ module config_parameter
 
         ! Set the corresponding parameter based on its name
         select case (trim(param_name))
-            case ('SPH_dim')
-                SPH_dim = param_value
-            case ('skf')
-                skf = param_value
-            case ('eos')
-                eos = param_value
-            case ('solver_type')
-                solver_type = param_value
-            case ('time_step')
-                time_step = param_value
-            case ('print_step')
-                print_step= param_value
-            case ('save_step')
+            case ('save_packing')
+                save_packing = param_value
                 save_step= param_value
-            case ('backup_step')
-                backup_step= param_value
+                print_step= param_value
             case ('dx_r')
-                dx_r = param_value
-            case ('ExtInputMeshType')   
-                ExtInputMeshType = param_value
-            case ('packagingIterations')
-                if(param_value .eq. 0) then
-                    packagingIterations = .false.
-                else
-                    packagingIterations = .true.    
-                endif  
+                dx_r = param_value  
             case ('pack_step2a')
                 pack_step2a =param_value
             case ('pack_step2b')
@@ -323,107 +258,20 @@ module config_parameter
                 endif 
             case ('hsml_const')
                 hsml_const = param_value
-            case ('rho_init')
-                rho_init = param_value
-            case ('mu_const')
-                mu_const = param_value
-            case ('ref_vel_max')
-                ref_vel_max= param_value
-            case ('c_sound')
-                c_sound = param_value
-            case ('F_ext_x')
-                F_ext(1) = param_value
-            case ('F_ext_y')
-                F_ext(2) = param_value
-            case ('NumericalSimCase')
-                NumericalSimCase = param_value
-            case ('timeIntegrationScheme')
-                timeIntegrationScheme = param_value
-            case ('BILtype')
-                BILtype = param_value
-            case ('PrsrGradtype')
-                PrsrGradtype = param_value
-            case ('ConDivtype')
-                ConDivtype = param_value
-            case ('SumDenstype')
-                SumDenstype = param_value
-            case ('summationDensity')
-                if(param_value .eq. 0) then
-                    summationDensity = .false.
-                else
-                    summationDensity = .true.    
-                endif              
-            case ('artViscType')
-                artViscType = param_value
-            case ('MLS_density_bound')
-                if(param_value .eq. 0) then
-                    MLS_density_bound = .false.
-                else
-                    MLS_density_bound = .true.    
-                endif  
-            case ('MLS_step')
-                MLS_step = param_value
-            case ('densDiffType')
-                densDiffType = param_value
-            case ('delta_SPH')
-                delta_SPH = param_value
-            case ('prsrBdryType')
-                prsrBdryType = param_value
-            case ('HG_density_correction')
-                if(param_value .eq. 0) then
-                    HG_density_correction = .false.
-                else
-                    HG_density_correction = .true.    
-                endif  
-            case ('FS_density_correction')
-                if(param_value .eq. 0) then
-                    FS_density_correction = .false.
-                else
-                    FS_density_correction = .true.    
-                endif  
-            case ('PSTtype') 
-                PSTtype = param_value
-            case('PST_step')
-                PST_step = param_value
             case('PSTCoeff')
                 PSTCoeff = param_value
-            case('delC_Cap')
-                delC_Cap = param_value
-                
-            case ('WallBoundaryLayer')
-                if(param_value .eq. 0) then
-                    WallBoundaryLayer = .false.
-                else
-                    WallBoundaryLayer = .true.    
-                endif   
             case ('nnps') 
                 nnps = param_value
             case ('nnes') 
                 nnes = param_value
-            case ('FScutoff')
-                FScutoff = param_value
             case ('edge_to_dx_ratio')
                 edge_to_dx_ratio =param_value
-            case('time_ev_par_op')            
-                if(param_value .eq. 1) then
-                    time_ev_par_op = .true.
-                else
-                    time_ev_par_op = .false.    
-                endif
-            case ('external_input_InitialCondition')
-                if(param_value .eq. 1) then
-                    external_input_InitialCondition = .true.
-                else
-                    external_input_InitialCondition = .false.    
-                endif
-                
-             case('P_EOS_extra')
-                P_EOS_extra = param_value
-                
             case default
                 ! Handle unknown parameter name
                 write(*, *) 'Unknown parameter: ', trim(param_name)
-            end select           
+            end select   
+            
+            
            
     end subroutine set_parameter
 

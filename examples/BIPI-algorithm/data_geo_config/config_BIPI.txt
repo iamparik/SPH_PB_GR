@@ -1,0 +1,12 @@
+save_packing 1 
+dx_r 0.01
+pack_step2a 5000
+pack_step2b 0.6
+pack_step2c 1000
+shorten_step2a 1
+shorten_step2c 1
+hsml_const 0.02
+PSTCoeff 0.5
+nnps 2
+nnes 2
+edge_to_dx_ratio 10
