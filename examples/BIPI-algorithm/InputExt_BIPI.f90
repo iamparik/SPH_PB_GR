@@ -55,7 +55,7 @@
     hsml=0.D0
     itype=0
     
-
+    
     ! initialize particle number to 0  
     k=0
         

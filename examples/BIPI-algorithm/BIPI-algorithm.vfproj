@@ -58,8 +58,7 @@
 		<File RelativePath="..\..\src\FORTRAN\subroutines\CorrectionFactors\gamma_continuous_leroy.f90"/></Filter>
 		<Filter Name="InputFiles">
 		<File RelativePath="..\..\src\FORTRAN\subroutines\Input\inputCADtoEdgeData.f90"/>
-		<File RelativePath=".\InputExt_BIPI.f90"/>
-		<File RelativePath="..\..\src\FORTRAN\subroutines\Input\inputSPHConfig.f90"/></Filter>
+		<File RelativePath=".\InputExt_BIPI.f90"/></Filter>
 		<Filter Name="Modules">
 		<File RelativePath=".\config_parameter_BIPI.f90"/>
 		<File RelativePath="..\..\src\FORTRAN\module\particle_data.f90"/></Filter>

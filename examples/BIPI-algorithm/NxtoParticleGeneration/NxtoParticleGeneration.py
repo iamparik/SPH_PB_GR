@@ -133,7 +133,7 @@ def bulkBdryCase2D(input_file_directory,output_file_directory, dx, bdry_toleranc
     if os.path.exists(input_file_path):
         print(" ****************************\n bulkBdry.dat file is processed to : \n generate particles on background grid and \n to process boundary elements \n ****************************")
         
-        # Regular expressions for GRID and CQUAD4 lines
+        # Regular expressions for GRID and PLOTEL lines
         grid_pattern_oneD_Bulkbdry = re.compile(r'GRID,([\d.-]+),\d+,([Ee\d.+-]+),([Ee\d.+-]+),([Ee\d.+-]+),\d+')
         oneD_pattern_SolidWall_Bulkbdry = re.compile(r'PLOTEL,([\d.-]+),([\d.-]+),([\d.-]+)')
 

@@ -112,7 +112,7 @@ module config_parameter
     
     integer(4), parameter :: ExtInputMeshType =2
     
-    logical :: packagingIterations
+    logical :: packagingIterations = .true.
     
     real(8) :: hsml_const
     
@@ -162,7 +162,7 @@ module config_parameter
     
     real(8) :: PSTCoeff
     
-    real(8) :: delC_Cap
+    real(8) :: delC_Cap = 1.D-4
     
     logical, parameter :: WallBoundaryLayer = 0
     
@@ -191,6 +191,7 @@ module config_parameter
     logical :: time_ev_par_op =.false.
     
     logical :: external_input_InitialCondition = .false.
+    
     real(8) :: P_EOS_extra=0.D0
     
     !integer(4) :: calc_prsr_bdry_IDs(4) = (/6, 7, 8, 9/)
@@ -236,13 +237,7 @@ module config_parameter
                 save_step= param_value
                 print_step= param_value
             case ('dx_r')
-                dx_r = param_value
-            case ('packagingIterations')
-                if(param_value .eq. 0) then
-                    packagingIterations = .false.
-                else
-                    packagingIterations = .true.    
-                endif  
+                dx_r = param_value  
             case ('pack_step2a')
                 pack_step2a =param_value
             case ('pack_step2b')
@@ -263,26 +258,14 @@ module config_parameter
                 endif 
             case ('hsml_const')
                 hsml_const = param_value
-            case ('delta_SPH')
-                delta_SPH = param_value
-            case('PST_step')
-                PST_step = param_value
             case('PSTCoeff')
                 PSTCoeff = param_value
-            case('delC_Cap')
-                delC_Cap = param_value
             case ('nnps') 
                 nnps = param_value
             case ('nnes') 
                 nnes = param_value
             case ('edge_to_dx_ratio')
                 edge_to_dx_ratio =param_value
-            case('time_ev_par_op')            
-                if(param_value .eq. 1) then
-                    time_ev_par_op = .true.
-                else
-                    time_ev_par_op = .false.    
-                endif
             case default
                 ! Handle unknown parameter name
                 write(*, *) 'Unknown parameter: ', trim(param_name)

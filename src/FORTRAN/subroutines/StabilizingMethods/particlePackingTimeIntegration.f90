@@ -13,7 +13,7 @@ subroutine particlePackingTimeIntegration
 use config_parameter, only: SPH_dim, pi, DataConfigPath, &
     & print_step, save_step, hsml_const, dx_r, &
     & pack_step2a, pack_step2b, pack_step2c, &
-    & shorten_step2a, shorten_step2c, save_packing
+    & shorten_step2a, shorten_step2c, save_packing, PSTCoeff
 use particle_data, only: nreal, w_aa, w, dwdx, &
         & gamma_discrt, gamma_cont, del_gamma_as, del_gamma, &
         & xi1_mat, beta_mat,gamma_mat,xi_cont_mat, &
@@ -29,7 +29,8 @@ real(8) dt, xEdgeTemp(2,2), xrefPoint(2), xEdge_surfNorm(2),gamma_cutoff, scale_
 real(8) PP_Variable_prev, PP_Variable, grad_b_term, maxShift, w_dxr, delr(SPH_dim), &
     & extra_vec(SPH_dim), dstress(SPH_dim), dx_as, w_dxas, ps_pa, PSTShift, &
     & temp_matrix(SPH_dim,SPH_dim), temp_scalar, &
-    & time_elapsed, maxtime_elapsed, mintime_elapsed,cur_tt
+    & time_elapsed, maxtime_elapsed, mintime_elapsed,cur_tt, &
+    & rho_a, rho_b, mass_a, mass_b
 integer(4) iterstep, a, b, k,s,d, cutoff_step, step2a_iter,n_step2a, n_pack
 logical packing_in_progress
 logical, DIMENSION(:),ALLOCATABLE :: packableParticle,step2a_particle
@@ -160,7 +161,7 @@ do while (packing_in_progress)
     
 !Call the packaging algorithm
     ! Define the coeffecient of particle shifting technique used for packing particles
-    grad_b_term= 0.5D0*hsml_const**2.D0!
+    grad_b_term= PSTCoeff*hsml_const**2.D0!
     
     maxShift=0.5D0*dx_r !0.2D0* hsml_const !0.25D0*dx_r!0.25*dx_r
 
@@ -175,9 +176,14 @@ do while (packing_in_progress)
         b=pair_j(k)
 
         dCF= 1.D0
-    
+        
+        mass_a= 1.D0
+        mass_b=1.D0
+        rho_a=mass_a/vol(a)
+        rho_b= mass_b/vol(b)
+        
         ! Calculate particle-particle term for concentration gradient
-        call CorrectedScaGradPtoP(delC(:,a),delC(:,b),a,b,dCF,dCF,dwdx(:,k), mass(a), mass(b), rho(a), rho(b), &
+        call CorrectedScaGradPtoP(delC(:,a),delC(:,b),a,b,dCF,dCF,dwdx(:,k), mass_a, mass_b, rho_a, rho_b, &
                     & gamma_cont(a), temp_scalar, temp_matrix, temp_matrix, temp_matrix, &
                     & gamma_cont(b), temp_scalar, temp_matrix, temp_matrix, temp_matrix, &
                     & 0,0,SPH_dim, 1, 1) ! SPH_dim, correctionFactorID, grad_type
